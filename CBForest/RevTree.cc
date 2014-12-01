@@ -25,6 +25,11 @@
 #include <ostream>
 #include <sstream>
 
+#ifdef __ANDROID__
+#include <algorithm>    // for std::sort
+#include <arpa/inet.h>  // for htons & ntohs
+#endif // __ANDROID__
+
 #define offsetby(PTR,OFFSET) (void*)((uint8_t*)(PTR)+(OFFSET))
 
 

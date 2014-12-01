@@ -18,6 +18,9 @@
 #include "forestdb.h"
 #include <string.h>
 
+#ifdef __ANDROID__
+#include <algorithm>
+#endif // __ANDROID__
 
 namespace forestdb {
 

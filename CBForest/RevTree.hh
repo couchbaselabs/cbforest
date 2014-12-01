@@ -21,6 +21,12 @@
 #include "Database.hh"
 #include <vector>
 
+#ifdef __ANDROID__  
+// <stdint.h> is included, but UINT16_MAX is not defined. ???
+#ifndef UINT16_MAX
+#define UINT16_MAX  (65535)
+#endif // UINT16_MAX
+#endif // __ANDROID__
 
 namespace forestdb {
 
