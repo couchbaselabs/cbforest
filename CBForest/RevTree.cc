@@ -26,7 +26,6 @@
 #include <sstream>
 
 #ifdef __ANDROID__
-#include <algorithm>    // for std::sort
 #include <arpa/inet.h>  // for htons & ntohs
 #endif // __ANDROID__
 

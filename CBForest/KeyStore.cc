@@ -112,18 +112,14 @@ namespace forestdb {
             memcpy(keybuf, key.buf, key.size);
             key.buf = keybuf;
         }
-        // for GCC 4.9?? compiler
-        fdb_doc doc;
-        doc.key = (void*)key.buf;
-        doc.keylen = key.size;
-        doc.meta = (void*)meta.buf;
-        doc.metalen = meta.size;
-        doc.body  = (void*)body.buf;
-        doc.bodylen = body.size;
-        doc.size_ondisk = 0;
-        doc.seqnum = 0;
-        doc.offset = 0;
-        doc.deleted = (bool)0;
+        fdb_doc doc = {
+            .key = (void*)key.buf,
+            .keylen = key.size,
+            .meta = (void*)meta.buf,
+            .metalen = meta.size,
+            .body  = (void*)body.buf,
+            .bodylen = body.size,
+        };
         check(fdb_set(_handle, &doc));
         if (meta.buf) {
             Log("DB %p: added %s --> %s (meta %s) (seq %llu)\n",
@@ -153,6 +149,11 @@ namespace forestdb {
             memcpy(keybuf, key.buf, key.size);
             key.buf = keybuf;
         }
+        fdb_doc doc = {
+            .keylen = key.size,
+            .key = (void*)key.buf,
+        };
+        /*
         // for GCC 4.9?? compiler
         fdb_doc doc;
         doc.key = (void*)key.buf;
@@ -164,7 +165,8 @@ namespace forestdb {
         doc.size_ondisk = 0;
         doc.seqnum = 0;
         doc.offset = 0;
-        doc.deleted = (bool)0;      
+        doc.deleted = (bool)0;   
+        */   
         return checkGet(fdb_del(_handle, &doc));
     }
 

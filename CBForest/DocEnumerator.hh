@@ -16,13 +16,6 @@
 #ifndef CBForest_DocEnumerator_hh
 #define CBForest_DocEnumerator_hh
 
-#ifdef __ANDROID__
-// <stdint.h> is included, but UINT64_MAX is not defined. ???
-#ifndef UINT64_MAX
-#define UINT64_MAX       (__UINT64_C(18446744073709551615))
-#endif // UINT64_MAX
-#endif // __ANDROID__
-
 #include "Document.hh"
 
 namespace forestdb {
