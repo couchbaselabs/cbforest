@@ -90,6 +90,7 @@ namespace forestdb {
         memcpy((void*)&meta[1], revID.buf, revID.size);
     }
 
+    // overrides RevTree method
     bool VersionedDocument::isBodyOfRevisionAvailable(const Revision* rev, uint64_t atOffset) const {
         if (RevTree::isBodyOfRevisionAvailable(rev, atOffset))
             return true;
@@ -102,6 +103,7 @@ namespace forestdb {
         return (oldRev && RevTree::isBodyOfRevisionAvailable(oldRev, atOffset));
     }
 
+    // overrides RevTree method
     alloc_slice VersionedDocument::readBodyOfRevision(const Revision* rev, uint64_t atOffset) const {
         if (RevTree::isBodyOfRevisionAvailable(rev, atOffset))
             return RevTree::readBodyOfRevision(rev, atOffset);
@@ -119,6 +121,20 @@ namespace forestdb {
     void VersionedDocument::save(Transaction& transaction) {
         if (!_changed)
             return;
+
+        for (auto rev = allRevisions().begin(); rev != allRevisions().end(); ++rev) {
+#if 1
+            const Revision* parent = rev->parent();
+            if (parent && parent->inlineBody().size > 0)
+                parent->compressAsDeltaFrom(&*rev);
+#else
+            // Remove bodies of any already-saved revs that are no longer leaves:
+            if (rev->inlineBody().size > 0 && !(rev->isLeaf() || rev->isNew())) {
+                rev->removeBody();
+            }
+#endif
+        }
+
         updateMeta();
         // Don't call _doc.setBody() because it'll invalidate all the pointers from Revisions into
         // the existing body buffer.

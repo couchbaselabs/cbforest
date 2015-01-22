@@ -115,4 +115,82 @@ static revidBuffer stringToRev(NSString* str) {
     AssertEq(v.currentRevisions()[0], v.currentRevision());
 }
 
+- (void) test04_MultipleRevisions {
+    // Create first revision:
+    int httpStatus;
+    NSString *docID = @"foo";
+    NSString *body1 = @"{\"type\":\"test\",\"hello\":true}";
+    revidBuffer rev1ID(@"1-fadebead");
+    {
+        VersionedDocument v(*db, docID);
+        v.insert(rev1ID, nsstring_slice(body1), false, false, NULL, false, httpStatus);
+        AssertEq(httpStatus, 201);
+
+        Transaction t(db);
+        v.save(t);
+    }
+    // Create 2nd revision:
+    revidBuffer rev2ID(@"2-cafed00d");
+    NSString *body2 = @"{\"type\":\"test\",\"hello\":false}";
+    {
+        VersionedDocument v(*db, docID);
+        const Revision* rev1 = v[rev1ID];
+        Assert(rev1);
+        v.insert(rev2ID, nsstring_slice(body2), false, false, rev1, false, httpStatus);
+        AssertEq(httpStatus, 201);
+
+        Transaction t(db);
+        v.save(t);
+    }
+    // Create 3rd revision:
+    revidBuffer rev3ID(@"3-feed1337");
+    NSString *body3 = @"{\"type\":\"test\",\"hello\":-1,\"sum\":5}";
+    {
+        VersionedDocument v(*db, docID);
+        const Revision* rev2 = v[0];
+        Assert(rev2);
+        AssertEq(rev2->revID, rev2ID);
+        v.insert(rev3ID, nsstring_slice(body3), false, false, rev2, false, httpStatus);
+        AssertEq(httpStatus, 201);
+
+        Transaction t(db);
+        v.save(t);
+    }
+    // Read back doc and check both revisions:
+    {
+        VersionedDocument v(*db, docID);
+        const Revision* rev = v[rev1ID];
+        Assert(rev);
+        AssertEq(rev->revID, rev1ID);
+        Assert(!rev->isLeaf());
+        Assert(!rev->isDeleted());
+        Assert(!rev->hasAttachments());
+        Assert(!rev->isNew());
+        Assert(rev->isCompressed());
+        alloc_slice body = rev->readBody();
+        AssertEqual((NSString*)body, body1);
+
+        rev = v[rev2ID];
+        Assert(rev);
+        Assert(!rev->isLeaf());
+        Assert(!rev->isDeleted());
+        Assert(!rev->hasAttachments());
+        Assert(!rev->isNew());
+        Assert(rev->isCompressed());
+        body = rev->readBody();
+        AssertEqual((NSString*)body, body2);
+
+        rev = v[rev3ID];
+        Assert(rev);
+        Assert(rev->isLeaf());
+        Assert(!rev->isDeleted());
+        Assert(!rev->hasAttachments());
+        Assert(!rev->isNew());
+        Assert(!rev->isCompressed());
+        body = rev->readBody();
+        AssertEqual((NSString*)body, body3);
+    }
+}
+
+
 @end

@@ -30,7 +30,7 @@ namespace forestdb {
     /** In-memory representation of a single revision's metadata. */
     class Revision {
     public:
-        const RevTree*  owner;
+        RevTree*        owner;
         revid           revID;      /**< Revision ID (compressed) */
         fdb_seqnum_t    sequence;   /**< DB sequence number that this revision has/had */
 
@@ -51,7 +51,9 @@ namespace forestdb {
 
         bool operator< (const Revision& rev) const;
 
-        void compressWithReference(const Revision* reference)   {owner->compress(this, reference);}
+        inline bool compressAsDeltaFrom(const Revision* reference) const;
+        inline bool decompress() const;
+        inline bool removeBody() const;
 
     private:
         enum Flags : uint8_t {
@@ -136,7 +138,6 @@ namespace forestdb {
     protected:
         virtual bool isBodyOfRevisionAvailable(const Revision*, uint64_t atOffset) const;
         virtual alloc_slice readBodyOfRevision(const Revision*, uint64_t atOffset) const;
-        virtual void compress(Revision* target, const Revision* reference);
 #if DEBUG
         virtual void dump(std::ostream&);
 #endif
@@ -145,8 +146,12 @@ namespace forestdb {
         friend class Revision;
         const Revision* _insert(revid, slice body, const Revision *parentRev,
                                 bool deleted, bool hasAttachments);
-        bool confirmLeaf(Revision* testRev);
+        void replaceBody(Revision*, alloc_slice&);
+        bool confirmLeaf(Revision*);
         void compact();
+        bool compress(Revision* target, const Revision* reference);
+        bool decompress(Revision*);
+        bool removeBody(Revision*);
         RevTree(const RevTree&); // forbidden
 
         uint64_t    _bodyOffset;     // File offset of body this tree was read from
@@ -166,8 +171,18 @@ namespace forestdb {
         return owner->readBodyOfRevision(this, oldBodyOffset);
     }
     inline slice Revision::inlineBody() const {
-        return body;
+        return isCompressed() ? slice::null : body;
     }
+    inline bool Revision::compressAsDeltaFrom(const Revision* reference) const {
+        return owner->compress(const_cast<Revision*>(this), reference);
+    }
+    inline bool Revision::decompress() const {
+        return owner->decompress(const_cast<Revision*>(this));
+    }
+    inline bool Revision::removeBody() const {
+        return owner->removeBody(const_cast<Revision*>(this));
+    }
+
 
 }
 

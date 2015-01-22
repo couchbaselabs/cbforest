@@ -114,10 +114,8 @@ namespace forestdb {
         for (auto rev = _revs.begin(); rev != _revs.end(); ++rev) {
             if (rev->body.size > 0 && !(rev->isLeaf() || rev->isNew())) {
                 // Prune body of an already-saved rev that's no longer a leaf:
-                rev->body.buf = NULL;
-                rev->body.size = 0;
-                assert(_bodyOffset > 0);
-                rev->oldBodyOffset = _bodyOffset;
+                alloc_slice empty;
+                replaceBody(&*rev, empty);
             }
             size += rev->sizeToWrite();
         }
@@ -291,9 +289,23 @@ namespace forestdb {
     }
 
     alloc_slice RevTree::readBodyOfRevision(const Revision* rev, uint64_t atOffset) const {
-        if (rev->body.buf != NULL)
+        if (rev->body.buf == NULL)
+            return alloc_slice();
+        else if (!rev->isCompressed())
             return alloc_slice(rev->body);
-        return alloc_slice(); // VersionedDocument overrides this
+        else {
+            // Expand delta-compressed body:
+            const Revision* referenceRev = &_revs[rev->deltaRefIndex];
+            slice inlineReference = referenceRev->inlineBody();
+            if (inlineReference.buf != NULL) {
+                return ApplyDelta(inlineReference, rev->body);
+            } else {
+                alloc_slice loadedReference = referenceRev->readBody();
+                if (!loadedReference.buf)
+                    return loadedReference; // failed to read parent
+                return ApplyDelta(loadedReference, rev->body);
+            }
+        }
     }
 
     bool RevTree::confirmLeaf(Revision* testRev) {
@@ -437,25 +449,70 @@ namespace forestdb {
         return commonAncestorIndex;
     }
 
-    void RevTree::compress(Revision* target, const Revision* reference) {
-        if (target->isCompressed())
-            return;
+#pragma mark - COMPRESSING / REMOVING REVISION BODIES:
+
+    // low-level subroutine
+    void RevTree::replaceBody(Revision* rev, alloc_slice& body) {
+        if (body.buf) {
+            _insertedData.push_back(body);
+        } else {
+            if (!rev->body.buf)
+                return; // no-op
+            assert(_bodyOffset > 0);
+            rev->oldBodyOffset = _bodyOffset; // remember the offset of the doc where body existed
+        }
+        rev->body = body;
+        _changed = true;
+    }
+
+    bool RevTree::removeBody(Revision* rev) {
+        if (!rev->body.buf)
+            return true;
+        // If this rev is the reference of a compressed revision, expand the target:
+        unsigned index = rev->index();
+        for (auto otherRev = _revs.begin(); otherRev != _revs.end(); ++otherRev) {
+            if (otherRev->deltaRefIndex == index) {
+                if (!decompress(&*otherRev))
+                    return false;
+            }
+        }
+        alloc_slice empty;
+        replaceBody(rev, empty);
+        return true;
+    }
+
+    bool RevTree::compress(Revision* target, const Revision* reference) {
         assert(reference != NULL);
         assert(reference->owner == this);
         assert(reference != target);
 
+        if (target->isCompressed())
+            return true;
         // Make sure there won't be a cycle:
         for (const Revision* rev = reference; rev->isCompressed(); rev = &_revs[rev->deltaRefIndex])
-            assert(rev != target);
+            if(rev == target)
+                return false;
 
         alloc_slice targetData = target->readBody();
         alloc_slice referenceData = reference->readBody();
         alloc_slice delta = CreateDelta(referenceData, targetData);
+        if (!delta.buf)
+            return false;
 
-        _insertedData.push_back(delta);
-        target->body = delta;
+        replaceBody(target, delta);
         target->deltaRefIndex = (uint16_t)reference->index();
-        _changed = true;
+        return true;
+    }
+
+    bool RevTree::decompress(Revision* rev) {
+        if (!rev->isCompressed())
+            return true;
+        alloc_slice body = rev->readBody();
+        if (!body.buf)
+            return false;
+        replaceBody(rev, body);
+        rev->deltaRefIndex = Revision::kNoParent;
+        return true;
     }
 
     unsigned RevTree::prune(unsigned maxDepth) {
