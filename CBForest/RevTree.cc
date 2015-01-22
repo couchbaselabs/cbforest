@@ -15,6 +15,8 @@
 
 #include "RevTree.hh"
 #include "varint.hh"
+#include "Delta.hh"
+
 #include <forestdb.h>
 #include <arpa/inet.h>  // for htons, etc.
 #include <assert.h>
@@ -33,8 +35,7 @@ namespace forestdb {
 
     // Layout of revision rev in encoded form. Tree is a sequence of these followed by a 32-bit zero.
     // Revs are stored in decending priority, with the current leaf rev(s) coming first.
-    class RawRevision {
-    public:
+    struct RawRevision {
         // Private RevisionFlags bits used in encoded form:
         enum : uint8_t {
             kPublicPersistentFlags = (Revision::kLeaf | Revision::kDeleted | Revision::kHasAttachments),
@@ -44,16 +45,16 @@ namespace forestdb {
         
         uint32_t        size;           // Total size of this tree rev
         uint16_t        parentIndex;
+        uint16_t        deltaRefIndex;
         uint8_t         flags;
         uint8_t         revIDLen;
         char            revID[1];       // actual size is [revIDLen]
         // These follow the revID:
         // varint       sequence
         // if HasData flag:
-        //    char      data[];       // Contains the revision body (JSON)
-        // else:
-        //    varint    oldBodyOffset;  // Points to doc that has the body (0 if none)
-        //    varint    body_size;
+        //    char      data[];         // Contains the revision body (JSON)
+        // else if HasBodyOffset flag:
+        //    varint    oldBodyOffset;  // File offset of doc that has the body
 
         bool isValid() const {
             return size != 0;
@@ -148,6 +149,7 @@ namespace forestdb {
         dst->revIDLen = (uint8_t)this->revID.size;
         memcpy(dst->revID, this->revID.buf, this->revID.size);
         dst->parentIndex = htons(this->parentIndex);
+        dst->deltaRefIndex = htons(this->deltaRefIndex);
 
         uint8_t dstFlags = this->flags & RawRevision::kPublicPersistentFlags;
         if (this->body.size > 0)
@@ -173,6 +175,7 @@ namespace forestdb {
         this->revID.size = src->revIDLen;
         this->flags = (Flags)(src->flags & RawRevision::kPublicPersistentFlags);
         this->parentIndex = ntohs(src->parentIndex);
+        this->deltaRefIndex = ntohs(src->deltaRefIndex);
         const void *data = offsetby(&src->revID, src->revIDLen);
         ptrdiff_t len = (uint8_t*)end-(uint8_t*)data;
         data = offsetby(data, GetUVarInt(slice(data, len), &this->sequence));
@@ -185,8 +188,7 @@ namespace forestdb {
             this->body.size = 0;
             if (src->flags & RawRevision::kHasBodyOffset) {
                 slice buf = {(void*)data, (size_t)((uint8_t*)end-(uint8_t*)data)};
-                size_t nBytes = GetUVarInt(buf, &this->oldBodyOffset);
-                buf.moveStart(nBytes);
+                GetUVarInt(buf, &this->oldBodyOffset);
             }
         }
     }
@@ -333,6 +335,7 @@ namespace forestdb {
             newRev.addFlag(Revision::kHasAttachments);
 
         newRev.parentIndex = Revision::kNoParent;
+        newRev.deltaRefIndex = Revision::kNoParent;
         if (parentRev) {
             ptrdiff_t parentIndex = parentRev->index();
             newRev.parentIndex = (uint16_t)parentIndex;
@@ -434,6 +437,27 @@ namespace forestdb {
         return commonAncestorIndex;
     }
 
+    void RevTree::compress(Revision* target, const Revision* reference) {
+        if (target->isCompressed())
+            return;
+        assert(reference != NULL);
+        assert(reference->owner == this);
+        assert(reference != target);
+
+        // Make sure there won't be a cycle:
+        for (const Revision* rev = reference; rev->isCompressed(); rev = &_revs[rev->deltaRefIndex])
+            assert(rev != target);
+
+        alloc_slice targetData = target->readBody();
+        alloc_slice referenceData = reference->readBody();
+        alloc_slice delta = CreateDelta(referenceData, targetData);
+
+        _insertedData.push_back(delta);
+        target->body = delta;
+        target->deltaRefIndex = (uint16_t)reference->index();
+        _changed = true;
+    }
+
     unsigned RevTree::prune(unsigned maxDepth) {
         if (maxDepth == 0 || _revs.size() <= maxDepth)
             return 0;
@@ -495,6 +519,8 @@ namespace forestdb {
             if (rev->revID.size > 0) {
                 if (rev->parentIndex != Revision::kNoParent)
                     rev->parentIndex = map[rev->parentIndex];
+                if (rev->deltaRefIndex != Revision::kNoParent)
+                    rev->deltaRefIndex = map[rev->deltaRefIndex];
                 if (dst != rev)
                     *dst = *rev;
                 dst++;
@@ -546,8 +572,12 @@ namespace forestdb {
             uint16_t parent = oldParents[oldIndex];
             if (parent != Revision::kNoParent)
                 parent = oldToNew[parent];
-                _revs[i].parentIndex = parent;
-                }
+            _revs[i].parentIndex = parent;
+
+            uint16_t deltaRefIndex = _revs[i].deltaRefIndex;
+            if (deltaRefIndex != Revision::kNoParent)
+                _revs[i].deltaRefIndex = oldToNew[deltaRefIndex];
+        }
         _sorted = true;
     }
 

@@ -25,7 +25,7 @@
 namespace forestdb {
 
     class RevTree;
-    class RawRevision;
+    struct RawRevision;
 
     /** In-memory representation of a single revision's metadata. */
     class Revision {
@@ -33,9 +33,9 @@ namespace forestdb {
         const RevTree*  owner;
         revid           revID;      /**< Revision ID (compressed) */
         fdb_seqnum_t    sequence;   /**< DB sequence number that this revision has/had */
-        slice           body;       /**< Revision body (JSON), or empty if not stored in this tree */
 
         inline bool isBodyAvailable() const;
+        inline slice inlineBody() const;
         inline alloc_slice readBody() const;
 
         bool isLeaf() const         {return (flags & kLeaf) != 0;}
@@ -43,12 +43,15 @@ namespace forestdb {
         bool hasAttachments() const {return (flags & kHasAttachments) != 0;}
         bool isNew() const          {return (flags & kNew) != 0;}
         bool isActive() const       {return isLeaf() && !isDeleted();}
+        bool isCompressed() const   {return deltaRefIndex != kNoParent;}
 
         unsigned index() const;
         const Revision* parent() const;
         std::vector<const Revision*> history() const;
 
         bool operator< (const Revision& rev) const;
+
+        void compressWithReference(const Revision* reference)   {owner->compress(this, reference);}
 
     private:
         enum Flags : uint8_t {
@@ -60,8 +63,10 @@ namespace forestdb {
 
         static const uint16_t kNoParent = UINT16_MAX;
         
+        slice       body;           /**< Revision body (JSON), or empty if not stored inline */
         uint64_t    oldBodyOffset;  /**< File offset of doc containing revision body, or else 0 */
         uint16_t    parentIndex;    /**< Index in tree's rev[] array of parent revision, if any */
+        uint16_t    deltaRefIndex;  /**< Index of delta reference revision, if any */
         Flags       flags;          /**< Leaf/deleted flags */
 
         void read(const RawRevision *src);
@@ -73,7 +78,7 @@ namespace forestdb {
         void dump(std::ostream&);
 #endif
         friend class RevTree;
-        friend class RawRevision;
+        friend struct RawRevision;
     };
 
 
@@ -131,6 +136,7 @@ namespace forestdb {
     protected:
         virtual bool isBodyOfRevisionAvailable(const Revision*, uint64_t atOffset) const;
         virtual alloc_slice readBodyOfRevision(const Revision*, uint64_t atOffset) const;
+        virtual void compress(Revision* target, const Revision* reference);
 #if DEBUG
         virtual void dump(std::ostream&);
 #endif
@@ -158,6 +164,9 @@ namespace forestdb {
     }
     inline alloc_slice Revision::readBody() const {
         return owner->readBodyOfRevision(this, oldBodyOffset);
+    }
+    inline slice Revision::inlineBody() const {
+        return body;
     }
 
 }

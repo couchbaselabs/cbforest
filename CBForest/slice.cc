@@ -71,8 +71,17 @@ namespace forestdb {
 
     void* alloc_slice::alloc(const void* src, size_t s) {
         void* buf = ::malloc(s);
+        if (!buf)
+            throw std::bad_alloc();
         ::memcpy((void*)buf, src, s);
         return buf;
+    }
+
+    void alloc_slice::realloc(size_t newSize) {
+        void* newBuf = ::realloc((void*)buf, newSize);
+        if (!newBuf)
+            throw std::bad_alloc();
+        reset((char*)newBuf, ::free);
     }
 
     alloc_slice& alloc_slice::operator=(slice s) {

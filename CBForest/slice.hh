@@ -95,9 +95,15 @@ namespace forestdb {
         alloc_slice(std::string str)
             :std::shared_ptr<char>((char*)alloc(&str[0], str.length()),::free), slice(get(), str.length()) {}
 
+        static alloc_slice adopt(void* b, size_t s)    {return alloc_slice(b, s, true);}
+
         alloc_slice& operator=(slice);
 
+        void realloc(size_t newSize);
+
     private:
+        alloc_slice(void* b, size_t s, bool)  // adopts block b
+            :std::shared_ptr<char>((char*)b, ::free), slice(b,s) {}
         static void* alloc(const void* src, size_t size);
     };
 
