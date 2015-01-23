@@ -24,65 +24,8 @@
 
 namespace forestdb {
 
-    class RevTree;
+    class Revision;
     struct RawRevision;
-
-    /** In-memory representation of a single revision's metadata. */
-    class Revision {
-    public:
-        RevTree*        owner;
-        revid           revID;      /**< Revision ID (compressed) */
-        fdb_seqnum_t    sequence;   /**< DB sequence number that this revision has/had */
-
-        inline bool isBodyAvailable() const;
-        inline slice inlineBody() const;
-        inline alloc_slice readBody() const;
-
-        bool isLeaf() const         {return (flags & kLeaf) != 0;}
-        bool isDeleted() const      {return (flags & kDeleted) != 0;}
-        bool hasAttachments() const {return (flags & kHasAttachments) != 0;}
-        bool isNew() const          {return (flags & kNew) != 0;}
-        bool isActive() const       {return isLeaf() && !isDeleted();}
-        bool isCompressed() const   {return deltaRefIndex != kNoParent;}
-
-        unsigned index() const;
-        const Revision* parent() const;
-        std::vector<const Revision*> history() const;
-
-        bool operator< (const Revision& rev) const;
-
-        inline bool compressAsDeltaFrom(const Revision* reference) const;
-        inline bool decompress() const;
-        inline bool removeBody() const;
-
-    private:
-        enum Flags : uint8_t {
-            kDeleted        = 0x01, /**< Is this revision a deletion/tombstone? */
-            kLeaf           = 0x02, /**< Is this revision a leaf (no children?) */
-            kNew            = 0x04, /**< Has this rev been inserted since decoding? */
-            kHasAttachments = 0x08  /**< Does this rev's body contain attachments? */
-        };
-
-        static const uint16_t kNoParent = UINT16_MAX;
-        
-        slice       body;           /**< Revision body (JSON), or empty if not stored inline */
-        uint64_t    oldBodyOffset;  /**< File offset of doc containing revision body, or else 0 */
-        uint16_t    parentIndex;    /**< Index in tree's rev[] array of parent revision, if any */
-        uint16_t    deltaRefIndex;  /**< Index of delta reference revision, if any */
-        Flags       flags;          /**< Leaf/deleted flags */
-
-        void read(const RawRevision *src);
-        RawRevision* write(RawRevision* dst, uint64_t bodyOffset) const;
-        size_t sizeToWrite() const;
-        void addFlag(Flags f)      {flags = (Flags)(flags | f);}
-        void clearFlag(Flags f)    {flags = (Flags)(flags & ~f);}
-#if DEBUG
-        void dump(std::ostream&);
-#endif
-        friend class RevTree;
-        friend struct RawRevision;
-    };
-
 
     /** A serializable tree of Revisions. */
     class RevTree {
@@ -164,25 +107,70 @@ namespace forestdb {
     };
 
 
-    inline bool Revision::isBodyAvailable() const {
-        return owner->isBodyOfRevisionAvailable(this, oldBodyOffset);
-    }
-    inline alloc_slice Revision::readBody() const {
-        return owner->readBodyOfRevision(this, oldBodyOffset);
-    }
-    inline slice Revision::inlineBody() const {
-        return isCompressed() ? slice::null : body;
-    }
-    inline bool Revision::compressAsDeltaFrom(const Revision* reference) const {
-        return owner->compress(const_cast<Revision*>(this), reference);
-    }
-    inline bool Revision::decompress() const {
-        return owner->decompress(const_cast<Revision*>(this));
-    }
-    inline bool Revision::removeBody() const {
-        return owner->removeBody(const_cast<Revision*>(this));
-    }
+    /** In-memory representation of a single revision's metadata. */
+    class Revision {
+    public:
+        RevTree*        owner;
+        revid           revID;      /**< Revision ID (compressed) */
+        fdb_seqnum_t    sequence;   /**< DB sequence number that this revision has/had */
 
+        bool isBodyAvailable() const
+            { return owner->isBodyOfRevisionAvailable(this, oldBodyOffset); }
+        slice inlineBody() const
+            { return isCompressed() ? slice::null : body; }
+        alloc_slice readBody() const
+            { return owner->readBodyOfRevision(this, oldBodyOffset); }
+
+        bool isLeaf() const         {return (flags & kLeaf) != 0;}
+        bool isDeleted() const      {return (flags & kDeleted) != 0;}
+        bool hasAttachments() const {return (flags & kHasAttachments) != 0;}
+        bool isNew() const          {return (flags & kNew) != 0;}
+        bool isActive() const       {return isLeaf() && !isDeleted();}
+        bool isCompressed() const   {return deltaRefIndex != kNoParent;}
+
+        unsigned index() const;
+        const Revision* parent() const;
+        const Revision* deltaReference() const;
+        std::vector<const Revision*> history() const;
+
+        bool operator< (const Revision& rev) const;
+
+        bool removeBody() const
+            { return owner->removeBody(const_cast<Revision*>(this)); }
+        bool compressAsDeltaFrom(const Revision* reference) const
+            { return owner->compress(const_cast<Revision*>(this), reference); }
+        bool decompress() const
+            { return owner->decompress(const_cast<Revision*>(this)); }
+        alloc_slice generateZDeltaFrom(const Revision* reference) const;
+        alloc_slice applyZDelta(slice delta);
+
+    private:
+        enum Flags : uint8_t {
+            kDeleted        = 0x01, /**< Is this revision a deletion/tombstone? */
+            kLeaf           = 0x02, /**< Is this revision a leaf (no children?) */
+            kNew            = 0x04, /**< Has this rev been inserted since decoding? */
+            kHasAttachments = 0x08  /**< Does this rev's body contain attachments? */
+        };
+
+        static const uint16_t kNoParent = UINT16_MAX;
+
+        slice       body;           /**< Revision body (JSON), or empty if not stored inline */
+        uint64_t    oldBodyOffset;  /**< File offset of doc containing revision body, or else 0 */
+        uint16_t    parentIndex;    /**< Index in tree's rev[] array of parent revision, if any */
+        uint16_t    deltaRefIndex;  /**< Index of delta reference revision, if any */
+        Flags       flags;          /**< Leaf/deleted flags */
+
+        void read(const RawRevision *src);
+        RawRevision* write(RawRevision* dst, uint64_t bodyOffset) const;
+        size_t sizeToWrite() const;
+        void addFlag(Flags f)      {flags = (Flags)(flags | f);}
+        void clearFlag(Flags f)    {flags = (Flags)(flags & ~f);}
+#if DEBUG
+        void dump(std::ostream&);
+#endif
+        friend class RevTree;
+        friend struct RawRevision;
+    };
 
 }
 

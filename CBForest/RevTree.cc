@@ -277,6 +277,12 @@ namespace forestdb {
         return owner->get(parentIndex);
     }
 
+    const Revision* Revision::deltaReference() const {
+        if (deltaRefIndex == Revision::kNoParent)
+            return NULL;
+        return owner->get(deltaRefIndex);
+    }
+
     std::vector<const Revision*> Revision::history() const {
         std::vector<const Revision*> h;
         for (const Revision* rev = this; rev; rev = rev->parent())
@@ -291,20 +297,18 @@ namespace forestdb {
     alloc_slice RevTree::readBodyOfRevision(const Revision* rev, uint64_t atOffset) const {
         if (rev->body.buf == NULL)
             return alloc_slice();
-        else if (!rev->isCompressed())
+        const Revision* referenceRev = rev->deltaReference();
+        if (!referenceRev)
             return alloc_slice(rev->body);
-        else {
-            // Expand delta-compressed body:
-            const Revision* referenceRev = &_revs[rev->deltaRefIndex];
-            slice inlineReference = referenceRev->inlineBody();
-            if (inlineReference.buf != NULL) {
-                return ApplyDelta(inlineReference, rev->body);
-            } else {
-                alloc_slice loadedReference = referenceRev->readBody();
-                if (!loadedReference.buf)
-                    return loadedReference; // failed to read parent
-                return ApplyDelta(loadedReference, rev->body);
-            }
+        // Expand delta-compressed body:
+        slice inlineReference = referenceRev->inlineBody();
+        if (inlineReference.buf != NULL) {
+            return ApplyDelta(inlineReference, rev->body);
+        } else {
+            alloc_slice loadedReference = referenceRev->readBody();
+            if (!loadedReference.buf)
+                return loadedReference; // failed to read parent
+            return ApplyDelta(loadedReference, rev->body);
         }
     }
 
@@ -481,21 +485,42 @@ namespace forestdb {
         return true;
     }
 
-    bool RevTree::compress(Revision* target, const Revision* reference) {
+    alloc_slice Revision::generateZDeltaFrom(const Revision* reference) const {
         assert(reference != NULL);
-        assert(reference->owner == this);
-        assert(reference != target);
+        assert(reference->owner == this->owner);
+        assert(reference != this);
+        if (this->isCompressed() && this->deltaRefIndex == reference->index())
+            return alloc_slice(this->body);
+        alloc_slice targetData = this->readBody();
+        alloc_slice referenceData = reference->readBody();
+        if (!targetData.buf || !referenceData.buf)
+            return alloc_slice();
+        return CreateDelta(referenceData, targetData);
+    }
 
+    alloc_slice Revision::applyZDelta(slice delta) {
+        if (body.buf) {
+            if (!isCompressed()) {
+                // avoid memcpy overhead by not using an alloc_slice
+                return ApplyDelta(body, delta);
+            } else {
+                alloc_slice loadedReference = readBody();
+                if (loadedReference.buf)
+                    return ApplyDelta(loadedReference, delta);
+            }
+        }
+        return alloc_slice(); // failed
+    }
+
+    bool RevTree::compress(Revision* target, const Revision* reference) {
         if (target->isCompressed())
             return true;
         // Make sure there won't be a cycle:
-        for (const Revision* rev = reference; rev->isCompressed(); rev = &_revs[rev->deltaRefIndex])
-            if(rev == target)
+        for (const Revision* rev = reference; rev->isCompressed(); rev = rev->deltaReference())
+            if (rev == target)
                 return false;
 
-        alloc_slice targetData = target->readBody();
-        alloc_slice referenceData = reference->readBody();
-        alloc_slice delta = CreateDelta(referenceData, targetData);
+        alloc_slice delta = target->generateZDeltaFrom(reference);
         if (!delta.buf)
             return false;
 
