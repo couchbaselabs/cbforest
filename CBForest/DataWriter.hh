@@ -10,6 +10,7 @@
 #define __CBForest__DataWriter__
 
 #include "Data.hh"
+#include <ctime>
 #include <iostream>
 #include <unordered_map>
 
@@ -18,32 +19,42 @@ namespace forestdb {
 
     class dataWriter {
     public:
-        dataWriter(std::ostream&);
+        dataWriter(std::ostream&,
+                   const std::unordered_map<std::string, uint32_t> *externStrings = NULL);
 
-        dataWriter& writeNull();
-        dataWriter& writeBool (bool); // overriding <<(bool) is dangerous due to implicit conversion
+        void writeNull();
+        void writeBool (bool);
 
-        dataWriter& writeInt(int64_t);
-        dataWriter& writeFloat(float);
-        dataWriter& writeDouble(double);
+        void writeInt(int64_t);
+        void writeUInt(uint64_t);
+        void writeFloat(float);
+        void writeDouble(double);
 
-        dataWriter& writeString(std::string);
-        dataWriter& writeString(slice);
-        dataWriter& writeExternString(unsigned stringID);
+        void writeDate(std::time_t);
 
-        dataWriter& beginArray(uint64_t count);
-        dataWriter& endArray()                      {return *this;}
+        void writeString(std::string);
+        void writeString(slice);
 
-        dataWriter& beginDict(uint64_t count);
-        dataWriter& writeKey(std::string);
-        dataWriter& writeKey(slice);
-        dataWriter& endDict();
+        void writeData(slice);
 
-        dataWriter& operator<< (int64_t i)          {return writeInt(i);}
-        dataWriter& operator<< (double d)          {return writeDouble(d);}
-        dataWriter& operator<< (float f)          {return writeFloat(f);}
-        dataWriter& operator<< (std::string str)        {return writeString(str);}
-        dataWriter& operator<< (slice s)            {return writeString(s);}
+        void beginArray(uint64_t count);
+        void endArray()                             { }
+
+        void beginDict(uint64_t count);
+        void writeKey(std::string);
+        void writeKey(slice);
+        void endDict();
+
+        // Note: overriding <<(bool) would be dangerous due to implicit conversion
+        dataWriter& operator<< (int64_t i)          {writeInt(i); return *this;}
+        dataWriter& operator<< (double d)           {writeDouble(d); return *this;}
+        dataWriter& operator<< (float f)            {writeFloat(f); return *this;}
+        dataWriter& operator<< (std::string str)    {writeString(str); return *this;}
+        dataWriter& operator<< (slice s)            {writeString(s); return *this;}
+
+#ifdef __OBJC__
+        void write(id);
+#endif
 
     private:
         void addTypeCode(uint8_t code)              {_out.write((char*)&code, 1);}
@@ -53,6 +64,7 @@ namespace forestdb {
         size_t _indexPos;
         std::vector<size_t> _savedIndexPos;
         std::unordered_map<std::string, size_t> _sharedStrings;
+        const std::unordered_map<std::string, uint32_t> *_externStrings;
     };
 
 

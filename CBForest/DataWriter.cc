@@ -12,8 +12,12 @@
 
 namespace forestdb {
 
-    dataWriter::dataWriter(std::ostream& out)
-    :_out(out)
+    static size_t kMinSharedStringLength = 4, kMaxSharedStringLength = 100;
+
+    dataWriter::dataWriter(std::ostream& out,
+                           const std::unordered_map<std::string, uint32_t>* externStrings)
+    :_out(out),
+     _externStrings(externStrings)
     { }
 
     void dataWriter::addUVarint(uint64_t n) {
@@ -21,27 +25,25 @@ namespace forestdb {
         _out.write(buf, PutUVarInt(buf, n));
     }
 
-    dataWriter& dataWriter::writeNull() {
+    void dataWriter::writeNull() {
         addTypeCode(value::kNullCode);
-        return *this;
     }
 
-    dataWriter& dataWriter::writeBool(bool b) {
+    void dataWriter::writeBool(bool b) {
         addTypeCode(b ? value::kTrueCode : value::kFalseCode);
-        return *this;
     }
 
-    dataWriter& dataWriter::writeInt(int64_t i) {
+    void dataWriter::writeInt(int64_t i) {
         char buf[9];
         size_t size;
         memcpy(&buf[1], &i, 8);         //FIX: Endian conversion
-        if (i >= -0x80 && i < 0x80) {
+        if (i >= INT8_MIN && i <= INT8_MAX) {
             buf[0] = value::kInt8Code;
             size = 2;
-        } else if (i >= -0x8000 && i < 0x8000) {
+        } else if (i >= INT16_MIN && i <= INT16_MAX) {
             buf[0] = value::kInt16Code;
             size = 3;
-        } else if (i >= -0x80000000 && i < 0x80000000) {
+        } else if (i >= INT32_MIN && i <= INT32_MAX) {
             buf[0] = value::kInt32Code;
             size = 5;
         } else {
@@ -49,58 +51,87 @@ namespace forestdb {
             size = 9;
         }
         _out.write(buf, size);
-        return *this;
     }
 
-    dataWriter& dataWriter::writeDouble(double n) {
+    void dataWriter::writeUInt(uint64_t u) {
+        if (u < INT64_MAX)
+            return writeInt((int64_t)u);
+        addTypeCode(value::kUInt64Code);
+        _out.write((const char*)&u, 8);         //FIX: Endian conversion
+    }
+
+    void dataWriter::writeDouble(double n) {
+        if (n == (int64_t)n)
+            return writeInt((int64_t)n);
         addTypeCode(value::kFloat64Code);
         _out.write((const char*)&n, 8);         //FIX: Endian conversion
-        return *this;
     }
 
-    dataWriter& dataWriter::writeFloat(float n) {
+    void dataWriter::writeFloat(float n) {
+        if (n == (int32_t)n)
+            return writeInt((int32_t)n);
         addTypeCode(value::kFloat32Code);
         _out.write((const char*)&n, 4);         //FIX: Endian conversion
-        return *this;
     }
 
-    dataWriter& dataWriter::writeString(slice s) {
-        addTypeCode(value::kStringCode);
+    void dataWriter::writeDate(std::time_t dateTime) {
+        addTypeCode(value::kDateCode);
+        addUVarint(dateTime);
+    }
+
+    void dataWriter::writeData(slice s) {
+        addTypeCode(value::kDataCode);
         addUVarint(s.size);
         _out.write((const char*)s.buf, s.size);
-        return *this;
     }
 
-    dataWriter& dataWriter::writeString(std::string str) {
-        size_t offset = _sharedStrings[str];
-        size_t curOffset = _out.tellp();
-        if (offset > 0) {
-            addTypeCode(value::kSharedStringCode);
-            addUVarint(curOffset - offset);
-        } else {
-            size_t len = str.length();
-            addTypeCode(value::kStringCode);
-            addUVarint(len);
-            _out << str;
-            if (str.le)
+    void dataWriter::writeString(slice s) {
+        return writeString(std::string(s));
+    }
+
+    void dataWriter::writeString(std::string str) {
+        if (_externStrings) {
+            auto externID = _externStrings->find(str);
+            if (externID != _externStrings->end()) {
+                // Write reference to extern string:
+                addTypeCode(value::kExternStringRefCode);
+                addUVarint(externID->second);
+                return;
+            }
         }
-        return *this;
+
+        size_t len = str.length();
+        const bool shareable = (len >= kMinSharedStringLength && len <= kMaxSharedStringLength);
+        if (shareable) {
+            size_t curOffset = _out.tellp();
+            size_t sharedOffset = _sharedStrings[str];
+            if (sharedOffset > 0) {
+                // Change previous string opcode to shared:
+                auto pos = _out.tellp();
+                _out.seekp(sharedOffset);
+                addTypeCode(value::kSharedStringCode);
+                _out.seekp(pos);
+
+                // Write reference to previous string:
+                addTypeCode(value::kSharedStringRefCode);
+                addUVarint(curOffset - sharedOffset);
+                return;
+            }
+            _sharedStrings[str] = curOffset;
+        }
+
+        // First appearance, or unshareable, so write the string itself:
+        addTypeCode(value::kStringCode);
+        addUVarint(len);
+        _out << str;
     }
 
-    dataWriter& dataWriter::writeExternString(unsigned stringID) {
-        addTypeCode(value::kExternStringCode);
-        addUVarint(stringID);
-        return *this;
-    }
-
-
-    dataWriter& dataWriter::beginArray(uint64_t count) {
+    void dataWriter::beginArray(uint64_t count) {
         addTypeCode(value::kArrayCode);
         addUVarint(count);
-        return *this;
     }
 
-    dataWriter& dataWriter::beginDict(uint64_t count) {
+    void dataWriter::beginDict(uint64_t count) {
         addTypeCode(value::kDictCode);
         addUVarint(count);
         // Write an empty hash list:
@@ -109,10 +140,9 @@ namespace forestdb {
         uint16_t hash = 0;
         for (; count > 0; --count)
             _out.write((char*)&hash, sizeof(hash));
-        return *this;
     }
 
-    dataWriter& dataWriter::writeKey(slice s) {
+    void dataWriter::writeKey(std::string s) {
         // Go back and write the hash code to the index:
         uint16_t hashCode = dict::hashCode(s);
         uint64_t pos = _out.tellp();
@@ -122,17 +152,15 @@ namespace forestdb {
         _out.seekp(pos);
 
         writeString(s);
-        return *this;
     }
 
-    dataWriter& dataWriter::writeKey(std::string str) {
-        return writeKey(slice(str));
+    void dataWriter::writeKey(slice str) {
+        return writeKey(std::string(str));
     }
 
-    dataWriter& dataWriter::endDict() {
+    void dataWriter::endDict() {
         _indexPos = _savedIndexPos.back();
         _savedIndexPos.pop_back();
-        return *this;
     }
 
 }

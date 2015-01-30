@@ -21,7 +21,8 @@ namespace forestdb {
         kNumber, kNumber, kNumber, kNumber, kNumber,
         kNumber, kNumber,
         kNumber,
-        kString, kString, kString,
+        kDate,
+        kString, kString, kString, kString,
         kData,
         kArray,
         kDict
@@ -59,13 +60,15 @@ namespace forestdb {
         uint64_t param = getParam(end);
 
         switch (_typeCode) {
-            case kStringCode:
             case kRawNumberCode:
+            case kStringCode:
+            case kSharedStringCode:
             case kDataCode:
                 end += param;
                 break;
-            case kSharedStringCode:
-            case kExternStringCode:
+            case kDateCode:
+            case kSharedStringRefCode:
+            case kExternStringRefCode:
                 break;
             case kArrayCode: {
                 // This is somewhat expensive: have to traverse all values in the array
@@ -120,6 +123,8 @@ namespace forestdb {
                 return (int64_t) *(float*)_paramStart;
             case kFloat64Code:
                 return (int64_t) *(double*)_paramStart;
+            case kDateCode:
+                return getParam();
             default:
                 throw "value is not a number";
         }
@@ -136,30 +141,47 @@ namespace forestdb {
         }
     }
 
+    std::time_t value::asDate() const {
+        if (_typeCode != kDateCode)
+            throw "value is not a date";
+        return (std::time_t)getParam();
+    }
+
     slice value::asString() const {
         const uint8_t* payload;
         uint64_t param = getParam(payload);
         switch (_typeCode) {
             case kStringCode:
+            case kSharedStringCode:
+            case kDataCode:
                 return slice(payload, (size_t)param);
-            case kSharedStringCode: {
-                const value* str = (const value*)offsetby(this, param);
-                if (str->_typeCode != kStringCode)
+            case kSharedStringRefCode: {
+                const value* str = (const value*)offsetby(this, -param);
+                if (str->_typeCode != kSharedStringCode)
                     throw "invalid shared-string";
                 param = str->getParam(payload);
                 return slice(payload, (size_t)param);
             }
-            case kExternStringCode:
+            case kExternStringRefCode:
                 throw "can't dereference extern string without table";
+            //TODO: Should be able to format dates (kDateCode) as strings
             default:
                 throw "value is not a string";
         }
     }
 
-    uint64_t value::externStringIndex() const {
-        if (_typeCode != kExternStringCode)
-            throw "value is not extern string";
-        return getParam();
+    uint64_t value::stringToken() const {
+        uint64_t param = getParam();
+        switch (_typeCode) {
+            case kSharedStringCode:
+                return (uint64_t)this;
+            case kSharedStringRefCode:
+                return (uint64_t)this - param;
+            case kExternStringRefCode:
+                return param;
+            default:
+                throw "value is not shared or extern string";
+        }
     }
 
     const array* value::asArray() const {

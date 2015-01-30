@@ -11,6 +11,7 @@
 #import <XCTest/XCTest.h>
 #import "testutil.h"
 #import <sstream>
+#import <unordered_map>
 
 using namespace forestdb;
 
@@ -30,7 +31,7 @@ using namespace forestdb;
     [super tearDown];
 }
 
-- (void)testNumbers {
+- (void)test01_Numbers {
     std::stringstream out;
     {
         dataWriter writer(out);
@@ -90,7 +91,7 @@ using namespace forestdb;
     AssertEq(v, s.end());
 }
 
-- (void)testStrings {
+- (void)test02_Strings {
     std::stringstream out;
     {
         dataWriter writer(out);
@@ -98,6 +99,7 @@ using namespace forestdb;
         writer << std::string("hi there");
         writer << slice("ho there");
         writer << "";
+        writer << std::string("hi there"); // repeated; will become shared ref
     }
     std::string str = out.str();
     slice s = (slice)str;
@@ -109,6 +111,8 @@ using namespace forestdb;
     v = v->next();
     AssertEq(v->type(), kString);
     AssertEq(v->asString(), std::string("hi there"));
+    Assert(v->isSharedString());
+    uint64_t token = v->stringToken();
     v = v->next();
     AssertEq(v->type(), kString);
     AssertEq(v->asString(), std::string("ho there"));
@@ -116,10 +120,62 @@ using namespace forestdb;
     AssertEq(v->type(), kString);
     AssertEq(v->asString(), std::string(""));
     v = v->next();
+    AssertEq(v->type(), kString);
+    AssertEq(v->asString(), std::string("hi there"));
+    Assert(v->isSharedString());
+    AssertEq(v->stringToken(), token);
+    v = v->next();
     AssertEq(v, s.end());
+
+    // Make sure repeated string "hi there" is only stored once:
+    AssertEq(str.find("hi there"), str.rfind("hi there"));
 }
 
-- (void)testArrays {
+- (void)test03_ExternStrings {
+    std::unordered_map<std::string, uint32_t> externStrings;
+    externStrings["hi there"] = 1;
+    externStrings["ho there"] = 2;
+
+    std::stringstream out;
+    {
+        dataWriter writer(out, &externStrings);
+        writer << "hey there";
+        writer << std::string("hi there");
+        writer << slice("ho there");
+        writer << "";
+        writer << std::string("hi there");
+    }
+    std::string str = out.str();
+    slice s = (slice)str;
+    NSLog(@"Encoded = %@", s.uncopiedNSData());
+
+    const value* v = (const value*)s.buf;
+    AssertEq(v->type(), kString);
+    AssertEq(v->asString(), std::string("hey there"));
+    v = v->next();
+    AssertEq(v->type(), kString);
+    Assert(v->isExternString());
+    AssertEq(v->stringToken(), 1u);
+    v = v->next();
+    AssertEq(v->type(), kString);
+    Assert(v->isExternString());
+    AssertEq(v->stringToken(), 2u);
+    v = v->next();
+    AssertEq(v->type(), kString);
+    AssertEq(v->asString(), std::string(""));
+    v = v->next();
+    AssertEq(v->type(), kString);
+    Assert(v->isExternString());
+    AssertEq(v->stringToken(), 1u);
+    v = v->next();
+    AssertEq(v, s.end());
+
+    // Make sure string "hi there" is not stored:
+    AssertEq(str.find("hi there"), std::string::npos);
+    AssertEq(str.find("ho there"), std::string::npos);
+}
+
+- (void)test04_Arrays {
     std::stringstream out;
     {
         dataWriter writer(out);
@@ -136,7 +192,8 @@ using namespace forestdb;
     slice s = (slice)str;
     NSLog(@"Encoded = %@", s.uncopiedNSData());
 
-    const value* v = (const value*)s.buf;
+    const value* outer = (const value*)s.buf;
+    const value* v = outer;
     AssertEq(v->type(), kArray);
     const array* a1 = v->asArray();
     AssertEq(a1->count(), 3);
@@ -159,9 +216,11 @@ using namespace forestdb;
     v = v->next();
 
     AssertEq(v, s.end());
+
+    AssertEqual(outer->asNSObject(), (@[@12, @"hi there", @[@665544, @NO]]));
 }
 
-- (void)testDicts {
+- (void)test05_Dicts {
     std::stringstream out;
     {
         dataWriter writer(out);
@@ -174,7 +233,7 @@ using namespace forestdb;
         writer.beginDict(2);
         writer.writeKey("big");
         writer.writeInt(665544);
-        writer.writeKey("no");
+        writer.writeKey("greeting");    // will be shared
         writer.writeBool(false);
         writer.endDict();
         writer.endDict();
@@ -184,9 +243,9 @@ using namespace forestdb;
     NSLog(@"Encoded = %@", s.uncopiedNSData());
 
     // Iterate:
-    const value* v = (const value*)s.buf;
-    AssertEq(v->type(), kDict);
-    const dict* d1 = v->asDict();
+    const value* outer = (const value*)s.buf;
+    AssertEq(outer->type(), kDict);
+    const dict* d1 = outer->asDict();
     AssertEq(d1->count(), 3);
 
     auto iter1 = dict::iterator(d1);
@@ -212,7 +271,7 @@ using namespace forestdb;
     AssertEq(iter2.value()->asInt(), 665544);
     ++iter2;
 
-    AssertEq(iter2.key()->asString(), std::string("no"));
+    AssertEq(iter2.key()->asString(), std::string("greeting"));
     AssertEq(iter2.value()->asInt(), 0);
     ++iter2;
 
@@ -223,12 +282,46 @@ using namespace forestdb;
     AssertEq(iter1.key(), s.end());
 
     // Random-access lookup:
-    v = d1->get(slice("twelve"));
+    const value* v = d1->get(slice("twelve"));
     AssertEq(v->asInt(), 12);
     v = d1->get(slice("nested"));
     AssertEq(v->type(), kDict);
     v = d1->get(slice("bogus"));
     Assert(v == NULL);
+
+    // Make sure repeated key "greeting" is only stored once:
+    AssertEq(str.find("greeting"), str.rfind("greeting"));
+
+    NSDictionary* nsDict = outer->asNSObject();
+    AssertEqual(nsDict, (@{@"twelve": @12,
+                                        @"greeting": @"hi there",
+                                        @"nested": @{
+                                                @"big": @665544,
+                                                @"greeting": @NO}
+                                        }));
+}
+
+- (void) test06_ObjC {
+    uint8_t rawData[] = {0x17, 0x76, 0xFC, 0xAA, 0x00};
+    NSData* data = [NSData dataWithBytes: rawData length: sizeof(rawData)];
+    NSDate* today = [NSDate dateWithTimeIntervalSinceReferenceDate: 444272101];
+    id object = @{@"twelve": @12,
+                  @"greeting": @"hi there",
+                  @"nested": @{
+                          @"big": @665544,
+                          @"greeting": @NO,
+                          @"whatIsThisCrap": data},
+                  @"date": today
+                  };
+    std::stringstream out;
+    dataWriter writer(out);
+    writer.write(object);
+    std::string str = out.str();
+    slice s = (slice)str;
+    NSLog(@"Encoded = %@", s.uncopiedNSData());
+
+    const value* outer = (const value*)s.buf;
+    AssertEqual(outer->asNSObject(), object);
 }
 
 @end

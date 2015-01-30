@@ -9,6 +9,7 @@
 #ifndef CBForest_Data_h
 #define CBForest_Data_h
 #include "slice.hh"
+#include <ctime>
 #include <stdint.h>
 
 
@@ -24,6 +25,7 @@ namespace forestdb {
         kNull = 0,
         kBoolean,
         kNumber,
+        kDate,
         kString,
         kData,
         kArray,
@@ -40,12 +42,23 @@ namespace forestdb {
         bool asBool() const;
         int64_t asInt() const;
         double asDouble() const;
+        bool isInteger() const                  {return _typeCode >= kInt8Code
+                                                    && _typeCode <= kUInt64Code;}
+        std::time_t asDate() const;
+
         slice asString() const;
-        bool isExternString() const             {return _typeCode == kExternStringCode;}
-        uint64_t externStringIndex() const;
+        bool isExternString() const             {return _typeCode == kExternStringRefCode;}
+        bool isSharedString() const             {return _typeCode == kSharedStringCode
+                                                     || _typeCode == kSharedStringRefCode;}
+        uint64_t stringToken() const;
 
         const array* asArray() const;
         const dict* asDict() const;
+
+#ifdef __OBJC__
+        id asNSObject(NSArray* externStrings) const;
+        id asNSObject() const                   {return asNSObject(nil);}
+#endif
 
     protected:
         enum typeCodes {
@@ -54,7 +67,8 @@ namespace forestdb {
             kInt8Code, kInt16Code, kInt32Code, kInt64Code, kUInt64Code,
             kFloat32Code, kFloat64Code,
             kRawNumberCode,
-            kStringCode, kSharedStringCode, kExternStringCode,
+            kDateCode,
+            kStringCode, kSharedStringCode, kSharedStringRefCode, kExternStringRefCode,
             kDataCode,
             kArrayCode,
             kDictCode,
@@ -66,7 +80,11 @@ namespace forestdb {
         size_t getParam() const;
         size_t getParam(const uint8_t* &after) const;
         friend class dataWriter;
-    };
+
+#ifdef __OBJC__
+        id asNSObject(NSMapTable *sharedStrings, NSArray* externStrings) const;
+#endif
+};
 
 
     class array : public value {
