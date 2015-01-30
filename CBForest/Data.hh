@@ -43,7 +43,7 @@ namespace forestdb {
         int64_t asInt() const;
         double asDouble() const;
         bool isInteger() const                  {return _typeCode >= kInt8Code
-                                                    && _typeCode <= kUInt64Code;}
+                                                     && _typeCode <= kUInt64Code;}
         std::time_t asDate() const;
 
         slice asString() const;
@@ -55,13 +55,15 @@ namespace forestdb {
         const array* asArray() const;
         const dict* asDict() const;
 
+        void writeJSON(std::ostream&, const std::vector<std::string> *externStrings) const;
+
 #ifdef __OBJC__
         id asNSObject(NSArray* externStrings) const;
         id asNSObject() const                   {return asNSObject(nil);}
 #endif
 
     protected:
-        enum typeCodes {
+        enum typeCode : uint8_t {
             kNullCode = 0,
             kFalseCode, kTrueCode,
             kInt8Code, kInt16Code, kInt32Code, kInt64Code, kUInt64Code,
@@ -74,7 +76,7 @@ namespace forestdb {
             kDictCode,
         };
         
-        uint8_t _typeCode;
+        typeCode _typeCode;
         uint8_t _paramStart[1];
 
         size_t getParam() const;

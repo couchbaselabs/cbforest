@@ -294,34 +294,53 @@ using namespace forestdb;
 
     NSDictionary* nsDict = outer->asNSObject();
     AssertEqual(nsDict, (@{@"twelve": @12,
-                                        @"greeting": @"hi there",
-                                        @"nested": @{
-                                                @"big": @665544,
-                                                @"greeting": @NO}
-                                        }));
+                           @"greeting": @"hi there",
+                           @"nested": @{
+                                   @"big": @665544,
+                                   @"greeting": @NO}
+                           }));
 }
 
-- (void) test06_ObjC {
+- (id) objCFixture {
     uint8_t rawData[] = {0x17, 0x76, 0xFC, 0xAA, 0x00};
     NSData* data = [NSData dataWithBytes: rawData length: sizeof(rawData)];
     NSDate* today = [NSDate dateWithTimeIntervalSinceReferenceDate: 444272101];
-    id object = @{@"twelve": @12,
-                  @"greeting": @"hi there",
-                  @"nested": @{
-                          @"big": @665544,
-                          @"greeting": @NO,
-                          @"whatIsThisCrap": data},
-                  @"date": today
-                  };
+    return @{@"twelve": @12,
+             @"greeting": @"hi there",
+             @"": @[@((double)3.1415926), @(UINT64_MAX), @1e17, @"two\nlines"],
+             @"nested": @{
+                     @"big": @665544,
+                     @"greeting": @NO,
+                     @"whatIsThisCrap": data},
+             @"date": today
+             };
+}
+
+- (void) test06_ObjC {
     std::stringstream out;
     dataWriter writer(out);
-    writer.write(object);
+    writer.write(self.objCFixture);
     std::string str = out.str();
     slice s = (slice)str;
     NSLog(@"Encoded = %@", s.uncopiedNSData());
 
     const value* outer = (const value*)s.buf;
-    AssertEqual(outer->asNSObject(), object);
+    AssertEqual(outer->asNSObject(), self.objCFixture);
+}
+
+- (void) test07_JSON {
+    std::stringstream out;
+    dataWriter writer(out);
+    writer.write(self.objCFixture);
+    std::string str = out.str();
+    slice s = (slice)str;
+
+    const value* outer = (const value*)s.buf;
+    std::stringstream json;
+    outer->writeJSON(json, NULL);
+    NSString* jsonStr = (NSString*)(slice)json.str();
+    NSLog(@"JSON = %@", jsonStr);
+    AssertEqual(jsonStr, @"{\"\":[3.1415926,18446744073709551615,100000000000000000,\"two\\nlines\"],\"nested\":{\"big\":665544,\"greeting\":false,\"whatIsThisCrap\":\"F3b8qgA=\"},\"date\":\"2015-01-30T00:55:01Z\",\"twelve\":12,\"greeting\":\"hi there\"}");
 }
 
 @end

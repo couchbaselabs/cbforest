@@ -7,6 +7,7 @@
 //
 
 #include "DataWriter.hh"
+#include "Endian.h"
 #include "varint.hh"
 
 
@@ -34,44 +35,50 @@ namespace forestdb {
     }
 
     void dataWriter::writeInt(int64_t i) {
-        char buf[9];
+        char buf[8];
         size_t size;
-        memcpy(&buf[1], &i, 8);         //FIX: Endian conversion
+        int64_t swapped = _enc64(i);
+        memcpy(&buf, &swapped, 8);
+        value::typeCode code;
         if (i >= INT8_MIN && i <= INT8_MAX) {
-            buf[0] = value::kInt8Code;
-            size = 2;
+            code = value::kInt8Code;
+            size = 1;
         } else if (i >= INT16_MIN && i <= INT16_MAX) {
-            buf[0] = value::kInt16Code;
-            size = 3;
+            code = value::kInt16Code;
+            size = 2;
         } else if (i >= INT32_MIN && i <= INT32_MAX) {
-            buf[0] = value::kInt32Code;
-            size = 5;
+            code = value::kInt32Code;
+            size = 4;
         } else {
-            buf[0] = value::kInt64Code;
-            size = 9;
+            code = value::kInt64Code;
+            size = 8;
         }
-        _out.write(buf, size);
+        addTypeCode(code);
+        _out.write(&buf[8-size], size);
     }
 
     void dataWriter::writeUInt(uint64_t u) {
         if (u < INT64_MAX)
             return writeInt((int64_t)u);
+        u = _enc64(u);
         addTypeCode(value::kUInt64Code);
-        _out.write((const char*)&u, 8);         //FIX: Endian conversion
+        _out.write((const char*)&u, 8);
     }
 
     void dataWriter::writeDouble(double n) {
         if (n == (int64_t)n)
             return writeInt((int64_t)n);
+        swappedDouble swapped = _encdouble(n);
         addTypeCode(value::kFloat64Code);
-        _out.write((const char*)&n, 8);         //FIX: Endian conversion
+        _out.write((const char*)&swapped, 8);
     }
 
     void dataWriter::writeFloat(float n) {
         if (n == (int32_t)n)
             return writeInt((int32_t)n);
+        swappedFloat swapped = _encfloat(n);
         addTypeCode(value::kFloat32Code);
-        _out.write((const char*)&n, 4);         //FIX: Endian conversion
+        _out.write((const char*)&swapped, 4);
     }
 
     void dataWriter::writeDate(std::time_t dateTime) {

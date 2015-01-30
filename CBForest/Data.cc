@@ -7,6 +7,7 @@
 //
 
 #include "Data.hh"
+#include "Endian.h"
 #include "varint.hh"
 extern "C" {
 #include "murmurhash3_x86_32.h"
@@ -52,8 +53,11 @@ namespace forestdb {
             case kNullCode...kTrueCode:  return (const value*)(end + 0);
             case kInt8Code:              return (const value*)(end + 1);
             case kInt16Code:             return (const value*)(end + 2);
-            case kInt32Code:             return (const value*)(end + 4);
-            case kInt64Code:             return (const value*)(end + 8);
+            case kInt32Code:
+            case kFloat32Code:           return (const value*)(end + 4);
+            case kInt64Code:
+            case kUInt64Code:
+            case kFloat64Code:           return (const value*)(end + 8);
             default: break;
         }
 
@@ -112,17 +116,18 @@ namespace forestdb {
             case kTrueCode:
                 return 1;
             case kInt8Code:
-                return *(int8_t*)_paramStart;            //TODO: Endian conversions
+                return *(int8_t*)_paramStart;
             case kInt16Code:
-                return *(int16_t*)_paramStart;
+                return (int16_t) _dec16(*(int16_t*)_paramStart);
             case kInt32Code:
-                return *(int32_t*)_paramStart;
+                return (int32_t) _dec32(*(int32_t*)_paramStart);
             case kInt64Code:
-                return *(int64_t*)_paramStart;
+            case kUInt64Code:
+                return (int64_t) _dec64(*(int64_t*)_paramStart);
             case kFloat32Code:
-                return (int64_t) *(float*)_paramStart;
+                return (int64_t) _decfloat(*(swappedFloat*)_paramStart);
             case kFloat64Code:
-                return (int64_t) *(double*)_paramStart;
+                return (int64_t) _decdouble(*(swappedDouble*)_paramStart);
             case kDateCode:
                 return getParam();
             default:
@@ -133,9 +138,9 @@ namespace forestdb {
     double value::asDouble() const {
         switch (_typeCode) {
             case kFloat32Code:
-                return *(float*)_paramStart;            //TODO: Endian conversions
+                return _decfloat(*(swappedFloat*)_paramStart);
             case kFloat64Code:
-                return *(double*)_paramStart;
+                return _decdouble(*(swappedDouble*)_paramStart);
             default:
                 return (double)asInt();
         }

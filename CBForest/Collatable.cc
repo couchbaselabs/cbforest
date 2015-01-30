@@ -14,27 +14,10 @@
 //  and limitations under the License.
 
 #include "Collatable.hh"
-#include "forestdb_endian.h"
+#include "Endian.h"
 #include <sstream>
 
 namespace forestdb {
-
-    union swappedDouble {
-        double asDouble;
-        uint64_t asRaw;
-    };
-
-    static inline swappedDouble _encdouble(double d) {
-        swappedDouble swapped;
-        swapped.asDouble = d;
-        swapped.asRaw = _enc64(swapped.asRaw);
-        return swapped;
-    }
-
-    static inline double _decdouble(swappedDouble swapped) {
-        swapped.asRaw = _dec64(swapped.asRaw);
-        return swapped.asDouble;
-    }
 
     static inline void _invertDouble(swappedDouble& swapped) {
         swapped.asRaw ^= 0xFFFFFFFFFFFFFFFF;

@@ -57,7 +57,7 @@ namespace forestdb {
 #endif
 
     private:
-        void addTypeCode(uint8_t code)              {_out.write((char*)&code, 1);}
+        void addTypeCode(value::typeCode code)      {_out.write((char*)&code, 1);}
         void addUVarint(uint64_t);
 
         std::ostream& _out;
