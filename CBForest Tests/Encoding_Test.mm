@@ -10,6 +10,7 @@
 #import "EncodingWriter.hh"
 #import <XCTest/XCTest.h>
 #import "testutil.h"
+#import <math.h>
 #import <sstream>
 #import <unordered_map>
 
@@ -47,6 +48,10 @@ using namespace forestdb;
         writer.writeInt(-123456789);
         writer.writeInt(INT64_MAX);
         writer.writeInt(INT64_MIN);
+        writer.writeUInt(UINT64_MAX);
+        writer.writeFloat((float)M_PI);
+        writer.writeDouble(M_PI);
+        writer.writeRawNumber("12345678901234567890123456789012345678901234567890.1234567890e-08");
     }
     std::string str = out.str();
     slice s = (slice)str;
@@ -78,6 +83,7 @@ using namespace forestdb;
     v = v->next();
     AssertEq(v->type(), kNumber);
     AssertEq(v->asInt(), 123456789);
+    AssertEq(v->asUnsigned(), 123456789);
     v = v->next();
     AssertEq(v->type(), kNumber);
     AssertEq(v->asInt(), -123456789);
@@ -87,6 +93,25 @@ using namespace forestdb;
     v = v->next();
     AssertEq(v->type(), kNumber);
     AssertEq(v->asInt(), INT64_MIN);
+    v = v->next();
+    AssertEq(v->type(), kNumber);
+    AssertEq(v->asUnsigned(), UINT64_MAX);
+
+    v = v->next();
+    AssertEq(v->type(), kNumber);
+    AssertEq(v->asInt(), 3);
+    XCTAssertEqualWithAccuracy(v->asDouble(), 3.14159, 1e-5);
+
+    v = v->next();
+    AssertEq(v->type(), kNumber);
+    AssertEq(v->asInt(), 3);
+    XCTAssertEqualWithAccuracy(v->asDouble(), 3.14159265359, 1e-10);
+
+    v = v->next();
+    AssertEq(v->type(), kNumber);
+    AssertEq((std::string)v->asString(),
+             "12345678901234567890123456789012345678901234567890.1234567890e-08");
+    XCTAssertEqualWithAccuracy(v->asDouble(), 1.2345678901234568E+41, 1);
     v = v->next();
     AssertEq(v, s.end());
 }

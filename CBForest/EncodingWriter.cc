@@ -81,6 +81,12 @@ namespace forestdb {
         _out.write((const char*)&swapped, 4);
     }
 
+    void dataWriter::writeRawNumber(slice s) {
+        addTypeCode(value::kRawNumberCode);
+        addUVarint(s.size);
+        _out.write((const char*)s.buf, s.size);
+    }
+
     void dataWriter::writeDate(std::time_t dateTime) {
         addTypeCode(value::kDateCode);
         addUVarint(dateTime);
@@ -116,6 +122,7 @@ namespace forestdb {
                 // Change previous string opcode to shared:
                 auto pos = _out.tellp();
                 _out.seekp(sharedOffset);
+                ++_count;
                 addTypeCode(value::kSharedStringCode);
                 _out.seekp(pos);
 
@@ -133,14 +140,27 @@ namespace forestdb {
         _out << str;
     }
 
+    void dataWriter::pushCount(uint64_t count) {
+        addUVarint(count);
+        _savedCounts.push_back(_count);
+        _count = count;
+    }
+
+    void dataWriter::popCount() {
+        if (_count != 0)
+            throw "dataWriter: mismatched count";
+        _count = _savedCounts.back();
+        _savedCounts.pop_back();
+    }
+
     void dataWriter::beginArray(uint64_t count) {
         addTypeCode(value::kArrayCode);
-        addUVarint(count);
+        pushCount(count);
     }
 
     void dataWriter::beginDict(uint64_t count) {
         addTypeCode(value::kDictCode);
-        addUVarint(count);
+        pushCount(count);
         // Write an empty hash list:
         _savedIndexPos.push_back(_indexPos);
         _indexPos = _out.tellp();
@@ -158,6 +178,7 @@ namespace forestdb {
         _indexPos += 2;
         _out.seekp(pos);
 
+        ++_count; // this doesn't 'count' as a dict item
         writeString(s);
     }
 
@@ -166,6 +187,7 @@ namespace forestdb {
     }
 
     void dataWriter::endDict() {
+        popCount();
         _indexPos = _savedIndexPos.back();
         _savedIndexPos.pop_back();
     }

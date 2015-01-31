@@ -12,6 +12,7 @@
 extern "C" {
 #include "murmurhash3_x86_32.h"
 }
+#include <math.h>
 
 
 namespace forestdb {
@@ -29,6 +30,9 @@ namespace forestdb {
         kDict
     };
 
+    static bool isNumeric(slice s);
+    static double readNumericString(slice str);
+
 #pragma mark - VALUE:
 
     valueType value::type() const {
@@ -37,13 +41,13 @@ namespace forestdb {
 
     size_t value::getParam() const {
         uint64_t param;
-        forestdb::GetUVarInt(slice(_paramStart, 99), &param);
+        forestdb::GetUVarInt(slice(_paramStart, kMaxVarintLen64), &param);
         return param;
     }
 
     size_t value::getParam(const uint8_t* &after) const {
         uint64_t param;
-        after = _paramStart + forestdb::GetUVarInt(slice(_paramStart, 99), &param);
+        after = _paramStart + forestdb::GetUVarInt(slice(_paramStart, kMaxVarintLen64), &param);
         return param;
     }
 
@@ -128,11 +132,20 @@ namespace forestdb {
                 return (int64_t) _decfloat(*(swappedFloat*)_paramStart);
             case kFloat64Code:
                 return (int64_t) _decdouble(*(swappedDouble*)_paramStart);
+            case kRawNumberCode:
+                return (int64_t) readNumericString(asString());
             case kDateCode:
                 return getParam();
             default:
                 throw "value is not a number";
         }
+    }
+
+    uint64_t value::asUnsigned() const {
+        if (_typeCode == kUInt64Code)
+            return (uint64_t) _dec64(*(int64_t*)_paramStart);
+        else
+            return (uint64_t) asInt();
     }
 
     double value::asDouble() const {
@@ -141,6 +154,8 @@ namespace forestdb {
                 return _decfloat(*(swappedFloat*)_paramStart);
             case kFloat64Code:
                 return _decdouble(*(swappedDouble*)_paramStart);
+            case kRawNumberCode:
+                return readNumericString(asString());
             default:
                 return (double)asInt();
         }
@@ -152,6 +167,38 @@ namespace forestdb {
         return (std::time_t)getParam();
     }
 
+    std::string value::toString() const {
+        char str[32];
+        switch (_typeCode) {
+            case kNullCode:
+                return "null";
+            case kFalseCode:
+                return "false";
+            case kTrueCode:
+                return "true";
+            case kInt8Code...kInt64Code:
+                sprintf(str, "%lld", asInt());
+                break;
+            case kUInt64Code:
+                sprintf(str, "%llu", asUnsigned());
+                break;
+            case kFloat32Code:
+                sprintf(str, "%.6f", _decfloat(*(swappedFloat*)_paramStart));
+                break;
+            case kFloat64Code:
+                sprintf(str, "%.16lf", _decdouble(*(swappedDouble*)_paramStart));
+                break;
+            case kDateCode: {
+                std::time_t date = asDate();
+                std::strftime(str, sizeof(str), "\"%Y-%m-%dT%H:%M:%SZ\"", std::gmtime(&date));
+                break;
+            }
+            default:
+                return (std::string)asString();
+        }
+        return std::string(str);
+    }
+
     slice value::asString() const {
         const uint8_t* payload;
         uint64_t param = getParam(payload);
@@ -159,6 +206,7 @@ namespace forestdb {
             case kStringCode:
             case kSharedStringCode:
             case kDataCode:
+            case kRawNumberCode:
                 return slice(payload, (size_t)param);
             case kSharedStringRefCode: {
                 const value* str = (const value*)offsetby(this, -param);
@@ -169,7 +217,6 @@ namespace forestdb {
             }
             case kExternStringRefCode:
                 throw "can't dereference extern string without table";
-            //TODO: Should be able to format dates (kDateCode) as strings
             default:
                 throw "value is not a string";
         }
@@ -239,7 +286,8 @@ namespace forestdb {
             return false;
 
         switch (type) {
-            case kRawNumberCode:            //TODO: Check for purely numeric data
+            case kRawNumberCode:
+                return isNumeric(s.read(param));
             case kStringCode:
             case kSharedStringCode:         //TODO: Check for valid UTF-8 data
             case kDataCode:
@@ -290,7 +338,7 @@ namespace forestdb {
 
     const value* array::first() const {
         const uint8_t* f;
-        getParam(f);
+        (void)getParam(f);
         return (const value*)f;
     }
 
@@ -341,5 +389,31 @@ namespace forestdb {
         _value = _key->next();
         return *this;
     }
+
+#pragma mark - UTILITIES:
+
+    static bool isNumeric(slice s) {
+        if (s.size < 1)
+            return false;
+        for (const char* c = (const char*)s.buf; s.size > 0; s.size--, c++) {
+            if (!isdigit(*c) && *c != '.' && *c != '+' && *c != '-' && *c != 'e' &&  *c != 'E')
+                return false;
+        }
+        return true;
+    }
+
+    static double readNumericString(slice str) {
+        char* cstr = strndup((const char*)str.buf, str.size);
+        if (!cstr)
+            return 0.0;
+        char* eof;
+        double result = ::strtod(cstr, &eof);
+        if (eof - cstr != str.size)
+            result = NAN;
+        ::free(cstr);
+        return result;
+    }
+    
+
 
 }

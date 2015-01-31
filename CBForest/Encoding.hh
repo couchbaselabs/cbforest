@@ -21,7 +21,7 @@ namespace forestdb {
         
 
     /* Types of values */
-    enum valueType {
+    enum valueType : uint8_t {
         kNull = 0,
         kBoolean,
         kNumber,
@@ -45,25 +45,37 @@ namespace forestdb {
 
         bool asBool() const;
         int64_t asInt() const;
+        uint64_t asUnsigned() const;
         double asDouble() const;
         bool isInteger() const                  {return _typeCode >= kInt8Code
                                                      && _typeCode <= kUInt64Code;}
-        std::time_t asDate() const;
+        bool isUnsigned() const                 {return _typeCode == kUInt64Code;}
 
+        std::time_t asDate() const;
+        std::string asDateString() const;
+
+        /** Returns the exact contents of a (non-extern) string, data, or raw number. */
         slice asString() const;
         bool isExternString() const             {return _typeCode == kExternStringRefCode;}
         bool isSharedString() const             {return _typeCode == kSharedStringCode
                                                      || _typeCode == kSharedStringRefCode;}
+
+        /** If this is an extern string, returns its external identifier.
+            If this is a shared string, returns an opaque value identifying it; all instances of
+            the same shared string in the same document will have the same identifier. */
         uint64_t stringToken() const;
 
         const array* asArray() const;
         const dict* asDict() const;
 
+        /** Converts any non-collection type (except externString) to string form. */
+        std::string toString() const;
+
         void writeJSON(std::ostream&, const std::vector<std::string> *externStrings) const;
+        std::string toJSON(const std::vector<std::string> *externStrings =NULL) const;
 
 #ifdef __OBJC__
-        id asNSObject(NSArray* externStrings) const;
-        id asNSObject() const                   {return asNSObject(nil);}
+        id asNSObject(NSArray* externStrings =nil) const;
 #endif
 
     protected:

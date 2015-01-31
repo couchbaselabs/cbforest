@@ -10,6 +10,7 @@
 #include <ostream>
 #include <ctime>
 #include <iomanip>
+#include <sstream>
 
 
 namespace forestdb {
@@ -54,6 +55,13 @@ namespace forestdb {
         base64_encode(out, (const uint8_t*)data.buf, (unsigned)data.size);
         out << '"';
     }
+
+    std::string value::toJSON(const std::vector<std::string> *externStrings) const {
+        std::stringstream s;
+        writeJSON(s, externStrings);
+        return s.str();
+    }
+
 
     void value::writeJSON(std::ostream &out, const std::vector<std::string> *externStrings) const {
         switch (_typeCode) {

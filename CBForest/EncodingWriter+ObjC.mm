@@ -44,7 +44,7 @@ namespace forestdb {
             beginDict([obj count]);
             for (NSString* key in obj) {
                 nsstring_slice slice(key);
-                writeString(slice);
+                writeKey(slice);
                 write([obj objectForKey: key]);
             }
             endDict();
@@ -60,8 +60,11 @@ namespace forestdb {
             writeDate((std::time_t)[obj timeIntervalSince1970]);
         } else if ([obj isKindOfClass: [NSNull class]]) {
             writeNull();
+        } else if ([obj isKindOfClass: [NSDecimalNumber class]]) {
+            nsstring_slice slice([obj stringValue]);
+            writeRawNumber(slice);
         } else {
-            NSCAssert(NO, @"Objects of class %@ are not JSON-compatible", [obj class]);
+            NSCAssert(NO, @"Objects of class %@ are not encodable", [obj class]);
         }
     }
 

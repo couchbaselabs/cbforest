@@ -29,6 +29,8 @@ namespace forestdb {
         void writeUInt(uint64_t);
         void writeFloat(float);
         void writeDouble(double);
+        void writeRawNumber(slice);
+        void writeRawNumber(std::string str)        {writeRawNumber(slice(str));}
 
         void writeDate(std::time_t);
 
@@ -38,7 +40,7 @@ namespace forestdb {
         void writeData(slice);
 
         void beginArray(uint64_t count);
-        void endArray()                             { }
+        void endArray()                             {popCount();}
 
         void beginDict(uint64_t count);
         void writeKey(std::string);
@@ -57,10 +59,14 @@ namespace forestdb {
 #endif
 
     private:
-        void addTypeCode(value::typeCode code)      {_out.write((char*)&code, 1);}
+        void addTypeCode(value::typeCode code)      {_out.write((char*)&code, 1); --_count;}
         void addUVarint(uint64_t);
+        void pushCount(uint64_t count);
+        void popCount();
 
         std::ostream& _out;
+        uint64_t _count;
+        std::vector<uint64_t> _savedCounts;
         size_t _indexPos;
         std::vector<size_t> _savedIndexPos;
         std::unordered_map<std::string, size_t> _sharedStrings;

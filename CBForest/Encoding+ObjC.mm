@@ -39,8 +39,9 @@ namespace forestdb {
                 return @((uint64_t)asInt());
             case kFloat32Code:
             case kFloat64Code:
-            case kRawNumberCode:
                 return @(asDouble());
+            case kRawNumberCode:
+                return [NSDecimalNumber decimalNumberWithString: (NSString*)asString()];
             case kDateCode:
                 return [NSDate dateWithTimeIntervalSince1970: getParam()];
             case kStringCode:
