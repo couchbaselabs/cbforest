@@ -1,12 +1,12 @@
 //
-//  Data+JSON.cc
+//  Encoding+JSON.cc
 //  CBForest
 //
 //  Created by Jens Alfke on 1/29/15.
 //  Copyright (c) 2015 Couchbase. All rights reserved.
 //
 
-#include "Data.hh"
+#include "Encoding.hh"
 #include <ostream>
 #include <ctime>
 #include <iomanip>

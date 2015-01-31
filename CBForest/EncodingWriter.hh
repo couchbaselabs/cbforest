@@ -1,5 +1,5 @@
 //
-//  DataWriter.h
+//  EncodingWriter.h
 //  CBForest
 //
 //  Created by Jens Alfke on 1/26/15.
@@ -9,7 +9,7 @@
 #ifndef __CBForest__DataWriter__
 #define __CBForest__DataWriter__
 
-#include "Data.hh"
+#include "Encoding.hh"
 #include <ctime>
 #include <iostream>
 #include <unordered_map>

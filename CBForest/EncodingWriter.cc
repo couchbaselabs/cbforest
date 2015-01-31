@@ -1,12 +1,12 @@
 //
-//  DataWriter.cc
+//  EncodingWriter.cc
 //  CBForest
 //
 //  Created by Jens Alfke on 1/26/15.
 //  Copyright (c) 2015 Couchbase. All rights reserved.
 //
 
-#include "DataWriter.hh"
+#include "EncodingWriter.hh"
 #include "Endian.h"
 #include "varint.hh"
 

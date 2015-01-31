@@ -1,12 +1,12 @@
 //
-//  Data.cc
+//  Encoding.cc
 //  CBForest
 //
 //  Created by Jens Alfke on 1/26/15.
 //  Copyright (c) 2015 Couchbase. All rights reserved.
 //
 
-#include "Data.hh"
+#include "Encoding.hh"
 #include "Endian.h"
 #include "varint.hh"
 extern "C" {
@@ -199,6 +199,91 @@ namespace forestdb {
         if (_typeCode != kDictCode)
             throw "value is not dict";
         return (const dict*)this;
+    }
+
+#pragma mark - VALIDATION:
+
+    const value* value::validate(slice s) {
+        slice s2 = s;
+        if (validate(s.buf, s2) && s2.size == 0)
+            return (const value*)s.buf;
+        else
+            return NULL;
+    }
+
+    bool value::validate(const void *start, slice& s) {
+        if (s.size < 1)
+            return false;
+        const void *valueStart = s.buf;
+        typeCode type = *(const typeCode*)valueStart;
+        s.moveStart(1);  // consume type-code
+
+        if (type <= kFloat64Code) {
+            size_t size;
+            switch (type) {
+                case kNullCode...kTrueCode:  return true;
+                case kInt8Code:              size = 1; break;
+                case kInt16Code:             size = 2; break;
+                case kInt32Code:
+                case kFloat32Code:           size = 4; break;
+                case kInt64Code:
+                case kUInt64Code:
+                case kFloat64Code:           size = 8; break;
+                default:                     return false;
+            }
+            return s.checkedMoveStart(size);
+        }
+
+        uint64_t param;
+        if (!ReadUVarInt(&s, &param))
+            return false;
+
+        switch (type) {
+            case kRawNumberCode:            //TODO: Check for purely numeric data
+            case kStringCode:
+            case kSharedStringCode:         //TODO: Check for valid UTF-8 data
+            case kDataCode:
+                if (!s.checkedMoveStart(param))
+                    return false;
+                return true;
+            case kDateCode:                 //TODO: Check for valid date format
+            case kExternStringRefCode:
+                return true;
+            case kSharedStringRefCode: {
+                // Get pointer to original string:
+                slice origString;
+                origString.buf = offsetby(valueStart, -param);
+                if (origString.buf < start || origString.buf >= s.buf)
+                    return false;
+                // Check that it's marked as a shared string:
+                if (*(const typeCode*)origString.buf != kSharedStringCode)
+                    return false;
+                // Validate it:
+                origString.setEnd(s.end());
+                return validate(start, origString);
+            }
+            case kArrayCode: {
+                for (; param > 0; --param)
+                    if (!validate(start, s))
+                        return false;
+                return true;
+            }
+            case kDictCode: {
+                // Skip hash codes:
+                if (!s.checkedMoveStart(param*sizeof(uint16_t)))
+                    return false;
+                for (; param > 0; --param) {
+                    auto v = (const value*)s.buf;
+                    if (!validate(start, s) || (v->type() != kString))
+                        return false;
+                    if (!validate(start, s))
+                        return false;
+                }
+                return true;
+            }
+            default:
+                return false;
+        }
     }
 
 #pragma mark - ARRAY:

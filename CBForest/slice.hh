@@ -44,6 +44,7 @@ namespace forestdb {
         const void* offset(size_t o) const          {return (uint8_t*)buf + o;}
         size_t offsetOf(const void* ptr) const      {return (uint8_t*)ptr - (uint8_t*)buf;}
         const void* end() const                     {return offset(size);}
+        void setEnd(const void* e)                  {size = (uint8_t*)e - (uint8_t*)buf;}
 
         const uint8_t& operator[](unsigned i) const     {return ((const uint8_t*)buf)[i];}
         slice operator()(unsigned i, unsigned n) const  {return slice(offset(i), n);}
@@ -60,6 +61,8 @@ namespace forestdb {
         bool operator>(slice s) const               {return compare(s) > 0;}
 
         void moveStart(ptrdiff_t delta)             {buf = offsetby(buf, delta); size -= delta;}
+        bool checkedMoveStart(ptrdiff_t delta)      {if (size<delta) return false;
+                                                     else {moveStart(delta); return true;}}
 
         slice copy() const;
         void free();

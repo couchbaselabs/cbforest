@@ -1,13 +1,13 @@
 //
-//  Data_Test.mm
+//  Encoding_Test.mm
 //  CBForest
 //
 //  Created by Jens Alfke on 1/26/15.
 //  Copyright (c) 2015 Couchbase. All rights reserved.
 //
 
-#import "Data.hh"
-#import "DataWriter.hh"
+#import "Encoding.hh"
+#import "EncodingWriter.hh"
 #import <XCTest/XCTest.h>
 #import "testutil.h"
 #import <sstream>
@@ -52,7 +52,7 @@ using namespace forestdb;
     slice s = (slice)str;
     NSLog(@"Encoded = %@", s.uncopiedNSData());
 
-    const value* v = (const value*)s.buf;
+    const value* v = (const array*)s.buf;
     AssertEq(v->type(), kNull);
     v = v->next();
     AssertEq(v->type(), kBoolean);
@@ -191,6 +191,7 @@ using namespace forestdb;
     std::string str = out.str();
     slice s = (slice)str;
     NSLog(@"Encoded = %@", s.uncopiedNSData());
+    Assert(value::validate(s));
 
     const value* outer = (const value*)s.buf;
     const value* v = outer;
@@ -220,6 +221,14 @@ using namespace forestdb;
     AssertEqual(outer->asNSObject(), (@[@12, @"hi there", @[@665544, @NO]]));
 }
 
+- (void) checkValidation: (slice)s {
+    Assert(value::validate(s));
+    while (s.size > 0) {
+        --s.size;
+        Assert(!value::validate(s));
+    }
+}
+
 - (void)test05_Dicts {
     std::stringstream out;
     {
@@ -241,6 +250,7 @@ using namespace forestdb;
     std::string str = out.str();
     slice s = (slice)str;
     NSLog(@"Encoded = %@", s.uncopiedNSData());
+    [self checkValidation: s];
 
     // Iterate:
     const value* outer = (const value*)s.buf;
@@ -323,6 +333,7 @@ using namespace forestdb;
     std::string str = out.str();
     slice s = (slice)str;
     NSLog(@"Encoded = %@", s.uncopiedNSData());
+    [self checkValidation: s];
 
     const value* outer = (const value*)s.buf;
     AssertEqual(outer->asNSObject(), self.objCFixture);
@@ -334,6 +345,7 @@ using namespace forestdb;
     writer.write(self.objCFixture);
     std::string str = out.str();
     slice s = (slice)str;
+    [self checkValidation: s];
 
     const value* outer = (const value*)s.buf;
     std::stringstream json;

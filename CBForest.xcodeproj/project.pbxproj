@@ -132,10 +132,10 @@
 		276E74EE1956853C0030ED3D /* crc32.cc in Sources */ = {isa = PBXBuildFile; fileRef = 275072DE18E4ACE100A80C5A /* crc32.cc */; };
 		27766E161982DA8E00CAA464 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27766E151982DA8E00CAA464 /* Security.framework */; };
 		27766E1D1982DED300CAA464 /* libCBForest.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 27EF81121917EEC600A327B9 /* libCBForest.a */; };
-		277CA75B1A7B090B00DDC338 /* DataWriter+ObjC.mm in Sources */ = {isa = PBXBuildFile; fileRef = 277CA75A1A7B090B00DDC338 /* DataWriter+ObjC.mm */; };
-		277CA75C1A7B090B00DDC338 /* DataWriter+ObjC.mm in Sources */ = {isa = PBXBuildFile; fileRef = 277CA75A1A7B090B00DDC338 /* DataWriter+ObjC.mm */; };
-		277CA75F1A7B1AFB00DDC338 /* Data+JSON.cc in Sources */ = {isa = PBXBuildFile; fileRef = 277CA75D1A7B1AFB00DDC338 /* Data+JSON.cc */; };
-		277CA7601A7B1AFB00DDC338 /* Data+JSON.cc in Sources */ = {isa = PBXBuildFile; fileRef = 277CA75D1A7B1AFB00DDC338 /* Data+JSON.cc */; };
+		277CA75B1A7B090B00DDC338 /* EncodingWriter+ObjC.mm in Sources */ = {isa = PBXBuildFile; fileRef = 277CA75A1A7B090B00DDC338 /* EncodingWriter+ObjC.mm */; };
+		277CA75C1A7B090B00DDC338 /* EncodingWriter+ObjC.mm in Sources */ = {isa = PBXBuildFile; fileRef = 277CA75A1A7B090B00DDC338 /* EncodingWriter+ObjC.mm */; };
+		277CA75F1A7B1AFB00DDC338 /* Encoding+JSON.cc in Sources */ = {isa = PBXBuildFile; fileRef = 277CA75D1A7B1AFB00DDC338 /* Encoding+JSON.cc */; };
+		277CA7601A7B1AFB00DDC338 /* Encoding+JSON.cc in Sources */ = {isa = PBXBuildFile; fileRef = 277CA75D1A7B1AFB00DDC338 /* Encoding+JSON.cc */; };
 		277D19C7194CCE7A008E91EB /* RevID.mm in Sources */ = {isa = PBXBuildFile; fileRef = 277D19C6194CCE7A008E91EB /* RevID.mm */; };
 		277D19C8194CCE7A008E91EB /* RevID.mm in Sources */ = {isa = PBXBuildFile; fileRef = 277D19C6194CCE7A008E91EB /* RevID.mm */; };
 		278EBF9F1976325A006362F8 /* adler32.cc in Sources */ = {isa = PBXBuildFile; fileRef = 278EBF9719763203006362F8 /* adler32.cc */; };
@@ -186,14 +186,14 @@
 		27E4873B19255EA8007D8940 /* MapReduceIndex.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27E4873819255EA8007D8940 /* MapReduceIndex.cc */; };
 		27E609A21951E4C000202B72 /* DocEnumerator.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27E609A11951E4C000202B72 /* DocEnumerator.cc */; };
 		27E609A31951E4C000202B72 /* DocEnumerator.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27E609A11951E4C000202B72 /* DocEnumerator.cc */; };
-		27E66B631A76ACFC0091DA3F /* Data.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27E66B621A76ACFC0091DA3F /* Data.cc */; };
-		27E66B641A76ACFC0091DA3F /* Data.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27E66B621A76ACFC0091DA3F /* Data.cc */; };
-		27E66B671A76D2940091DA3F /* DataWriter.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27E66B651A76D2940091DA3F /* DataWriter.cc */; };
-		27E66B681A76D2940091DA3F /* DataWriter.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27E66B651A76D2940091DA3F /* DataWriter.cc */; };
+		27E66B631A76ACFC0091DA3F /* Encoding.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27E66B621A76ACFC0091DA3F /* Encoding.cc */; };
+		27E66B641A76ACFC0091DA3F /* Encoding.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27E66B621A76ACFC0091DA3F /* Encoding.cc */; };
+		27E66B671A76D2940091DA3F /* EncodingWriter.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27E66B651A76D2940091DA3F /* EncodingWriter.cc */; };
+		27E66B681A76D2940091DA3F /* EncodingWriter.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27E66B651A76D2940091DA3F /* EncodingWriter.cc */; };
 		27E66B6B1A76F6C10091DA3F /* murmurhash3_x86_32.c in Sources */ = {isa = PBXBuildFile; fileRef = 27E66B691A76F6C10091DA3F /* murmurhash3_x86_32.c */; };
 		27E66B6C1A76F6C10091DA3F /* murmurhash3_x86_32.c in Sources */ = {isa = PBXBuildFile; fileRef = 27E66B691A76F6C10091DA3F /* murmurhash3_x86_32.c */; };
-		27E66B6E1A77010F0091DA3F /* Data_Test.mm in Sources */ = {isa = PBXBuildFile; fileRef = 27E66B6D1A77010F0091DA3F /* Data_Test.mm */; };
-		27E66B6F1A77010F0091DA3F /* Data_Test.mm in Sources */ = {isa = PBXBuildFile; fileRef = 27E66B6D1A77010F0091DA3F /* Data_Test.mm */; };
+		27E66B6E1A77010F0091DA3F /* Encoding_Test.mm in Sources */ = {isa = PBXBuildFile; fileRef = 27E66B6D1A77010F0091DA3F /* Encoding_Test.mm */; };
+		27E66B6F1A77010F0091DA3F /* Encoding_Test.mm in Sources */ = {isa = PBXBuildFile; fileRef = 27E66B6D1A77010F0091DA3F /* Encoding_Test.mm */; };
 		27EF007F1949297F001BF7F3 /* transaction.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27EF007E1949297F001BF7F3 /* transaction.cc */; };
 		27EF00801949297F001BF7F3 /* transaction.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27EF007E1949297F001BF7F3 /* transaction.cc */; };
 		27EF008319492BD7001BF7F3 /* Collatable.mm in Sources */ = {isa = PBXBuildFile; fileRef = 27EF008219492BD7001BF7F3 /* Collatable.mm */; };
@@ -273,8 +273,8 @@
 		27EF80BA19142C9900A327B9 /* stem_UTF_8_turkish.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FF41914296D00A327B9 /* stem_UTF_8_turkish.h */; };
 		27EF81081917EEC600A327B9 /* varint.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27FDFC0018EA58BF00AC4647 /* varint.cc */; };
 		27EF810C1917EEC600A327B9 /* libforestdb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 27139B9018F8EDA20021A9A3 /* libforestdb.a */; };
-		27F9528F1A7AD818007F0269 /* Data+ObjC.mm in Sources */ = {isa = PBXBuildFile; fileRef = 27F9528E1A7AD818007F0269 /* Data+ObjC.mm */; };
-		27F952901A7AD818007F0269 /* Data+ObjC.mm in Sources */ = {isa = PBXBuildFile; fileRef = 27F9528E1A7AD818007F0269 /* Data+ObjC.mm */; };
+		27F9528F1A7AD818007F0269 /* Encoding+ObjC.mm in Sources */ = {isa = PBXBuildFile; fileRef = 27F9528E1A7AD818007F0269 /* Encoding+ObjC.mm */; };
+		27F952901A7AD818007F0269 /* Encoding+ObjC.mm in Sources */ = {isa = PBXBuildFile; fileRef = 27F9528E1A7AD818007F0269 /* Encoding+ObjC.mm */; };
 		27FA99E01917EF9600912F96 /* libTokenizer.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 27EF807419142C2500A327B9 /* libTokenizer.a */; };
 		27FA99F619180B5F00912F96 /* stem_UTF_8_dutch.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FD71914296D00A327B9 /* stem_UTF_8_dutch.c */; };
 		27FA99F719180B5F00912F96 /* stem_ISO_8859_1_hungarian.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FC31914296D00A327B9 /* stem_ISO_8859_1_hungarian.c */; };
@@ -522,8 +522,8 @@
 		27696AD119F5B66800B8D3D6 /* Tokenizer_Test.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Tokenizer_Test.mm; sourceTree = "<group>"; };
 		276E93B719ECA01100DDD621 /* LogInternal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = LogInternal.hh; sourceTree = "<group>"; };
 		27766E151982DA8E00CAA464 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
-		277CA75A1A7B090B00DDC338 /* DataWriter+ObjC.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "DataWriter+ObjC.mm"; sourceTree = "<group>"; };
-		277CA75D1A7B1AFB00DDC338 /* Data+JSON.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "Data+JSON.cc"; sourceTree = "<group>"; };
+		277CA75A1A7B090B00DDC338 /* EncodingWriter+ObjC.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "EncodingWriter+ObjC.mm"; sourceTree = "<group>"; };
+		277CA75D1A7B1AFB00DDC338 /* Encoding+JSON.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "Encoding+JSON.cc"; sourceTree = "<group>"; };
 		277CA7611A7B445400DDC338 /* Endian.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Endian.h; sourceTree = "<group>"; };
 		277D19C6194CCE7A008E91EB /* RevID.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RevID.mm; path = ../CBForest/RevID.mm; sourceTree = "<group>"; };
 		277D19C9194E295B008E91EB /* Error.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Error.hh; path = ../CBForest/Error.hh; sourceTree = "<group>"; };
@@ -571,13 +571,13 @@
 		27E4873919255EA8007D8940 /* MapReduceIndex.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = MapReduceIndex.hh; path = ../CBForest/MapReduceIndex.hh; sourceTree = "<group>"; };
 		27E609A11951E4C000202B72 /* DocEnumerator.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DocEnumerator.cc; path = ../CBForest/DocEnumerator.cc; sourceTree = "<group>"; };
 		27E609A41951E53F00202B72 /* DocEnumerator.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = DocEnumerator.hh; path = ../CBForest/DocEnumerator.hh; sourceTree = "<group>"; };
-		27E66B611A7627F70091DA3F /* Data.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Data.hh; sourceTree = "<group>"; };
-		27E66B621A76ACFC0091DA3F /* Data.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Data.cc; sourceTree = "<group>"; };
-		27E66B651A76D2940091DA3F /* DataWriter.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DataWriter.cc; sourceTree = "<group>"; };
-		27E66B661A76D2940091DA3F /* DataWriter.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = DataWriter.hh; sourceTree = "<group>"; };
+		27E66B611A7627F70091DA3F /* Encoding.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Encoding.hh; sourceTree = "<group>"; };
+		27E66B621A76ACFC0091DA3F /* Encoding.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Encoding.cc; sourceTree = "<group>"; };
+		27E66B651A76D2940091DA3F /* EncodingWriter.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EncodingWriter.cc; sourceTree = "<group>"; };
+		27E66B661A76D2940091DA3F /* EncodingWriter.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = EncodingWriter.hh; sourceTree = "<group>"; };
 		27E66B691A76F6C10091DA3F /* murmurhash3_x86_32.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = murmurhash3_x86_32.c; path = ../../../../CBJSON/vendor/murmurhash/murmurhash3_x86_32.c; sourceTree = "<group>"; };
 		27E66B6A1A76F6C10091DA3F /* murmurhash3_x86_32.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = murmurhash3_x86_32.h; path = ../../../../CBJSON/vendor/murmurhash/murmurhash3_x86_32.h; sourceTree = "<group>"; };
-		27E66B6D1A77010F0091DA3F /* Data_Test.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Data_Test.mm; sourceTree = "<group>"; };
+		27E66B6D1A77010F0091DA3F /* Encoding_Test.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Encoding_Test.mm; sourceTree = "<group>"; };
 		27EF007E1949297F001BF7F3 /* transaction.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = transaction.cc; sourceTree = "<group>"; };
 		27EF00811949299A001BF7F3 /* fdb_internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = fdb_internal.h; sourceTree = "<group>"; };
 		27EF008219492BD7001BF7F3 /* Collatable.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = Collatable.mm; path = ../CBForest/Collatable.mm; sourceTree = "<group>"; };
@@ -664,7 +664,7 @@
 		27EF807419142C2500A327B9 /* libTokenizer.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libTokenizer.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		27EF80C7191445CF00A327B9 /* english_stopwords.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = english_stopwords.h; path = ../CBForest/english_stopwords.h; sourceTree = "<group>"; };
 		27EF81121917EEC600A327B9 /* libCBForest.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libCBForest.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		27F9528E1A7AD818007F0269 /* Data+ObjC.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "Data+ObjC.mm"; sourceTree = "<group>"; };
+		27F9528E1A7AD818007F0269 /* Encoding+ObjC.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "Encoding+ObjC.mm"; sourceTree = "<group>"; };
 		27FA9A3F19180B5F00912F96 /* libTokenizer-iOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libTokenizer-iOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		27FDFC0018EA58BF00AC4647 /* varint.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = varint.cc; path = ../CBForest/varint.cc; sourceTree = "<group>"; };
 		27FDFC0218EA58DA00AC4647 /* varint.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = varint.hh; path = ../CBForest/varint.hh; sourceTree = "<group>"; };
@@ -924,7 +924,7 @@
 				27696AD119F5B66800B8D3D6 /* Tokenizer_Test.mm */,
 				2722304A1A08178200BFF25C /* GeoHash_Test.mm */,
 				27DF46BC1A0D90C7007BB4A4 /* GeoIndex_Test.mm */,
-				27E66B6D1A77010F0091DA3F /* Data_Test.mm */,
+				27E66B6D1A77010F0091DA3F /* Encoding_Test.mm */,
 				27E4872019226699007D8940 /* testutil.h */,
 				275072AE18E4A68E00A80C5A /* Supporting Files */,
 			);
@@ -997,13 +997,13 @@
 				277CA7611A7B445400DDC338 /* Endian.h */,
 				27E4872E1924178B007D8940 /* Collatable.hh */,
 				27EF008219492BD7001BF7F3 /* Collatable.mm */,
-				27E66B621A76ACFC0091DA3F /* Data.cc */,
-				27E66B611A7627F70091DA3F /* Data.hh */,
-				277CA75D1A7B1AFB00DDC338 /* Data+JSON.cc */,
-				27F9528E1A7AD818007F0269 /* Data+ObjC.mm */,
-				27E66B651A76D2940091DA3F /* DataWriter.cc */,
-				27E66B661A76D2940091DA3F /* DataWriter.hh */,
-				277CA75A1A7B090B00DDC338 /* DataWriter+ObjC.mm */,
+				27E66B621A76ACFC0091DA3F /* Encoding.cc */,
+				27E66B611A7627F70091DA3F /* Encoding.hh */,
+				277CA75D1A7B1AFB00DDC338 /* Encoding+JSON.cc */,
+				27F9528E1A7AD818007F0269 /* Encoding+ObjC.mm */,
+				27E66B651A76D2940091DA3F /* EncodingWriter.cc */,
+				27E66B661A76D2940091DA3F /* EncodingWriter.hh */,
+				277CA75A1A7B090B00DDC338 /* EncodingWriter+ObjC.mm */,
 				277D19C9194E295B008E91EB /* Error.hh */,
 				27E4871A19218E5D007D8940 /* slice.cc */,
 				2704A1E219049E2300138320 /* slice.hh */,
@@ -1487,7 +1487,7 @@
 				27E4871E19226508007D8940 /* Database_Test.mm in Sources */,
 				27696AD219F5B66800B8D3D6 /* Tokenizer_Test.mm in Sources */,
 				2722304B1A08178200BFF25C /* GeoHash_Test.mm in Sources */,
-				27E66B6E1A77010F0091DA3F /* Data_Test.mm in Sources */,
+				27E66B6E1A77010F0091DA3F /* Encoding_Test.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1546,21 +1546,21 @@
 				272230491A0815E700BFF25C /* Geohash.cc in Sources */,
 				27E4872C1923F24D007D8940 /* VersionedDocument.cc in Sources */,
 				27E609A31951E4C000202B72 /* DocEnumerator.cc in Sources */,
-				27E66B641A76ACFC0091DA3F /* Data.cc in Sources */,
-				277CA75C1A7B090B00DDC338 /* DataWriter+ObjC.mm in Sources */,
-				277CA7601A7B1AFB00DDC338 /* Data+JSON.cc in Sources */,
+				27E66B641A76ACFC0091DA3F /* Encoding.cc in Sources */,
+				277CA75C1A7B090B00DDC338 /* EncodingWriter+ObjC.mm in Sources */,
+				277CA7601A7B1AFB00DDC338 /* Encoding+JSON.cc in Sources */,
 				27E4873B19255EA8007D8940 /* MapReduceIndex.cc in Sources */,
 				27EF008419492BD7001BF7F3 /* Collatable.mm in Sources */,
 				27E487301924178B007D8940 /* Collatable.cc in Sources */,
 				27E487241922A64F007D8940 /* RevTree.cc in Sources */,
 				2701993C19F1972E00FDC239 /* Tokenizer.cc in Sources */,
 				27DD1514193CD005009A367D /* RevID.cc in Sources */,
-				27F952901A7AD818007F0269 /* Data+ObjC.mm in Sources */,
+				27F952901A7AD818007F0269 /* Encoding+ObjC.mm in Sources */,
 				277D19C8194CCE7A008E91EB /* RevID.mm in Sources */,
 				27E4871C19218E5D007D8940 /* slice.cc in Sources */,
 				27E487341924242C007D8940 /* Index.cc in Sources */,
 				271E03521A21A331007B843E /* fdb_errors.cc in Sources */,
-				27E66B681A76D2940091DA3F /* DataWriter.cc in Sources */,
+				27E66B681A76D2940091DA3F /* EncodingWriter.cc in Sources */,
 				27E66B6C1A76F6C10091DA3F /* murmurhash3_x86_32.c in Sources */,
 				275F1446195CC588009DADB2 /* VersionedDocument.mm in Sources */,
 				27139BC218F8EEBE0021A9A3 /* varint.cc in Sources */,
@@ -1579,7 +1579,7 @@
 				270A4B081925746900DE4104 /* VersionedDocument_Tests.mm in Sources */,
 				272230451A08133300BFF25C /* Tokenizer_Test.mm in Sources */,
 				2722304C1A08178200BFF25C /* GeoHash_Test.mm in Sources */,
-				27E66B6F1A77010F0091DA3F /* Data_Test.mm in Sources */,
+				27E66B6F1A77010F0091DA3F /* Encoding_Test.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1682,21 +1682,21 @@
 				272230481A0815E700BFF25C /* Geohash.cc in Sources */,
 				27E4872B1923F24D007D8940 /* VersionedDocument.cc in Sources */,
 				27E609A21951E4C000202B72 /* DocEnumerator.cc in Sources */,
-				27E66B631A76ACFC0091DA3F /* Data.cc in Sources */,
-				277CA75B1A7B090B00DDC338 /* DataWriter+ObjC.mm in Sources */,
-				277CA75F1A7B1AFB00DDC338 /* Data+JSON.cc in Sources */,
+				27E66B631A76ACFC0091DA3F /* Encoding.cc in Sources */,
+				277CA75B1A7B090B00DDC338 /* EncodingWriter+ObjC.mm in Sources */,
+				277CA75F1A7B1AFB00DDC338 /* Encoding+JSON.cc in Sources */,
 				27E4873A19255EA8007D8940 /* MapReduceIndex.cc in Sources */,
 				27EF008319492BD7001BF7F3 /* Collatable.mm in Sources */,
 				27E4872F1924178B007D8940 /* Collatable.cc in Sources */,
 				27EF81081917EEC600A327B9 /* varint.cc in Sources */,
 				2701993B19F1972E00FDC239 /* Tokenizer.cc in Sources */,
 				27E487231922A64F007D8940 /* RevTree.cc in Sources */,
-				27F9528F1A7AD818007F0269 /* Data+ObjC.mm in Sources */,
+				27F9528F1A7AD818007F0269 /* Encoding+ObjC.mm in Sources */,
 				27DD1513193CD005009A367D /* RevID.cc in Sources */,
 				277D19C7194CCE7A008E91EB /* RevID.mm in Sources */,
 				27E4871B19218E5D007D8940 /* slice.cc in Sources */,
 				271E03511A21A331007B843E /* fdb_errors.cc in Sources */,
-				27E66B671A76D2940091DA3F /* DataWriter.cc in Sources */,
+				27E66B671A76D2940091DA3F /* EncodingWriter.cc in Sources */,
 				27E66B6B1A76F6C10091DA3F /* murmurhash3_x86_32.c in Sources */,
 				275F1445195CC588009DADB2 /* VersionedDocument.mm in Sources */,
 				27E487331924242C007D8940 /* Index.cc in Sources */,

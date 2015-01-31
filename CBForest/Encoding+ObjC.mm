@@ -1,5 +1,5 @@
 //
-//  Data.mm
+//  Encoding+ObjC.mm
 //  CBForest
 //
 //  Created by Jens Alfke on 1/29/15.
@@ -7,13 +7,13 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "Data.hh"
+#import "Encoding.hh"
 
 
 namespace forestdb {
 
 
-    id value::asNSObject(NSArray* externStrings) const {
+    id value::asNSObject(__unsafe_unretained NSArray* externStrings) const {
         NSMapTable* strings = [[NSMapTable alloc]
                initWithKeyOptions: NSPointerFunctionsIntegerPersonality |
                                    NSPointerFunctionsOpaqueMemory
@@ -23,7 +23,9 @@ namespace forestdb {
     }
 
 
-    id value::asNSObject(NSMapTable *sharedStrings, NSArray* externStrings) const {
+    id value::asNSObject(__unsafe_unretained NSMapTable *sharedStrings,
+                         __unsafe_unretained NSArray* externStrings) const
+    {
         switch (_typeCode) {
             case kNullCode:
                 return [NSNull null];

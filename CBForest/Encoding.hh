@@ -1,5 +1,5 @@
 //
-//  Data.hh
+//  Encoding.hh
 //  CBForest
 //
 //  Created by Jens Alfke on 1/25/15.
@@ -36,6 +36,10 @@ namespace forestdb {
     /* A raw value */
     class value {
     public:
+        /** Makes sure the slice contains a valid value (and nothing else.)
+            If so, returns a pointer to it; else NULL. */
+        static const value* validate(slice);
+
         valueType type() const;
         const value* next() const;
 
@@ -81,6 +85,7 @@ namespace forestdb {
 
         size_t getParam() const;
         size_t getParam(const uint8_t* &after) const;
+        static bool validate(const void* start, slice&);
         friend class dataWriter;
 
 #ifdef __OBJC__
