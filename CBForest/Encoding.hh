@@ -11,6 +11,7 @@
 #include "slice.hh"
 #include <ctime>
 #include <stdint.h>
+#include <vector>
 
 
 namespace forestdb {

@@ -61,7 +61,7 @@ namespace forestdb {
         bool operator>(slice s) const               {return compare(s) > 0;}
 
         void moveStart(ptrdiff_t delta)             {buf = offsetby(buf, delta); size -= delta;}
-        bool checkedMoveStart(ptrdiff_t delta)      {if (size<delta) return false;
+        bool checkedMoveStart(size_t delta)         {if (size<delta) return false;
                                                      else {moveStart(delta); return true;}}
 
         slice copy() const;

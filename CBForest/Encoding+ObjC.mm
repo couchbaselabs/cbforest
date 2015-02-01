@@ -14,6 +14,8 @@ namespace forestdb {
 
 
     id value::asNSObject(__unsafe_unretained NSArray* externStrings) const {
+        if (this == NULL)
+            return nil;
         NSMapTable* strings = [[NSMapTable alloc]
                initWithKeyOptions: NSPointerFunctionsIntegerPersonality |
                                    NSPointerFunctionsOpaqueMemory
