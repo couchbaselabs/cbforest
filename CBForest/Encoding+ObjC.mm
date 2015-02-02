@@ -46,17 +46,27 @@ namespace forestdb {
                 return [NSDecimalNumber decimalNumberWithString: (NSString*)asString()];
             case kDateCode:
                 return [NSDate dateWithTimeIntervalSince1970: getParam()];
-            case kStringCode:
-                return (NSString*)asString();
+            case kStringCode: {
+                NSString* str = (NSString*)asString();
+                if (!str)
+                    throw "Invalid UTF-8 in string";
+                return str;
+            }
+            case kSharedStringRefCode: {
+                NSString* str = (__bridge NSString*)NSMapGet(sharedStrings, (const void*)stringToken());
+                if (str)
+                    return str;
+                // If not already registered, fall through to register it...
+            }
             case kSharedStringCode: {
                 NSString* str = (NSString*)asString();
+                if (!str)
+                    throw "Invalid UTF-8 in string";
                 NSMapInsertIfAbsent(sharedStrings,
                                     (const void*)stringToken(),
                                     CFBridgingRetain(str));
                 return str;
             }
-            case kSharedStringRefCode:
-                return (__bridge NSString*)NSMapGet(sharedStrings, (const void*)stringToken());
             case kExternStringRefCode:
                 if (!externStrings)
                     throw "unexpected extern string";

@@ -384,9 +384,10 @@ namespace forestdb {
     dict::iterator& dict::iterator::operator++() {
         if (_count == 0)
             throw "iterating past end of dict";
-        --_count;
-        _key = _value->next();
-        _value = _key->next();
+        if (--_count > 0) {
+            _key = _value->next();
+            _value = _key->next();
+        }
         return *this;
     }
 

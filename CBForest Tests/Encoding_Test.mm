@@ -314,7 +314,6 @@ using namespace forestdb;
 
     ++iter1;
     Assert(!iter1);
-    AssertEq(iter1.key(), s.end());
 
     // Random-access lookup:
     const value* v = d1->get(slice("twelve"));

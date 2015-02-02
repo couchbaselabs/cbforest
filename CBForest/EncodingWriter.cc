@@ -66,6 +66,8 @@ namespace forestdb {
     }
 
     void dataWriter::writeDouble(double n) {
+        if (isnan(n))
+            throw "Can't write NaN";
         if (n == (int64_t)n)
             return writeInt((int64_t)n);
         swappedDouble swapped = _encdouble(n);
@@ -74,6 +76,8 @@ namespace forestdb {
     }
 
     void dataWriter::writeFloat(float n) {
+        if (isnan(n))
+            throw "Can't write NaN";
         if (n == (int32_t)n)
             return writeInt((int32_t)n);
         swappedFloat swapped = _encfloat(n);
