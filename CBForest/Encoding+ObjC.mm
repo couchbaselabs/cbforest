@@ -13,21 +13,26 @@
 namespace forestdb {
 
 
+    NSMapTable* value::createSharedStringsTable() {
+        return [[NSMapTable alloc] initWithKeyOptions: NSPointerFunctionsIntegerPersonality |
+                                                       NSPointerFunctionsOpaqueMemory
+                                   valueOptions: NSPointerFunctionsStrongMemory
+                                       capacity: 10];
+    }
+
+
     id value::asNSObject(__unsafe_unretained NSArray* externStrings) const {
         if (this == NULL)
             return nil;
-        NSMapTable* strings = [[NSMapTable alloc]
-               initWithKeyOptions: NSPointerFunctionsIntegerPersonality |
-                                   NSPointerFunctionsOpaqueMemory
-               valueOptions: NSPointerFunctionsStrongMemory
-               capacity: 10];
-        return asNSObject(strings, externStrings);
+        return asNSObject(createSharedStringsTable(), externStrings);
     }
 
 
     id value::asNSObject(__unsafe_unretained NSMapTable *sharedStrings,
                          __unsafe_unretained NSArray* externStrings) const
     {
+        if (this == NULL)
+            return nil;
         switch (_typeCode) {
             case kNullCode:
                 return [NSNull null];

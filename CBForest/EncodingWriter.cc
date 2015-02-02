@@ -182,7 +182,7 @@ namespace forestdb {
         _indexPos += 2;
         _out.seekp(pos);
 
-        ++_count; // this doesn't 'count' as a dict item
+        ++_count; // the key doesn't 'count' as a dict item
         writeString(s);
     }
 

@@ -232,7 +232,7 @@ namespace forestdb {
             case kExternStringRefCode:
                 return param;
             default:
-                throw "value is not shared or extern string";
+                return 0;
         }
     }
 

@@ -77,6 +77,8 @@ namespace forestdb {
 
 #ifdef __OBJC__
         id asNSObject(NSArray* externStrings =nil) const;
+        id asNSObject(NSMapTable *sharedStrings, NSArray* externStrings =nil) const;
+        static NSMapTable* createSharedStringsTable();
 #endif
 
     protected:
@@ -100,10 +102,6 @@ namespace forestdb {
         size_t getParam(const uint8_t* &after) const;
         static bool validate(const void* start, slice&);
         friend class dataWriter;
-
-#ifdef __OBJC__
-        id asNSObject(NSMapTable *sharedStrings, NSArray* externStrings) const;
-#endif
 };
 
 
@@ -133,7 +131,7 @@ namespace forestdb {
 
         size_t count() const                {return getParam();}
         const value* get(slice key) const   {return get(key, hashCode(key));}
-        const value* get(slice key, uint16_t hash) const;
+        const value* get(slice key, uint16_t hashCode) const;
 
         static uint16_t hashCode(slice);
 
@@ -142,44 +140,6 @@ namespace forestdb {
         friend class iterator;
         friend class value;
     };
-
-
-#if 0 // not doing it this way(?)
-    class dict : public value {
-    public:
-        class iterator {
-        public:
-            iterator(const dict*);
-            uint16_t hash() const       {return _entry->hash;}  //TODO: Endian conversion
-            const value* key() const;
-            const value* value() const  {return key()->next();}
-
-            operator bool() const       {return _count > 0;}
-            inline iterator& operator++();
-
-        private:
-            struct raw {
-                uint16_t hash;
-                uint32_t offset;
-            };
-            const dict* _dict;
-            size_t _count;
-            const raw* _entry;
-            uint8_t _step;
-            friend class dict;
-        };
-
-        size_t count() const                                {return getParam();}
-        const value* get(slice key) const                   {return get(key, hashCode(key));}
-        const value* get(slice key, uint16_t hash) const;
-    };
-    dict::iterator& dict::iterator::operator++() {
-        --_count;
-        _entry = (const raw*) offsetby(_entry, _step);
-        return *this;
-    }
-#endif
-
 
 }
 
