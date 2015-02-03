@@ -22,7 +22,7 @@
 #include <memory>
 
 
-#define offsetby(PTR,OFFSET) (void*)((uint8_t*)(PTR)+(OFFSET))
+#define offsetby(PTR,OFFSET) (void*)((uint8_t*)(PTR)+(ptrdiff_t)(OFFSET))
 
 
 namespace forestdb {

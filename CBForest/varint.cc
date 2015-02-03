@@ -59,11 +59,30 @@ size_t GetUVarInt(slice buf, uint64_t *n) {
     return 0; // buffer too short
 }
 
+size_t GetUVarInt32(slice buf, uint32_t *n) {
+    uint64_t n64;
+    size_t size = GetUVarInt(buf, &n64);
+    if (n64 > UINT32_MAX)
+        return 0; // Numeric overflow
+    *n = (uint32_t)n64;
+    return size;
+}
+
 
 bool ReadUVarInt(slice *buf, uint64_t *n) {
     if (buf->size == 0)
         return false;
     size_t bytesRead = GetUVarInt(*buf, n);
+    if (bytesRead == 0)
+        return false;
+    buf->moveStart(bytesRead);
+    return true;
+}
+
+bool ReadUVarInt32(slice *buf, uint32_t *n) {
+    if (buf->size == 0)
+        return false;
+    size_t bytesRead = GetUVarInt32(*buf, n);
     if (bytesRead == 0)
         return false;
     buf->moveStart(bytesRead);

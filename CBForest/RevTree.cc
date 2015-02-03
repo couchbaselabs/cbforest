@@ -26,8 +26,6 @@
 #include <ostream>
 #include <sstream>
 
-#define offsetby(PTR,OFFSET) (void*)((uint8_t*)(PTR)+(OFFSET))
-
 
 namespace forestdb {
 

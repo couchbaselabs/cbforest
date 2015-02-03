@@ -39,15 +39,15 @@ namespace forestdb {
         return _typeCode < sizeof(kValueTypes) ? (valueType)kValueTypes[_typeCode] : kNull;
     }
 
-    size_t value::getParam() const {
-        uint64_t param;
-        forestdb::GetUVarInt(slice(_paramStart, kMaxVarintLen64), &param);
+    uint32_t value::getParam() const {
+        uint32_t param;
+        forestdb::GetUVarInt32(slice(_paramStart, kMaxVarintLen32), &param);
         return param;
     }
 
-    size_t value::getParam(const uint8_t* &after) const {
-        uint64_t param;
-        after = _paramStart + forestdb::GetUVarInt(slice(_paramStart, kMaxVarintLen64), &param);
+    uint32_t value::getParam(const uint8_t* &after) const {
+        uint32_t param;
+        after = _paramStart + forestdb::GetUVarInt32(slice(_paramStart, kMaxVarintLen64), &param);
         return param;
     }
 
@@ -65,7 +65,7 @@ namespace forestdb {
             default: break;
         }
 
-        uint64_t param = getParam(end);
+        uint32_t param = getParam(end);
 
         switch (_typeCode) {
             case kRawNumberCode:
@@ -87,7 +87,7 @@ namespace forestdb {
             }
             case kDictCode: {
                 // This is somewhat expensive: have to traverse all keys+values in the dict
-                size_t count;
+                uint32_t count;
                 const value* key = ((const dict*)this)->firstKey(count);
                 for (; count > 0; --count)
                     key = key->next()->next();
@@ -201,7 +201,7 @@ namespace forestdb {
 
     slice value::asString() const {
         const uint8_t* payload;
-        uint64_t param = getParam(payload);
+        uint32_t param = getParam(payload);
         switch (_typeCode) {
             case kStringCode:
             case kSharedStringCode:
@@ -209,7 +209,7 @@ namespace forestdb {
             case kRawNumberCode:
                 return slice(payload, (size_t)param);
             case kSharedStringRefCode: {
-                const value* str = (const value*)offsetby(this, -param);
+                const value* str = (const value*)offsetby(this, -(ptrdiff_t)param);
                 if (str->_typeCode != kSharedStringCode)
                     throw "invalid shared-string";
                 param = str->getParam(payload);
@@ -223,14 +223,14 @@ namespace forestdb {
     }
 
     uint64_t value::stringToken() const {
-        uint64_t param = getParam();
+        uint32_t param = getParam();
         switch (_typeCode) {
             case kSharedStringCode:
-                return (uint64_t)this;
+                return (uint64_t)this;              // Shared string: return pointer to this
             case kSharedStringRefCode:
-                return (uint64_t)this - param;
+                return (uint64_t)this - param;      // Shared ref: return pointer to original string
             case kExternStringRefCode:
-                return param;
+                return param;                       // Extern string: return code
             default:
                 return 0;
         }
@@ -281,8 +281,8 @@ namespace forestdb {
             return s.checkedMoveStart(size);
         }
 
-        uint64_t param;
-        if (!ReadUVarInt(&s, &param))
+        uint32_t param;
+        if (!ReadUVarInt32(&s, &param))
             return false;
 
         switch (type) {
@@ -300,7 +300,7 @@ namespace forestdb {
             case kSharedStringRefCode: {
                 // Get pointer to original string:
                 slice origString;
-                origString.buf = offsetby(valueStart, -param);
+                origString.buf = offsetby(valueStart, -(ptrdiff_t)param);
                 if (origString.buf < start || origString.buf >= s.buf)
                     return false;
                 // Check that it's marked as a shared string:
@@ -352,12 +352,12 @@ namespace forestdb {
 
     const value* dict::get(forestdb::slice keyToFind, uint16_t hashToFind) const {
         const uint8_t* after;
-        size_t count = getParam(after);
+        uint32_t count = getParam(after);
         auto hashes = (const uint16_t*)after;
 
-        size_t keyIndex = 0;
+        uint32_t keyIndex = 0;
         const value* key = (const value*)&hashes[count];
-        for (size_t i = 0; i < count; i++) {
+        for (uint32_t i = 0; i < count; i++) {
             if (hashes[i] == hashToFind) {
                 while (keyIndex < i) {
                     key = key->next()->next();
@@ -370,7 +370,7 @@ namespace forestdb {
         return NULL;
     }
 
-    const value* dict::firstKey(size_t &count) const {
+    const value* dict::firstKey(uint32_t &count) const {
         const uint8_t* after;
         count = getParam(after);
         return (value*) offsetby(after, count * sizeof(uint16_t));

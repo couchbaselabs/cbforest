@@ -103,7 +103,7 @@ namespace forestdb {
             case kExternStringRefCode:
                 if (!externStrings)
                     throw "unexpected extern string";
-                return writeEscaped(out, (*externStrings)[stringToken() - 1]);
+                return writeEscaped(out, (*externStrings)[(size_t)stringToken() - 1]);
             case kDataCode:
                 return writeBase64(out, asString());
             case kArrayCode: {

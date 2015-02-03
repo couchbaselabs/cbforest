@@ -67,9 +67,9 @@ namespace forestdb {
         std::ostream& _out;
         uint64_t _count;
         std::vector<uint64_t> _savedCounts;
-        size_t _indexPos;
-        std::vector<size_t> _savedIndexPos;
-        std::unordered_map<std::string, size_t> _sharedStrings;
+        uint64_t _indexPos;
+        std::vector<uint64_t> _savedIndexPos;
+        std::unordered_map<std::string, uint32_t> _sharedStrings;
         const std::unordered_map<std::string, uint32_t> *_externStrings;
     };
 

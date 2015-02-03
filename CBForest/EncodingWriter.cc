@@ -120,7 +120,9 @@ namespace forestdb {
         size_t len = str.length();
         const bool shareable = (len >= kMinSharedStringLength && len <= kMaxSharedStringLength);
         if (shareable) {
-            size_t curOffset = _out.tellp();
+            uint64_t curOffset = _out.tellp();
+            if (curOffset > UINT32_MAX)
+                throw "output too large";
             size_t sharedOffset = _sharedStrings[str];
             if (sharedOffset > 0) {
                 // Change previous string opcode to shared:
@@ -135,7 +137,7 @@ namespace forestdb {
                 addUVarint(curOffset - sharedOffset);
                 return;
             }
-            _sharedStrings[str] = curOffset;
+            _sharedStrings[str] = (uint32_t)curOffset;
         }
 
         // First appearance, or unshareable, so write the string itself:

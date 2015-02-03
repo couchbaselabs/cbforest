@@ -98,8 +98,8 @@ namespace forestdb {
         typeCode _typeCode;
         uint8_t _paramStart[1];
 
-        size_t getParam() const;
-        size_t getParam(const uint8_t* &after) const;
+        uint32_t getParam() const;
+        uint32_t getParam(const uint8_t* &after) const;
         static bool validate(const void* start, slice&);
         friend class dataWriter;
 };
@@ -107,7 +107,7 @@ namespace forestdb {
 
     class array : public value {
     public:
-        size_t count() const            {return getParam();}
+        uint32_t count() const          {return getParam();}
         const value* first() const;
     };
 
@@ -124,19 +124,19 @@ namespace forestdb {
             iterator& operator++();
 
         private:
-            size_t _count;
+            uint32_t _count;
             const class value* _key;
             const class value* _value;
         };
 
-        size_t count() const                {return getParam();}
+        uint32_t count() const              {return getParam();}
         const value* get(slice key) const   {return get(key, hashCode(key));}
         const value* get(slice key, uint16_t hashCode) const;
 
         static uint16_t hashCode(slice);
 
     private:
-        const value* firstKey(size_t &count) const;
+        const value* firstKey(uint32_t &count) const;
         friend class iterator;
         friend class value;
     };

@@ -58,7 +58,7 @@ namespace forestdb {
                 return str;
             }
             case kSharedStringRefCode: {
-                NSString* str = (__bridge NSString*)NSMapGet(sharedStrings, (const void*)stringToken());
+                NSString* str = [sharedStrings objectForKey: (__bridge id)(void*)stringToken()];
                 if (str)
                     return str;
                 // If not already registered, fall through to register it...
@@ -67,15 +67,17 @@ namespace forestdb {
                 NSString* str = (NSString*)asString();
                 if (!str)
                     throw "Invalid UTF-8 in string";
-                NSMapInsertIfAbsent(sharedStrings,
-                                    (const void*)stringToken(),
-                                    CFBridgingRetain(str));
+                [sharedStrings setObject: str forKey: (__bridge id)(void*)stringToken()];
                 return str;
             }
-            case kExternStringRefCode:
+            case kExternStringRefCode: {
                 if (!externStrings)
                     throw "unexpected extern string";
-                return externStrings[stringToken() - 1];
+                uint64_t stringIndex = stringToken();
+                if (stringIndex > UINT32_MAX)
+                    throw "invalid extern string index";
+                return externStrings[(uint32_t)stringIndex - 1];
+            }
             case kDataCode:
                 return asString().copiedNSData();
             case kArrayCode: {

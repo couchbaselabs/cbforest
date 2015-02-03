@@ -308,7 +308,7 @@ using namespace forestdb;
     for (NSUInteger t = 1; t <= kNTransactions; t++) {
         Transaction trans(db);
         for (NSUInteger d = 1; d <= kNDocs; d++) {
-            NSString* docID = [NSString stringWithFormat: @"%03lu.%03lu", t, d];
+            NSString* docID = [NSString stringWithFormat: @"%03u.%03u", (unsigned)t, (unsigned)d];
             trans.set(nsstring_slice(docID), nsstring_slice(@"some document content goes here"));
         }
     }
@@ -319,7 +319,7 @@ using namespace forestdb;
         //NSLog(@"key = %@", key);
         NSUInteger t = (i / kNDocs) + 1;
         NSUInteger d = (i % kNDocs) + 1;
-        XCTAssertEqualObjects(key, ([NSString stringWithFormat: @"%03lu.%03lu", t, d]));
+        XCTAssertEqualObjects(key, ([NSString stringWithFormat: @"%03u.%03u", (unsigned)t, (unsigned)d]));
         i++;
     }
 }
