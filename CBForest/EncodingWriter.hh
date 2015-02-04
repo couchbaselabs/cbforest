@@ -40,7 +40,7 @@ namespace forestdb {
         void writeData(slice);
 
         void beginArray(uint64_t count);
-        void endArray()                             {popCount();}
+        void endArray()                             {popState();}
 
         void beginDict(uint64_t count);
         void writeKey(std::string);
@@ -59,16 +59,25 @@ namespace forestdb {
 #endif
 
     private:
-        void addTypeCode(value::typeCode code)      {_out.write((char*)&code, 1); --_count;}
+        void _addTypeCode(value::typeCode code)     {_out.write((char*)&code, 1);}
+        void addTypeCode(value::typeCode code)      {_addTypeCode(code); ++_state->i;}
         void addUVarint(uint64_t);
+
+        struct state {
+            uint64_t count;
+            uint64_t i;
+            uint64_t indexPos;
+            uint16_t* hashes;
+        };
+
+        void pushState();
+        void popState();
         void pushCount(uint64_t count);
-        void popCount();
+        void writeHashes();
 
         std::ostream& _out;
-        uint64_t _count;
-        std::vector<uint64_t> _savedCounts;
-        uint64_t _indexPos;
-        std::vector<uint64_t> _savedIndexPos;
+        state* _state;
+        std::vector<state> _states;
         std::unordered_map<std::string, uint32_t> _sharedStrings;
         const std::unordered_map<std::string, uint32_t> *_externStrings;
     };

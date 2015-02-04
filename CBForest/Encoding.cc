@@ -347,7 +347,7 @@ namespace forestdb {
     uint16_t dict::hashCode(slice s) {
         uint32_t result;
         MurmurHash3_x86_32(s.buf, (int)s.size, 0, &result);
-        return result & 0xFFFF;
+        return (uint16_t)_enc16(result & 0xFFFF);
     }
 
     const value* dict::get(forestdb::slice keyToFind, uint16_t hashToFind) const {

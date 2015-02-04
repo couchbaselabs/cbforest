@@ -317,8 +317,10 @@ using namespace forestdb;
 
     // Random-access lookup:
     const value* v = d1->get(slice("twelve"));
+    Assert(v != NULL);
     AssertEq(v->asInt(), 12);
     v = d1->get(slice("nested"));
+    Assert(v != NULL);
     AssertEq(v->type(), kDict);
     v = d1->get(slice("bogus"));
     Assert(v == NULL);

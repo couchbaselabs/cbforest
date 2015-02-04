@@ -19,7 +19,10 @@ namespace forestdb {
                            const std::unordered_map<std::string, uint32_t>* externStrings)
     :_out(out),
      _externStrings(externStrings)
-    { }
+    {
+        pushState();
+        _state->count = 0;
+    }
 
     void dataWriter::addUVarint(uint64_t n) {
         char buf[kMaxVarintLen64];
@@ -128,8 +131,7 @@ namespace forestdb {
                 // Change previous string opcode to shared:
                 auto pos = _out.tellp();
                 _out.seekp(sharedOffset);
-                ++_count;
-                addTypeCode(value::kSharedStringCode);
+                _addTypeCode(value::kSharedStringCode);
                 _out.seekp(pos);
 
                 // Write reference to previous string:
@@ -146,17 +148,25 @@ namespace forestdb {
         _out << str;
     }
 
-    void dataWriter::pushCount(uint64_t count) {
-        addUVarint(count);
-        _savedCounts.push_back(_count);
-        _count = count;
+    void dataWriter::pushState() {
+        _states.push_back(state());
+        _state = &_states[_states.size()-1];
+        _state->hashes = NULL;
     }
 
-    void dataWriter::popCount() {
-        if (_count != 0)
+    void dataWriter::popState() {
+        if (_state->i != _state->count)
             throw "dataWriter: mismatched count";
-        _count = _savedCounts.back();
-        _savedCounts.pop_back();
+        delete[] _state->hashes;
+        _states.pop_back();
+        _state = &_states[_states.size()-1];
+    }
+
+    void dataWriter::pushCount(uint64_t count) {
+        addUVarint(count);
+        pushState();
+        _state->count = count;
+        _state->i = 0;
     }
 
     void dataWriter::beginArray(uint64_t count) {
@@ -167,25 +177,21 @@ namespace forestdb {
     void dataWriter::beginDict(uint64_t count) {
         addTypeCode(value::kDictCode);
         pushCount(count);
-        // Write an empty hash list:
-        _savedIndexPos.push_back(_indexPos);
-        _indexPos = _out.tellp();
-        uint16_t hash = 0;
-        for (; count > 0; --count)
-            _out.write((char*)&hash, sizeof(hash));
+        // Write an empty/garbage hash list as a placeholder to fill in later:
+        _state->hashes = new uint16_t[count];
+        _state->indexPos = _out.tellp();
+        writeHashes();
+    }
+
+    void dataWriter::writeHashes() {
+        _out.write((char*)_state->hashes, _state->count*sizeof(uint16_t));
     }
 
     void dataWriter::writeKey(std::string s) {
         // Go back and write the hash code to the index:
-        uint16_t hashCode = dict::hashCode(s);
-        uint64_t pos = _out.tellp();
-        _out.seekp(_indexPos);
-        _out.write((char*)&hashCode, 2);
-        _indexPos += 2;
-        _out.seekp(pos);
-
-        ++_count; // the key doesn't 'count' as a dict item
+        _state->hashes[_state->i] = dict::hashCode(s);
         writeString(s);
+        --_state->i; // the key didn't 'count' as a dict item
     }
 
     void dataWriter::writeKey(slice str) {
@@ -193,9 +199,11 @@ namespace forestdb {
     }
 
     void dataWriter::endDict() {
-        popCount();
-        _indexPos = _savedIndexPos.back();
-        _savedIndexPos.pop_back();
+        uint64_t pos = _out.tellp();
+        _out.seekp(_state->indexPos);
+        writeHashes();
+        _out.seekp(pos);
+        popState();
     }
 
 }
