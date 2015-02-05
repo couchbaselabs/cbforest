@@ -51,7 +51,8 @@ namespace forestdb {
     }
 
     bool IndexWriter::update(slice docID, sequence docSequence,
-                             std::vector<Collatable> keys, std::vector<Collatable> values,
+                             const std::vector<Collatable>& keys,
+                             const std::vector<Collatable>& values,
                              uint64_t &rowCount)
     {
         Collatable collatableDocID;
@@ -94,7 +95,7 @@ namespace forestdb {
 
 
     alloc_slice Index::getEntry(slice docID, sequence docSequence,
-                                Collatable key, unsigned emitIndex) {
+                                const Collatable& key, unsigned emitIndex) {
         Collatable collatableDocID;
         collatableDocID << docID;
         Collatable realKey;
@@ -113,7 +114,7 @@ namespace forestdb {
 
 
     // Converts an index key into the actual key used in the index db (key + docID)
-    static Collatable makeRealKey(Collatable key, slice docID, bool isEnd, bool descending) {
+    static Collatable makeRealKey(const Collatable& key, slice docID, bool isEnd, bool descending) {
         bool addEllipsis = (isEnd != descending);
         if (key.empty() && addEllipsis)
             return Collatable();
@@ -139,8 +140,8 @@ namespace forestdb {
     }
 
     IndexEnumerator::IndexEnumerator(Index* index,
-                                     Collatable startKey, slice startKeyDocID,
-                                     Collatable endKey,   slice endKeyDocID,
+                                     const Collatable& startKey, slice startKeyDocID,
+                                     const Collatable& endKey,   slice endKeyDocID,
                                      const DocEnumerator::Options& options)
     :_index(index),
      _options(options),

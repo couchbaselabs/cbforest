@@ -10,6 +10,7 @@
 #define __CBForest__DataWriter__
 
 #include "Encoding.hh"
+#include "Writer.hh"
 #include <ctime>
 #include <iostream>
 #include <unordered_map>
@@ -19,8 +20,10 @@ namespace forestdb {
 
     class dataWriter {
     public:
-        dataWriter(std::ostream&,
+        dataWriter(Writer&,
                    const std::unordered_map<std::string, uint32_t> *externStrings = NULL);
+
+        void enableSharedStrings(bool e)            {_enableSharedStrings = e;}
 
         void writeNull();
         void writeBool (bool);
@@ -39,10 +42,10 @@ namespace forestdb {
 
         void writeData(slice);
 
-        void beginArray(uint64_t count);
+        void beginArray(uint32_t count);
         void endArray()                             {popState();}
 
-        void beginDict(uint64_t count);
+        void beginDict(uint32_t count);
         void writeKey(std::string);
         void writeKey(slice);
         void endDict();
@@ -59,25 +62,25 @@ namespace forestdb {
 #endif
 
     private:
-        void _addTypeCode(value::typeCode code)     {_out.write((char*)&code, 1);}
+        void _addTypeCode(value::typeCode code)     {_out << code;}
         void addTypeCode(value::typeCode code)      {_addTypeCode(code); ++_state->i;}
         void addUVarint(uint64_t);
 
         struct state {
-            uint64_t count;
-            uint64_t i;
-            uint64_t indexPos;
+            uint32_t count;
+            uint32_t i;
+            size_t indexPos;
             uint16_t* hashes;
         };
 
         void pushState();
         void popState();
-        void pushCount(uint64_t count);
-        void writeHashes();
+        void pushCount(uint32_t count);
 
-        std::ostream& _out;
+        Writer& _out;
         state* _state;
         std::vector<state> _states;
+        bool _enableSharedStrings;
         std::unordered_map<std::string, uint32_t> _sharedStrings;
         const std::unordered_map<std::string, uint32_t> *_externStrings;
     };

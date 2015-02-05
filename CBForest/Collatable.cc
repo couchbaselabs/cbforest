@@ -19,6 +19,8 @@
 
 namespace forestdb {
 
+    static const size_t kDefaultBufferSize = 64;
+
     static inline void _invertDouble(swappedDouble& swapped) {
         swapped.asRaw ^= 0xFFFFFFFFFFFFFFFF;
     }
@@ -27,6 +29,15 @@ namespace forestdb {
 
 
     Collatable::Collatable()
+    :_out(kDefaultBufferSize)
+    { }
+
+    Collatable::Collatable(const Collatable& c)
+    :_out(c._out)
+    { }
+
+    Collatable::Collatable(Collatable&& c)
+    :_out((Writer&&)c._out)
     { }
 
     Collatable& Collatable::addBool (bool b) {
@@ -44,31 +55,24 @@ namespace forestdb {
     }
 
     Collatable& Collatable::operator<< (std::string str) {
-        const uint8_t* priority = getCharPriorityMap();
-        addTag(kString);
-        size_t first = _str.length();
-        _str += str;
-        for (auto c=_str.begin()+first; c != _str.end(); ++c) {
-            *c = priority[(uint8_t)*c];
-        }
-        _str.push_back(0);
-        return *this;
+        return (*this) << slice(str);
     }
 
     Collatable& Collatable::operator<< (slice s) {
         const uint8_t* priority = getCharPriorityMap();
         addTag(kString);
-        size_t first = _str.length();
+        size_t first = _out.length();
         add(s);
-        for (auto c=_str.begin()+first; c != _str.end(); ++c) {
+        slice output = _out.output();
+        for (auto c = (uint8_t*)&output[first]; c != output.end(); ++c) {
             *c = priority[(uint8_t)*c];
         }
-        _str.push_back(0);
+        _out << 0;
         return *this;
     }
 
     Collatable& Collatable::operator<< (const Collatable& coll) {
-        _str += coll._str;
+        _out << (slice)coll;
         return *this;
     }
 

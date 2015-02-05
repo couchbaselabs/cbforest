@@ -38,13 +38,13 @@ namespace forestdb {
 
     class EmitFn {
     public:
-        virtual void emit(Collatable key, Collatable value) =0;
+        virtual void emit(const Collatable& key, const Collatable& value) =0;
 
         /** Emits the text for full-text indexing. Each word in the text will be emitted separately
             as a string key. When querying, use IndexEnumerator::getTextToken to read the info. */
         virtual void emitTextTokens(slice text) =0;
 
-        inline void operator() (Collatable key, Collatable value) {emit(key, value);}
+        inline void operator() (const Collatable& key, const Collatable& value) {emit(key, value);}
     };
 
     class MapFn {

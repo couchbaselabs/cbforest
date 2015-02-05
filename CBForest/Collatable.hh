@@ -17,7 +17,7 @@
 #define __CBForest__Collatable__
 #include <stdint.h>
 #include <string>
-#include <iostream>
+#include "Writer.hh"
 #include "slice.hh"
 
 namespace forestdb {
@@ -45,6 +45,8 @@ namespace forestdb {
     class Collatable : public CollatableTypes {
     public:
         Collatable();
+        Collatable(const Collatable&);
+        Collatable(Collatable&&);
 
         template<typename T> explicit Collatable(const T &t)    {*this << t;}
 
@@ -71,18 +73,18 @@ namespace forestdb {
 
         Collatable& addSpecial()                    {addTag(kSpecial); return *this;}
 
-        operator slice() const                      {return slice(_str);}
-        size_t size() const                         {return _str.size();}
-        bool empty() const                          {return _str.size() == 0;}
-        bool operator< (const Collatable& c) const  {return _str < c._str;}
+        operator slice() const                      {return _out.output();}
+        size_t size() const                         {return _out.length();}
+        bool empty() const                          {return size() == 0;}
+        bool operator< (const Collatable& c) const  {return _out.output().compare(c) < 0;}
 
         std::string dump();
 
     private:
-        void addTag(Tag t)                          {uint8_t c = t; add(slice(&c,1));}
-        void add(slice s)                           {_str += std::string((char*)s.buf, s.size);}
+        void addTag(Tag t)                          {_out << (uint8_t)t;}
+        void add(slice s)                           {_out << s;}
 
-        std::string _str;
+        Writer _out;
     };
 
 

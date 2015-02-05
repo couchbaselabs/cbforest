@@ -46,8 +46,8 @@ namespace forestdb {
         const void* end() const                     {return offset(size);}
         void setEnd(const void* e)                  {size = (uint8_t*)e - (uint8_t*)buf;}
 
-        const uint8_t& operator[](unsigned i) const     {return ((const uint8_t*)buf)[i];}
-        slice operator()(unsigned i, unsigned n) const  {return slice(offset(i), n);}
+        const uint8_t& operator[](size_t i) const     {return ((const uint8_t*)buf)[i];}
+        slice operator()(size_t i, unsigned n) const  {return slice(offset(i), n);}
 
         slice read(size_t nBytes);
         bool readInto(slice dst);
@@ -77,8 +77,13 @@ namespace forestdb {
 
         NSData* copiedNSData() const;
 
-        /** Creates an NSData using initWithBytesNoCopy, i.e. it doesn't own the bytes */
+        /** Creates an NSData using initWithBytesNoCopy and freeWhenDone:NO.
+            The data is not copied and does not belong to the NSData object. */
         NSData* uncopiedNSData() const;
+
+        /** Creates an NSData using initWithBytesNoCopy but with freeWhenDone:YES.
+            The data is not copied but it now belongs to the NSData object. */
+        NSData* convertToNSData();
 #endif
     };
 
@@ -98,10 +103,15 @@ namespace forestdb {
         alloc_slice(std::string str)
             :std::shared_ptr<char>((char*)alloc(&str[0], str.length()),::free), slice(get(), str.length()) {}
 
+        static alloc_slice adopt(slice s)            {return alloc_slice((void*)s.buf,s.size,true);}
+        static alloc_slice adopt(void* buf, size_t size) {return alloc_slice(buf,size,true);}
+
         alloc_slice& operator=(slice);
 
     private:
         static void* alloc(const void* src, size_t size);
+        explicit alloc_slice(void* adoptBuf, size_t size, bool)
+            :std::shared_ptr<char>((char*)adoptBuf,::free), slice(get(),size) {}
     };
 
 #ifdef __OBJC__

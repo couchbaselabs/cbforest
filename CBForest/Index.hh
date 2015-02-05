@@ -28,9 +28,9 @@ namespace forestdb {
         Collatable end;
         bool inclusiveEnd;
 
-        KeyRange(Collatable s, Collatable e, bool inclusive =true)
+        KeyRange(const Collatable& s, const Collatable& e, bool inclusive =true)
                                                 :start(s), end(e), inclusiveEnd(inclusive) { }
-        KeyRange(Collatable single)             :start(single), end(single), inclusiveEnd(true) { }
+        KeyRange(const Collatable& single)             :start(single), end(single), inclusiveEnd(true) { }
         KeyRange(const KeyRange &r)             :start(r.start), end(r.end),
                                                  inclusiveEnd(r.inclusiveEnd) { }
         bool isKeyPastEnd(slice key) const;
@@ -43,7 +43,7 @@ namespace forestdb {
         Index(Database*, std::string name);
 
         alloc_slice getEntry(slice docID, sequence docSequence,
-                             Collatable key,
+                             const Collatable& key,
                              unsigned emitIndex);
 
     private:
@@ -62,8 +62,8 @@ namespace forestdb {
             Returns true if the index may have changed as a result. */
         bool update(slice docID,
                     sequence docSequence,
-                    std::vector<Collatable> keys,
-                    std::vector<Collatable> values,
+                    const std::vector<Collatable>& keys,
+                    const std::vector<Collatable>& values,
                     uint64_t &rowCount);
 
     private:
@@ -78,8 +78,8 @@ namespace forestdb {
     class IndexEnumerator {
     public:
         IndexEnumerator(Index*,
-                        Collatable startKey, slice startKeyDocID,
-                        Collatable endKey, slice endKeyDocID,
+                        const Collatable& startKey, slice startKeyDocID,
+                        const Collatable& endKey,   slice endKeyDocID,
                         const DocEnumerator::Options&);
 
         IndexEnumerator(Index*,

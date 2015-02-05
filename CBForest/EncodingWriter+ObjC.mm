@@ -41,7 +41,7 @@ namespace forestdb {
                     break;
             }
         } else if ([obj isKindOfClass: [NSDictionary class]]) {
-            beginDict([obj count]);
+            beginDict((uint32_t)[obj count]);
             for (NSString* key in obj) {
                 nsstring_slice slice(key);
                 writeKey(slice);
@@ -49,7 +49,7 @@ namespace forestdb {
             }
             endDict();
         } else if ([obj isKindOfClass: [NSArray class]]) {
-            beginArray([obj count]);
+            beginArray((uint32_t)[obj count]);
             for (NSString* item in obj) {
                 write(item);
             }

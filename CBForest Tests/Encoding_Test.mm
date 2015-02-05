@@ -14,6 +14,7 @@
 #import <sstream>
 #import <unordered_map>
 
+
 using namespace forestdb;
 
 
@@ -21,21 +22,27 @@ using namespace forestdb;
 @end
 
 @implementation Data_Test
-
-- (void)setUp {
-    [super setUp];
-    // Put setup code here. This method is called before the invocation of each test method in the class.
+{
+    bool _shareStrings;
 }
 
-- (void)tearDown {
-    // Put teardown code here. This method is called after the invocation of each test method in the class.
-    [super tearDown];
+// Overridden to run each test twice: once with shared strings enabled, once without
+- (void)invokeTest {
+    NSLog(@"-- without shared strings --");
+    _shareStrings = false;
+    [super invokeTest];
+    NSLog(@"-- with shared strings --");
+    _shareStrings = true;
+    [super invokeTest];
 }
+
 
 - (void)test01_Numbers {
-    std::stringstream out;
+    alloc_slice s;
     {
+        Writer out(32);
         dataWriter writer(out);
+        writer.enableSharedStrings(_shareStrings);
         writer.writeNull();
         writer.writeBool(false);
         writer.writeBool(true);
@@ -52,9 +59,8 @@ using namespace forestdb;
         writer.writeFloat((float)M_PI);
         writer.writeDouble(M_PI);
         writer.writeRawNumber("12345678901234567890123456789012345678901234567890.1234567890e-08");
+        s = alloc_slice::adopt(out.extractOutput());
     }
-    std::string str = out.str();
-    slice s = (slice)str;
     NSLog(@"Encoded = %@", s.uncopiedNSData());
 
     const value* v = (const array*)s.buf;
@@ -117,17 +123,18 @@ using namespace forestdb;
 }
 
 - (void)test02_Strings {
-    std::stringstream out;
+    alloc_slice s;
     {
+        Writer out(32);
         dataWriter writer(out);
+        writer.enableSharedStrings(_shareStrings);
         writer << "hey there";
         writer << std::string("hi there");
         writer << slice("ho there");
         writer << "";
         writer << std::string("hi there"); // repeated; will become shared ref
+        s = alloc_slice::adopt(out.extractOutput());
     }
-    std::string str = out.str();
-    slice s = (slice)str;
     NSLog(@"Encoded = %@", s.uncopiedNSData());
 
     const value* v = (const value*)s.buf;
@@ -136,7 +143,8 @@ using namespace forestdb;
     v = v->next();
     AssertEq(v->type(), kString);
     AssertEq(v->asString(), std::string("hi there"));
-    Assert(v->isSharedString());
+    if (_shareStrings)
+        Assert(v->isSharedString());
     uint64_t token = v->stringToken();
     v = v->next();
     AssertEq(v->type(), kString);
@@ -147,13 +155,17 @@ using namespace forestdb;
     v = v->next();
     AssertEq(v->type(), kString);
     AssertEq(v->asString(), std::string("hi there"));
-    Assert(v->isSharedString());
+    if (_shareStrings)
+        Assert(v->isSharedString());
     AssertEq(v->stringToken(), token);
     v = v->next();
     AssertEq(v, s.end());
 
-    // Make sure repeated string "hi there" is only stored once:
-    AssertEq(str.find("hi there"), str.rfind("hi there"));
+    if (_shareStrings) {
+        // Make sure repeated string "hi there" is only stored once:
+        std::string str((char*)s.buf, s.size);
+        AssertEq(str.find("hi there"), str.rfind("hi there"));
+    }
 }
 
 - (void)test03_ExternStrings {
@@ -161,17 +173,18 @@ using namespace forestdb;
     externStrings["hi there"] = 1;
     externStrings["ho there"] = 2;
 
-    std::stringstream out;
+    alloc_slice s;
     {
+        Writer out(32);
         dataWriter writer(out, &externStrings);
+        writer.enableSharedStrings(_shareStrings);
         writer << "hey there";
         writer << std::string("hi there");
         writer << slice("ho there");
         writer << "";
         writer << std::string("hi there");
+        s = alloc_slice::adopt(out.extractOutput());
     }
-    std::string str = out.str();
-    slice s = (slice)str;
     NSLog(@"Encoded = %@", s.uncopiedNSData());
 
     const value* v = (const value*)s.buf;
@@ -196,14 +209,17 @@ using namespace forestdb;
     AssertEq(v, s.end());
 
     // Make sure string "hi there" is not stored:
+    std::string str((char*)s.buf, s.size);
     AssertEq(str.find("hi there"), std::string::npos);
     AssertEq(str.find("ho there"), std::string::npos);
 }
 
 - (void)test04_Arrays {
-    std::stringstream out;
+    alloc_slice s;
     {
+        Writer out(32);
         dataWriter writer(out);
+        writer.enableSharedStrings(_shareStrings);
         writer.beginArray(3);
         writer.writeInt(12);
         writer << "hi there";
@@ -212,9 +228,8 @@ using namespace forestdb;
         writer.writeBool(false);
         writer.endArray();
         writer.endArray();
+        s = alloc_slice::adopt(out.extractOutput());
     }
-    std::string str = out.str();
-    slice s = (slice)str;
     NSLog(@"Encoded = %@", s.uncopiedNSData());
     Assert(value::validate(s));
 
@@ -255,9 +270,11 @@ using namespace forestdb;
 }
 
 - (void)test05_Dicts {
-    std::stringstream out;
+    alloc_slice s;
     {
+        Writer out(32);
         dataWriter writer(out);
+        writer.enableSharedStrings(_shareStrings);
         writer.beginDict(3);
         writer.writeKey("twelve");
         writer.writeInt(12);
@@ -271,9 +288,8 @@ using namespace forestdb;
         writer.writeBool(false);
         writer.endDict();
         writer.endDict();
+        s = alloc_slice::adopt(out.extractOutput());
     }
-    std::string str = out.str();
-    slice s = (slice)str;
     NSLog(@"Encoded = %@", s.uncopiedNSData());
     [self checkValidation: s];
 
@@ -325,8 +341,11 @@ using namespace forestdb;
     v = d1->get(slice("bogus"));
     Assert(v == NULL);
 
-    // Make sure repeated key "greeting" is only stored once:
-    AssertEq(str.find("greeting"), str.rfind("greeting"));
+    if (_shareStrings) {
+        // Make sure repeated key "greeting" is only stored once:
+        std::string str((char*)s.buf, s.size);
+        AssertEq(str.find("greeting"), str.rfind("greeting"));
+    }
 
     NSDictionary* nsDict = outer->asNSObject();
     AssertEqual(nsDict, (@{@"twelve": @12,
@@ -353,11 +372,11 @@ using namespace forestdb;
 }
 
 - (void) test06_ObjC {
-    std::stringstream out;
+    Writer out(32);
     dataWriter writer(out);
+    writer.enableSharedStrings(_shareStrings);
     writer.write(self.objCFixture);
-    std::string str = out.str();
-    slice s = (slice)str;
+    alloc_slice s = alloc_slice::adopt(out.extractOutput());
     NSLog(@"Encoded = %@", s.uncopiedNSData());
     [self checkValidation: s];
 
@@ -366,11 +385,11 @@ using namespace forestdb;
 }
 
 - (void) test07_JSON {
-    std::stringstream out;
+    Writer out(32);
     dataWriter writer(out);
+    writer.enableSharedStrings(_shareStrings);
     writer.write(self.objCFixture);
-    std::string str = out.str();
-    slice s = (slice)str;
+    alloc_slice s = alloc_slice::adopt(out.extractOutput());
     [self checkValidation: s];
 
     const value* outer = (const value*)s.buf;

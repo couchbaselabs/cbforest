@@ -134,12 +134,12 @@ namespace forestdb {
             delete _tokenizer;
         }
 
-        inline void emit(Collatable key, Collatable value) {
+        inline void emit(const Collatable &key, const Collatable &value) {
             keys.push_back(key);
             values.push_back(value);
         }
 
-        virtual void operator() (Collatable key, Collatable value) {
+        virtual void operator() (const Collatable& key, const Collatable& value) {
             emit(key, value);
         }
 
