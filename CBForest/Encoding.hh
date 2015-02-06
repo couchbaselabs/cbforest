@@ -41,6 +41,9 @@ namespace forestdb {
             If so, returns a pointer to it; else NULL. */
         static const value* validate(slice);
 
+        /** Returns true if the contents of the slice might be a value (just based on 1st byte) */
+        static bool mayBeValue(slice s)         {return s.size > 0 && s[0] <= kDictCode;}
+
         valueType type() const;
         const value* next() const;
 
