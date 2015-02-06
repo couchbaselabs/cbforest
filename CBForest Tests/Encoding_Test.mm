@@ -168,50 +168,52 @@ using namespace forestdb;
     }
 }
 
-- (void)test03_ExternStrings {
-    std::unordered_map<std::string, uint32_t> externStrings;
-    externStrings["hi there"] = 1;
-    externStrings["ho there"] = 2;
+- (void) test03_ExternStrings {
+    value::stringTable externStrings;
+    Writer out(32);
+    dataWriter writer(out, &externStrings, 2);
+    writer.beginDict(3);
+    writer.writeKey("_id");
+    writer.writeString("firstDoc");
+    writer.writeKey("_rev");
+    writer.writeString("1-f00ba5");
+    writer.writeKey("temp");
+    writer.writeDouble(98.6);
+    writer.endDict();
 
-    alloc_slice s;
-    {
-        Writer out(32);
-        dataWriter writer(out, &externStrings);
-        writer.enableSharedStrings(_shareStrings);
-        writer << "hey there";
-        writer << std::string("hi there");
-        writer << slice("ho there");
-        writer << "";
-        writer << std::string("hi there");
-        s = alloc_slice::adopt(out.extractOutput());
-    }
+    AssertEq(writer.addedExternStrings(), true);
+    AssertEq(externStrings.size(), 2);
+    AssertEq(externStrings[0], std::string("_id"));
+    AssertEq(externStrings[1], std::string("_rev"));
+
+    auto s = alloc_slice::adopt(out.extractOutput());
     NSLog(@"Encoded = %@", s.uncopiedNSData());
+    [self checkValidation: s];
 
-    const value* v = (const value*)s.buf;
-    AssertEq(v->type(), kString);
-    AssertEq(v->asString(), std::string("hey there"));
-    v = v->next();
-    AssertEq(v->type(), kString);
-    Assert(v->isExternString());
-    AssertEq(v->stringToken(), 1u);
-    v = v->next();
-    AssertEq(v->type(), kString);
-    Assert(v->isExternString());
-    AssertEq(v->stringToken(), 2u);
-    v = v->next();
-    AssertEq(v->type(), kString);
-    AssertEq(v->asString(), std::string(""));
-    v = v->next();
-    AssertEq(v->type(), kString);
-    Assert(v->isExternString());
-    AssertEq(v->stringToken(), 1u);
-    v = v->next();
-    AssertEq(v, s.end());
+    // Iterate:
+    const dict* d1 = ((const value*)s.buf)->asDict();
+    auto iter1 = dict::iterator(d1);
+    Assert(iter1);
+    Assert(iter1.key()->isExternString());
+    AssertEq(iter1.key()->stringToken(), 1);
+    AssertEq(iter1.value()->asString(), std::string("firstDoc"));
+    ++iter1;
 
-    // Make sure string "hi there" is not stored:
-    std::string str((char*)s.buf, s.size);
-    AssertEq(str.find("hi there"), std::string::npos);
-    AssertEq(str.find("ho there"), std::string::npos);
+    Assert(iter1);
+    Assert(iter1.key()->isExternString());
+    AssertEq(iter1.key()->stringToken(), 2);
+    AssertEq(iter1.value()->asString(), std::string("1-f00ba5"));
+    ++iter1;
+
+    value::stringTable externLookup;
+
+    // Random access:
+    const value* v = d1->get(std::string("_id"), &externStrings);
+    Assert(v);
+    AssertEq(v->asString(), std::string("firstDoc"));
+    v = d1->get(std::string("_rev"), &externStrings);
+    Assert(v);
+    AssertEq(v->asString(), std::string("1-f00ba5"));
 }
 
 - (void)test04_Arrays {

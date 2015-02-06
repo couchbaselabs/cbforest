@@ -16,13 +16,20 @@ namespace forestdb {
     static size_t kMinSharedStringLength = 4, kMaxSharedStringLength = 100;
 
     dataWriter::dataWriter(Writer& out,
-                           const std::unordered_map<std::string, uint32_t> *externStrings)
+                           value::stringTable *externStrings,
+                           uint32_t maxExternStrings)
     :_out(out),
-     _externStrings(externStrings)
+     _enableSharedStrings(false),
+     _externStrings(externStrings),
+     _maxExternStrings(maxExternStrings)
     {
+        // Invert externStrings, if given:
+        if (externStrings) {
+            for (size_t i = 0; i < externStrings->size(); i++)
+                _externStringsLookup[externStrings->at(i)] = (uint32_t)i + 1;
+        }
         pushState();
         _state->count = 0;
-        _enableSharedStrings = false;
     }
 
     void dataWriter::addUVarint(uint64_t n) {
@@ -106,30 +113,38 @@ namespace forestdb {
         _out << s;
     }
 
-    void dataWriter::writeString(slice s) {
+    void dataWriter::writeString(slice s, bool canAddExtern) {
         if (_externStrings || (_enableSharedStrings && s.size >= kMinSharedStringLength
                                                     && s.size <= kMaxSharedStringLength)) {
-            return writeString(std::string(s));
+            return writeString(std::string(s), canAddExtern);
         } else {
-            // not shareable so no need to convert to std::string
+            // not shareable or externable so no need to convert to std::string
             addTypeCode(value::kStringCode);
             addUVarint(s.size);
             _out << s;
         }
     }
 
-    void dataWriter::writeString(std::string str) {
+    void dataWriter::writeString(std::string str, bool canAddExtern) {
+        size_t len = str.length();
         if (_externStrings) {
-            auto externID = _externStrings->find(str);
-            if (externID != _externStrings->end()) {
+            auto externID = _externStringsLookup.find(str);
+            if (externID != _externStringsLookup.end()) {
                 // Write reference to extern string:
                 addTypeCode(value::kExternStringRefCode);
                 addUVarint(externID->second);
                 return;
             }
+            uint32_t n = (uint32_t)_externStrings->size();
+            if (n < _maxExternStrings && canAddExtern) {
+                _externStrings->push_back(str);
+                _externStringsLookup[str] = ++n;
+                addTypeCode(value::kExternStringRefCode);
+                addUVarint(n);
+                return;
+            }
         }
 
-        size_t len = str.length();
         if (_enableSharedStrings && len >= kMinSharedStringLength
                                  && len <= kMaxSharedStringLength) {
             size_t curOffset = _out.length();
@@ -190,15 +205,18 @@ namespace forestdb {
         _out.write((char*)_state->hashes, (std::streamsize)(_state->count*sizeof(uint16_t)));
     }
 
-    void dataWriter::writeKey(std::string s) {
+    void dataWriter::writeKey(std::string key, bool canAddExtern) {
         // Go back and write the hash code to the index:
-        _state->hashes[_state->i] = dict::hashCode(s);
-        writeString(s);
+        _state->hashes[_state->i] = dict::hashCode(key);
+        writeString(key, canAddExtern);
         --_state->i; // the key didn't 'count' as a dict item
     }
 
-    void dataWriter::writeKey(slice str) {
-        return writeKey(std::string(str));
+    void dataWriter::writeKey(slice key, bool canAddExtern) {
+        // Go back and write the hash code to the index:
+        _state->hashes[_state->i] = dict::hashCode(key);
+        writeString(key, canAddExtern);
+        --_state->i; // the key didn't 'count' as a dict item
     }
 
     void dataWriter::endDict() {

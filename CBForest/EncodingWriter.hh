@@ -21,7 +21,8 @@ namespace forestdb {
     class dataWriter {
     public:
         dataWriter(Writer&,
-                   const std::unordered_map<std::string, uint32_t> *externStrings = NULL);
+                   value::stringTable *externStrings = NULL,
+                   uint32_t maxExternStrings = 0);
 
         void enableSharedStrings(bool e)            {_enableSharedStrings = e;}
 
@@ -37,8 +38,8 @@ namespace forestdb {
 
         void writeDate(std::time_t);
 
-        void writeString(std::string);
-        void writeString(slice);
+        void writeString(std::string, bool canAddExtern =false);
+        void writeString(slice, bool canAddExtern =false);
 
         void writeData(slice);
 
@@ -46,8 +47,8 @@ namespace forestdb {
         void endArray()                             {popState();}
 
         void beginDict(uint32_t count);
-        void writeKey(std::string);
-        void writeKey(slice);
+        void writeKey(std::string, bool canAddExtern =true);
+        void writeKey(slice, bool canAddExtern =true);
         void endDict();
 
         // Note: overriding <<(bool) would be dangerous due to implicit conversion
@@ -77,12 +78,16 @@ namespace forestdb {
         void popState();
         void pushCount(uint32_t count);
 
+        typedef std::unordered_map<std::string, uint32_t> stringLookupTable;
+
         Writer& _out;
         state* _state;
         std::vector<state> _states;
         bool _enableSharedStrings;
-        std::unordered_map<std::string, uint32_t> _sharedStrings;
-        const std::unordered_map<std::string, uint32_t> *_externStrings;
+        stringLookupTable _sharedStrings;
+        stringLookupTable _externStringsLookup;
+        value::stringTable* _externStrings;
+        uint32_t _maxExternStrings;
     };
 
 

@@ -11,6 +11,7 @@
 #include "slice.hh"
 #include <ctime>
 #include <stdint.h>
+#include <unordered_map>
 #include <vector>
 
 
@@ -37,6 +38,8 @@ namespace forestdb {
     /* A raw value */
     class value {
     public:
+        typedef std::vector<std::string> stringTable;
+
         /** Makes sure the slice contains a valid value (and nothing else.)
             If so, returns a pointer to it; else NULL. */
         static const value* validate(slice);
@@ -59,7 +62,7 @@ namespace forestdb {
         std::string asDateString() const;
 
         /** Returns the exact contents of a (non-extern) string, data, or raw number. */
-        slice asString() const;
+        slice asString(const stringTable* externStrings =NULL) const;
         bool isExternString() const             {return _typeCode == kExternStringRefCode;}
         bool isSharedString() const             {return _typeCode == kSharedStringCode
                                                      || _typeCode == kSharedStringRefCode;}
@@ -133,8 +136,12 @@ namespace forestdb {
         };
 
         uint32_t count() const              {return getParam();}
-        const value* get(slice key) const   {return get(key, hashCode(key));}
-        const value* get(slice key, uint16_t hashCode) const;
+        const value* get(slice key,
+                         const stringTable* externStrings =NULL) const
+                                            {return get(key, hashCode(key), externStrings);}
+        const value* get(slice key,
+                         uint16_t hashCode,
+                         const stringTable* externStrings =NULL) const;
 
         static uint16_t hashCode(slice);
 

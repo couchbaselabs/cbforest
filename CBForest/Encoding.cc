@@ -199,7 +199,7 @@ namespace forestdb {
         return std::string(str);
     }
 
-    slice value::asString() const {
+    slice value::asString(const stringTable* externStrings) const {
         const uint8_t* payload;
         uint32_t param = getParam(payload);
         switch (_typeCode) {
@@ -216,7 +216,11 @@ namespace forestdb {
                 return slice(payload, (size_t)param);
             }
             case kExternStringRefCode:
-                throw "can't dereference extern string without table";
+                if (!externStrings)
+                    throw "can't dereference extern string without table";
+                if (param < 1 || param > externStrings->size())
+                    throw "invalid extern string index";
+                return (*externStrings)[param-1];
             default:
                 throw "value is not a string";
         }
@@ -350,7 +354,10 @@ namespace forestdb {
         return (uint16_t)_enc16(result & 0xFFFF);
     }
 
-    const value* dict::get(forestdb::slice keyToFind, uint16_t hashToFind) const {
+    const value* dict::get(forestdb::slice keyToFind,
+                           uint16_t hashToFind,
+                           const stringTable* externStrings) const
+    {
         const uint8_t* after;
         uint32_t count = getParam(after);
         auto hashes = (const uint16_t*)after;
@@ -363,7 +370,7 @@ namespace forestdb {
                     key = key->next()->next();
                     ++keyIndex;
                 }
-                if (keyToFind.compare(key->asString()) == 0)
+                if (keyToFind.compare(key->asString(externStrings)) == 0)
                     return key->next();
             }
         }
