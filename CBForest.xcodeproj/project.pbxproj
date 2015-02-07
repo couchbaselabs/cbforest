@@ -150,6 +150,8 @@
 		278EBFA619763269006362F8 /* btree_str_kv.cc in Sources */ = {isa = PBXBuildFile; fileRef = 278EBF8F1976317D006362F8 /* btree_str_kv.cc */; };
 		27A755061A86A2EE008BCD4D /* EncodingContext.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27A755041A86A2EE008BCD4D /* EncodingContext.cc */; };
 		27A755071A86A2EE008BCD4D /* EncodingContext.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27A755041A86A2EE008BCD4D /* EncodingContext.cc */; };
+		27A7550A1A86A5F7008BCD4D /* murmurhash3_x86_32.c in Sources */ = {isa = PBXBuildFile; fileRef = 27A755081A86A5F7008BCD4D /* murmurhash3_x86_32.c */; };
+		27A7550B1A86A5F7008BCD4D /* murmurhash3_x86_32.c in Sources */ = {isa = PBXBuildFile; fileRef = 27A755081A86A5F7008BCD4D /* murmurhash3_x86_32.c */; };
 		27B6298A197ED63D00F7148E /* btree_fast_str_kv.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B62988197ED63D00F7148E /* btree_fast_str_kv.cc */; };
 		27B6298B197ED63D00F7148E /* btree_fast_str_kv.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B62988197ED63D00F7148E /* btree_fast_str_kv.cc */; };
 		27C319EE1A143F5D00A89EDC /* KeyStore.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27C319EC1A143F5D00A89EDC /* KeyStore.cc */; };
@@ -194,8 +196,6 @@
 		27E66B641A76ACFC0091DA3F /* Encoding.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27E66B621A76ACFC0091DA3F /* Encoding.cc */; };
 		27E66B671A76D2940091DA3F /* EncodingWriter.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27E66B651A76D2940091DA3F /* EncodingWriter.cc */; };
 		27E66B681A76D2940091DA3F /* EncodingWriter.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27E66B651A76D2940091DA3F /* EncodingWriter.cc */; };
-		27E66B6B1A76F6C10091DA3F /* murmurhash3_x86_32.c in Sources */ = {isa = PBXBuildFile; fileRef = 27E66B691A76F6C10091DA3F /* murmurhash3_x86_32.c */; };
-		27E66B6C1A76F6C10091DA3F /* murmurhash3_x86_32.c in Sources */ = {isa = PBXBuildFile; fileRef = 27E66B691A76F6C10091DA3F /* murmurhash3_x86_32.c */; };
 		27E66B6E1A77010F0091DA3F /* Encoding_Test.mm in Sources */ = {isa = PBXBuildFile; fileRef = 27E66B6D1A77010F0091DA3F /* Encoding_Test.mm */; };
 		27E66B6F1A77010F0091DA3F /* Encoding_Test.mm in Sources */ = {isa = PBXBuildFile; fileRef = 27E66B6D1A77010F0091DA3F /* Encoding_Test.mm */; };
 		27EF007F1949297F001BF7F3 /* transaction.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27EF007E1949297F001BF7F3 /* transaction.cc */; };
@@ -543,6 +543,8 @@
 		278EBF9C19763238006362F8 /* memleak.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = memleak.h; sourceTree = "<group>"; };
 		27A755041A86A2EE008BCD4D /* EncodingContext.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EncodingContext.cc; sourceTree = "<group>"; };
 		27A755051A86A2EE008BCD4D /* EncodingContext.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = EncodingContext.hh; sourceTree = "<group>"; };
+		27A755081A86A5F7008BCD4D /* murmurhash3_x86_32.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = murmurhash3_x86_32.c; path = vendor/murmurhash/murmurhash3_x86_32.c; sourceTree = SOURCE_ROOT; };
+		27A755091A86A5F7008BCD4D /* murmurhash3_x86_32.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = murmurhash3_x86_32.h; path = vendor/murmurhash/murmurhash3_x86_32.h; sourceTree = SOURCE_ROOT; };
 		27B62988197ED63D00F7148E /* btree_fast_str_kv.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = btree_fast_str_kv.cc; sourceTree = "<group>"; };
 		27B62989197ED63D00F7148E /* btree_fast_str_kv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = btree_fast_str_kv.h; sourceTree = "<group>"; };
 		27C319EC1A143F5D00A89EDC /* KeyStore.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KeyStore.cc; sourceTree = "<group>"; };
@@ -583,8 +585,6 @@
 		27E66B621A76ACFC0091DA3F /* Encoding.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Encoding.cc; sourceTree = "<group>"; };
 		27E66B651A76D2940091DA3F /* EncodingWriter.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EncodingWriter.cc; sourceTree = "<group>"; };
 		27E66B661A76D2940091DA3F /* EncodingWriter.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = EncodingWriter.hh; sourceTree = "<group>"; };
-		27E66B691A76F6C10091DA3F /* murmurhash3_x86_32.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = murmurhash3_x86_32.c; path = ../../../../CBJSON/vendor/murmurhash/murmurhash3_x86_32.c; sourceTree = "<group>"; };
-		27E66B6A1A76F6C10091DA3F /* murmurhash3_x86_32.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = murmurhash3_x86_32.h; path = ../../../../CBJSON/vendor/murmurhash/murmurhash3_x86_32.h; sourceTree = "<group>"; };
 		27E66B6D1A77010F0091DA3F /* Encoding_Test.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Encoding_Test.mm; sourceTree = "<group>"; };
 		27EF007E1949297F001BF7F3 /* transaction.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = transaction.cc; sourceTree = "<group>"; };
 		27EF00811949299A001BF7F3 /* fdb_internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = fdb_internal.h; sourceTree = "<group>"; };
@@ -1032,8 +1032,8 @@
 				27FDFC0218EA58DA00AC4647 /* varint.hh */,
 				276E93B719ECA01100DDD621 /* LogInternal.hh */,
 				27EF80C7191445CF00A327B9 /* english_stopwords.h */,
-				27E66B691A76F6C10091DA3F /* murmurhash3_x86_32.c */,
-				27E66B6A1A76F6C10091DA3F /* murmurhash3_x86_32.h */,
+				27A755081A86A5F7008BCD4D /* murmurhash3_x86_32.c */,
+				27A755091A86A5F7008BCD4D /* murmurhash3_x86_32.h */,
 				2750724318E3E52800A80C5A /* Supporting Files */,
 			);
 			path = CBForest;
@@ -1577,13 +1577,13 @@
 				27E487241922A64F007D8940 /* RevTree.cc in Sources */,
 				2701993C19F1972E00FDC239 /* Tokenizer.cc in Sources */,
 				27DD1514193CD005009A367D /* RevID.cc in Sources */,
+				27A7550B1A86A5F7008BCD4D /* murmurhash3_x86_32.c in Sources */,
 				27F952901A7AD818007F0269 /* Encoding+ObjC.mm in Sources */,
 				277D19C8194CCE7A008E91EB /* RevID.mm in Sources */,
 				27E4871C19218E5D007D8940 /* slice.cc in Sources */,
 				27E487341924242C007D8940 /* Index.cc in Sources */,
 				271E03521A21A331007B843E /* fdb_errors.cc in Sources */,
 				27E66B681A76D2940091DA3F /* EncodingWriter.cc in Sources */,
-				27E66B6C1A76F6C10091DA3F /* murmurhash3_x86_32.c in Sources */,
 				275F1446195CC588009DADB2 /* VersionedDocument.mm in Sources */,
 				27139BC218F8EEBE0021A9A3 /* varint.cc in Sources */,
 			);
@@ -1715,13 +1715,13 @@
 				27EF81081917EEC600A327B9 /* varint.cc in Sources */,
 				2701993B19F1972E00FDC239 /* Tokenizer.cc in Sources */,
 				27E487231922A64F007D8940 /* RevTree.cc in Sources */,
+				27A7550A1A86A5F7008BCD4D /* murmurhash3_x86_32.c in Sources */,
 				27F9528F1A7AD818007F0269 /* Encoding+ObjC.mm in Sources */,
 				27DD1513193CD005009A367D /* RevID.cc in Sources */,
 				277D19C7194CCE7A008E91EB /* RevID.mm in Sources */,
 				27E4871B19218E5D007D8940 /* slice.cc in Sources */,
 				271E03511A21A331007B843E /* fdb_errors.cc in Sources */,
 				27E66B671A76D2940091DA3F /* EncodingWriter.cc in Sources */,
-				27E66B6B1A76F6C10091DA3F /* murmurhash3_x86_32.c in Sources */,
 				275F1445195CC588009DADB2 /* VersionedDocument.mm in Sources */,
 				27E487331924242C007D8940 /* Index.cc in Sources */,
 			);
