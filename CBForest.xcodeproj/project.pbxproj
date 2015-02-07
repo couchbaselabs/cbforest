@@ -148,6 +148,8 @@
 		278EBFA41976325A006362F8 /* memleak.cc in Sources */ = {isa = PBXBuildFile; fileRef = 278EBF9B19763238006362F8 /* memleak.cc */; };
 		278EBFA519763269006362F8 /* btree_str_kv.cc in Sources */ = {isa = PBXBuildFile; fileRef = 278EBF8F1976317D006362F8 /* btree_str_kv.cc */; };
 		278EBFA619763269006362F8 /* btree_str_kv.cc in Sources */ = {isa = PBXBuildFile; fileRef = 278EBF8F1976317D006362F8 /* btree_str_kv.cc */; };
+		27A755061A86A2EE008BCD4D /* EncodingContext.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27A755041A86A2EE008BCD4D /* EncodingContext.cc */; };
+		27A755071A86A2EE008BCD4D /* EncodingContext.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27A755041A86A2EE008BCD4D /* EncodingContext.cc */; };
 		27B6298A197ED63D00F7148E /* btree_fast_str_kv.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B62988197ED63D00F7148E /* btree_fast_str_kv.cc */; };
 		27B6298B197ED63D00F7148E /* btree_fast_str_kv.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B62988197ED63D00F7148E /* btree_fast_str_kv.cc */; };
 		27C319EE1A143F5D00A89EDC /* KeyStore.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27C319EC1A143F5D00A89EDC /* KeyStore.cc */; };
@@ -539,6 +541,8 @@
 		278EBF9819763203006362F8 /* adler32.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adler32.h; path = vendor/forestdb/utils/adler32.h; sourceTree = SOURCE_ROOT; };
 		278EBF9B19763238006362F8 /* memleak.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = memleak.cc; sourceTree = "<group>"; };
 		278EBF9C19763238006362F8 /* memleak.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = memleak.h; sourceTree = "<group>"; };
+		27A755041A86A2EE008BCD4D /* EncodingContext.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EncodingContext.cc; sourceTree = "<group>"; };
+		27A755051A86A2EE008BCD4D /* EncodingContext.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = EncodingContext.hh; sourceTree = "<group>"; };
 		27B62988197ED63D00F7148E /* btree_fast_str_kv.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = btree_fast_str_kv.cc; sourceTree = "<group>"; };
 		27B62989197ED63D00F7148E /* btree_fast_str_kv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = btree_fast_str_kv.h; sourceTree = "<group>"; };
 		27C319EC1A143F5D00A89EDC /* KeyStore.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KeyStore.cc; sourceTree = "<group>"; };
@@ -771,6 +775,8 @@
 				27E66B651A76D2940091DA3F /* EncodingWriter.cc */,
 				27E66B661A76D2940091DA3F /* EncodingWriter.hh */,
 				277CA75A1A7B090B00DDC338 /* EncodingWriter+ObjC.mm */,
+				27A755041A86A2EE008BCD4D /* EncodingContext.cc */,
+				27A755051A86A2EE008BCD4D /* EncodingContext.hh */,
 				272C6D791A82CA9D001AF525 /* Writer.cc */,
 				272C6D7A1A82CA9D001AF525 /* Writer.hh */,
 			);
@@ -1552,6 +1558,7 @@
 			files = (
 				272230501A0858A100BFF25C /* GeoIndex.cc in Sources */,
 				27E487281923B80E007D8940 /* slice.mm in Sources */,
+				27A755071A86A2EE008BCD4D /* EncodingContext.cc in Sources */,
 				27E45D031A6F01AD001A3A03 /* time_utils.cc in Sources */,
 				271E03561A21A372007B843E /* partiallock.cc in Sources */,
 				27E48714192171EA007D8940 /* Database.cc in Sources */,
@@ -1689,6 +1696,7 @@
 			files = (
 				2722304F1A0858A100BFF25C /* GeoIndex.cc in Sources */,
 				27E487271923B80E007D8940 /* slice.mm in Sources */,
+				27A755061A86A2EE008BCD4D /* EncodingContext.cc in Sources */,
 				27E45D021A6F01AD001A3A03 /* time_utils.cc in Sources */,
 				271E03551A21A372007B843E /* partiallock.cc in Sources */,
 				27E48713192171EA007D8940 /* Database.cc in Sources */,

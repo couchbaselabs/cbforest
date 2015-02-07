@@ -40,6 +40,7 @@ namespace forestdb {
 
         void writeString(std::string, bool canAddExtern =false);
         void writeString(slice, bool canAddExtern =false);
+        void writeExternString(uint32_t externRef);
 
         void writeData(slice);
 
@@ -49,6 +50,7 @@ namespace forestdb {
         void beginDict(uint32_t count);
         void writeKey(std::string, bool canAddExtern =true);
         void writeKey(slice, bool canAddExtern =true);
+        void writeExternKey(uint32_t externRef, uint16_t hash);
         void endDict();
 
         // Note: overriding <<(bool) would be dangerous due to implicit conversion

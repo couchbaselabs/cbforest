@@ -9,6 +9,7 @@
 #include "EncodingWriter.hh"
 #include "Endian.h"
 #include "varint.hh"
+#include <assert.h>
 
 
 namespace forestdb {
@@ -130,17 +131,14 @@ namespace forestdb {
         if (_externStrings) {
             auto externID = _externStringsLookup.find(str);
             if (externID != _externStringsLookup.end()) {
-                // Write reference to extern string:
-                addTypeCode(value::kExternStringRefCode);
-                addUVarint(externID->second);
+                writeExternString(externID->second);
                 return;
             }
             uint32_t n = (uint32_t)_externStrings->size();
             if (n < _maxExternStrings && canAddExtern) {
                 _externStrings->push_back(str);
                 _externStringsLookup[str] = ++n;
-                addTypeCode(value::kExternStringRefCode);
-                addUVarint(n);
+                writeExternString(n);
                 return;
             }
         }
@@ -168,6 +166,12 @@ namespace forestdb {
         addTypeCode(value::kStringCode);
         addUVarint(len);
         _out << str;
+    }
+
+    void dataWriter::writeExternString(uint32_t externRef) {
+        assert(externRef > 0);
+        addTypeCode(value::kExternStringRefCode);
+        addUVarint(externRef);
     }
 
     void dataWriter::pushState() {
@@ -206,18 +210,23 @@ namespace forestdb {
     }
 
     void dataWriter::writeKey(std::string key, bool canAddExtern) {
-        // Go back and write the hash code to the index:
         _state->hashes[_state->i] = dict::hashCode(key);
         writeString(key, canAddExtern);
         --_state->i; // the key didn't 'count' as a dict item
     }
 
     void dataWriter::writeKey(slice key, bool canAddExtern) {
-        // Go back and write the hash code to the index:
         _state->hashes[_state->i] = dict::hashCode(key);
         writeString(key, canAddExtern);
         --_state->i; // the key didn't 'count' as a dict item
     }
+
+    void dataWriter::writeExternKey(uint32_t externRef, uint16_t hash) {
+        _state->hashes[_state->i] = hash;
+        writeExternString(externRef);
+        --_state->i; // the key didn't 'count' as a dict item
+    }
+
 
     void dataWriter::endDict() {
         _out.rewrite(_state->indexPos, slice(_state->hashes, _state->count*sizeof(uint16_t)));
