@@ -114,12 +114,9 @@ namespace forestdb {
         revid           revID;      /**< Revision ID (compressed) */
         fdb_seqnum_t    sequence;   /**< DB sequence number that this revision has/had */
 
-        bool isBodyAvailable() const
-            { return owner->isBodyOfRevisionAvailable(this, oldBodyOffset); }
-        slice inlineBody() const
-            { return isCompressed() ? slice::null : body; }
-        alloc_slice readBody() const
-            { return owner->readBodyOfRevision(this, oldBodyOffset); }
+        inline bool isBodyAvailable() const;
+        inline slice inlineBody() const;
+        inline alloc_slice readBody() const;
 
         bool isLeaf() const         {return (flags & kLeaf) != 0;}
         bool isDeleted() const      {return (flags & kDeleted) != 0;}
@@ -171,6 +168,16 @@ namespace forestdb {
         friend class RevTree;
         friend struct RawRevision;
     };
+
+    inline bool Revision::isBodyAvailable() const {
+        return owner->isBodyOfRevisionAvailable(this, oldBodyOffset);
+    }
+    inline alloc_slice Revision::readBody() const {
+        return owner->readBodyOfRevision(this, oldBodyOffset);
+    }
+    inline slice Revision::inlineBody() const {
+        return isCompressed() ? slice::null : body;;
+    }
 
 }
 

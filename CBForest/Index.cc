@@ -17,6 +17,7 @@
 #include "Collatable.hh"
 #include "varint.hh"
 #include "LogInternal.hh"
+#include "hash_functions.h" // from forestdb source
 
 
 namespace forestdb {
@@ -34,20 +35,36 @@ namespace forestdb {
     { }
 
 
-    int64_t IndexWriter::removeOldRowsForDoc(slice docID) {
-        int64_t rowsRemoved = 0;
+    // djb2 hash function:
+    static const uint32_t kInitialHash = 5381;
+    static inline void addHash(uint32_t &hash, slice value) {
+        for (auto i = 0; i < value.size; ++i)
+            hash = ((hash << 5) + hash) + value[i];
+    }
+
+    void IndexWriter::getKeysForDoc(slice docID, std::vector<Collatable> &keys, uint32_t &hash) {
         Document doc = get(docID);
-        slice sequences = doc.body();
-        if (sequences.size > 0) {
-            uint64_t seq;
-            while (ReadUVarInt(&sequences, &seq)) {
-                if (!del((sequence)seq)) {
-                    Warn("Index::removeOldRowsForDoc -- couldn't find seq %llu", seq);
-                }
-                ++rowsRemoved;
+        if (doc.body().size > 0) {
+            CollatableReader reader(doc.body());
+            hash = (uint32_t)reader.readInt();
+            while (!reader.atEnd()) {
+                keys.push_back( Collatable(reader.read(), true) );
             }
+        } else {
+            hash = kInitialHash;
         }
-        return rowsRemoved;
+    }
+
+    void IndexWriter::setKeysForDoc(slice docID, const std::vector<Collatable> &keys, uint32_t hash) {
+        if (keys.size() > 0) {
+            Collatable writer;
+            writer << hash;
+            for (auto i=keys.begin(); i != keys.end(); ++i)
+                writer << *i;
+            set(docID, writer);
+        } else {
+            del(docID);
+        }
     }
 
     bool IndexWriter::update(slice docID, sequence docSequence,
@@ -57,37 +74,104 @@ namespace forestdb {
         Collatable collatableDocID;
         collatableDocID << docID;
 
-        int64_t rowsRemoved = removeOldRowsForDoc(collatableDocID);
-        int64_t rowsAdded = 0;
+        // Get the previously emitted keys:
+        std::vector<Collatable> oldStoredKeys, newStoredKeys;
+        uint32_t oldStoredHash;
+        getKeysForDoc(collatableDocID, oldStoredKeys, oldStoredHash);
 
-        std::string sequences;
+        // Compute a hash of the values and see whether it's the same as the previous values' hash:
+        uint32_t newStoredHash = kInitialHash;
+        for (auto value = values.begin(); value != values.end(); ++value) {
+            if (((slice)*value)[0] == Collatable::kSpecial) {
+                // kSpecial is placeholder for entire doc, and always considered to have changed.
+                oldStoredHash = newStoredHash - 1; // force comparison to fail
+                break;
+            }
+            addHash(newStoredHash, *value);
+        }
+        bool valuesMightBeUnchanged = (newStoredHash == oldStoredHash);
+
+        bool keysChanged = false;
+        int64_t rowsRemoved = 0, rowsAdded = 0;
+
         auto value = values.begin();
         unsigned emitIndex = 0;
+        auto oldKey = oldStoredKeys.begin();
         for (auto key = keys.begin(); key != keys.end(); ++key,++value,++emitIndex) {
+            // Create a key for the index db by combining the emitted key and doc ID:
             Collatable realKey;
-            realKey.beginArray();
-            realKey << *key << collatableDocID << (int64_t)docSequence;
+            realKey.beginArray() << *key << collatableDocID;
             if (emitIndex > 0)
-                realKey << emitIndex; // This disambiguates duplicate keys emitted by the same doc
+                realKey << emitIndex;
             realKey.endArray();
-
-            if (realKey.size() <= Document::kMaxKeyLength
-                    && value->size() <= Document::kMaxBodyLength) {
-                sequence seq = set(realKey, slice::null, *value);
-
-                uint8_t buf[kMaxVarintLen64];
-                size_t size = PutUVarInt(buf, seq);
-                sequences += std::string((char*)buf, size);
-                ++rowsAdded;
-            } else {
+            if (realKey.size() > Document::kMaxKeyLength
+                    || value->size() > Document::kMaxBodyLength) {
                 Warn("Index key or value too long"); //FIX: Need more-official warning
+                continue;
             }
+
+            // Is this a key that was previously emitted last time we indexed this document?
+            if (keysChanged || oldKey == oldStoredKeys.end() || !(*oldKey == *key)) {
+                // no; note that the set of keys is different
+                keysChanged = true;
+            } else {
+                // yes
+                ++oldKey;
+                if (valuesMightBeUnchanged) {
+                    // read the old row so we can compare the value too:
+                    Document oldRow = get(realKey);
+                    if (oldRow.exists()) {
+                        CollatableReader body(oldRow.body());
+                        body.beginArray();
+                        (void)body.readInt(); // old doc sequence
+                        slice oldValue = slice::null;
+                        if (body.peekTag() != Collatable::kEndSequence)
+                            oldValue = body.read();
+
+                        if (oldValue == (slice)*value) {
+                            Log("Old k/v pair (%s, %s) unchanged",
+                                  key->dump().c_str(), value->dump().c_str());
+                            continue;  // Value is unchanged, so this is a no-op; skip to next key!
+                        }
+                    } else {
+                        Warn("Old emitted k/v pair unexpectedly missing");
+                    }
+                }
+                ++rowsRemoved;  // more like "overwritten"
+            }
+
+            // Store the key & value:
+            Collatable realValue;
+            realValue.beginArray() << docSequence << *value;
+            realValue.endArray();
+            set(realKey, slice::null, realValue);
+            newStoredKeys.push_back(*key);
+            ++rowsAdded;
         }
+
+        // If there are any old keys that weren't emitted this time, we need to delete those rows:
+        for (; oldKey != oldStoredKeys.end(); ++oldKey) {
+            Collatable realKey;
+            realKey.beginArray() << *oldKey << collatableDocID;
+            auto oldEmitIndex = oldKey - oldStoredKeys.begin();
+            if (oldEmitIndex > 0)
+                realKey << oldEmitIndex;
+            realKey.endArray();
+            bool deleted = del(realKey);
+            if (!deleted) {
+                Warn("Failed to delete old emitted k/v pair");
+            }
+            ++rowsRemoved;
+            keysChanged = true;
+        }
+
+        // Store the keys that were emitted for this doc, and the hash of the values:
+        if (keysChanged)
+            setKeysForDoc(collatableDocID, newStoredKeys, newStoredHash);
 
         if (rowsRemoved==0 && rowsAdded==0)
             return false;
 
-        set(collatableDocID, slice(sequences));
         rowCount += rowsAdded - rowsRemoved;
         return true;
     }
@@ -99,13 +183,19 @@ namespace forestdb {
         collatableDocID << docID;
         Collatable realKey;
         realKey.beginArray();
-        realKey << key << collatableDocID << (int64_t)docSequence;
+        realKey << key << collatableDocID;
         if (emitIndex > 0)
             realKey << emitIndex;
         realKey.endArray();
 
         Document doc = get(realKey);
-        return alloc_slice(doc.body());
+
+        CollatableReader realValue(doc.body());
+        realValue.beginArray();
+        (void)realValue.readInt(); // doc sequence
+        if (realValue.peekTag() == Collatable::kEndSequence)
+            return alloc_slice();
+        return alloc_slice(realValue.read());
     }
 
 
@@ -193,9 +283,9 @@ namespace forestdb {
             const Document& doc = _dbEnum.doc();
 
             // Decode the key from collatable form:
-            CollatableReader reader(doc.key());
-            reader.beginArray();
-            _key = reader.read();
+            CollatableReader keyReader(doc.key());
+            keyReader.beginArray();
+            _key = keyReader.read();
 
             if (!_inclusiveEnd && _key == _endKey) {
                 _dbEnum.close();
@@ -232,9 +322,15 @@ namespace forestdb {
             }
 
             // Return it as the next row:
-            _docID = reader.readString();
-            _sequence = reader.readInt();
-            _value = doc.body();
+            _docID = keyReader.readString();
+
+            CollatableReader valueReader(doc.body());
+            valueReader.beginArray();
+            _sequence = valueReader.readInt();
+            if (valueReader.peekTag() == Collatable::kEndSequence)
+                _value = slice::null;
+            else
+                _value = valueReader.read();
             Debug("IndexEnumerator: found key=%s",
                     forestdb::CollatableReader(_key).dump().c_str());
             return true;
