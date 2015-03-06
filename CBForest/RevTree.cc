@@ -33,6 +33,11 @@
 
 namespace forestdb {
 
+    // Since forestdb already applies a CRC checksum to the document, and both the
+    // source and target of a delta come from the same doc, we can safely skip the
+    // zdelta checksum.
+    static const DeltaFlags kRevDeltaFlags = kNoChecksum;
+
     // Layout of revision rev in encoded form. Tree is a sequence of these followed by a 32-bit zero.
     // Revs are stored in decending priority, with the current leaf rev(s) coming first.
     struct RawRevision {
@@ -303,12 +308,12 @@ namespace forestdb {
         // Expand delta-compressed body:
         slice inlineReference = referenceRev->inlineBody();
         if (inlineReference.buf != NULL) {
-            return ApplyDelta(inlineReference, rev->body);
+            return ApplyDelta(inlineReference, rev->body, kRevDeltaFlags);
         } else {
             alloc_slice loadedReference = referenceRev->readBody();
             if (!loadedReference.buf)
                 return loadedReference; // failed to read parent
-            return ApplyDelta(loadedReference, rev->body);
+            return ApplyDelta(loadedReference, rev->body, kRevDeltaFlags);
         }
     }
 
@@ -495,18 +500,27 @@ namespace forestdb {
         alloc_slice referenceData = reference->readBody();
         if (!targetData.buf || !referenceData.buf)
             return alloc_slice();
-        return CreateDelta(referenceData, targetData);
+#if 1
+        alloc_slice result = CreateDelta(referenceData, targetData, kRevDeltaFlags);
+        fprintf(stderr, "DELTA: %zd bytes (%lu%%) for %.*s ---> %.*s\n", result.size,
+                (result.size * 100 / targetData.size),
+                (int)referenceData.size, referenceData.buf,
+                (int)targetData.size, targetData.buf);
+        return result;
+#else
+        return CreateDelta(referenceData, targetData, kDeltaFlags);
+#endif
     }
 
     alloc_slice Revision::applyZDelta(slice delta) {
         if (body.buf) {
             if (!isCompressed()) {
                 // avoid memcpy overhead by not using an alloc_slice
-                return ApplyDelta(body, delta);
+                return ApplyDelta(body, delta, kRevDeltaFlags);
             } else {
                 alloc_slice loadedReference = readBody();
                 if (loadedReference.buf)
-                    return ApplyDelta(loadedReference, delta);
+                    return ApplyDelta(loadedReference, delta, kRevDeltaFlags);
             }
         }
         return alloc_slice(); // failed

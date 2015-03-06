@@ -569,6 +569,8 @@
 		278EBF9C19763238006362F8 /* memleak.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = memleak.h; sourceTree = "<group>"; };
 		27B62988197ED63D00F7148E /* btree_fast_str_kv.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = btree_fast_str_kv.cc; sourceTree = "<group>"; };
 		27B62989197ED63D00F7148E /* btree_fast_str_kv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = btree_fast_str_kv.h; sourceTree = "<group>"; };
+		27BFF3911AA977AD00C3BA75 /* zd_mem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = zd_mem.h; sourceTree = "<group>"; };
+		27BFF3921AA977AD00C3BA75 /* zutil.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = zutil.h; sourceTree = "<group>"; };
 		27C319EC1A143F5D00A89EDC /* KeyStore.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KeyStore.cc; sourceTree = "<group>"; };
 		27C319ED1A143F5D00A89EDC /* KeyStore.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = KeyStore.hh; sourceTree = "<group>"; };
 		27DD14EF19328576009A367D /* Index_Test.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Index_Test.mm; sourceTree = "<group>"; };
@@ -1032,6 +1034,8 @@
 		27E45D041A708777001A3A03 /* zdelta */ = {
 			isa = PBXGroup;
 			children = (
+				27BFF3911AA977AD00C3BA75 /* zd_mem.h */,
+				27BFF3921AA977AD00C3BA75 /* zutil.h */,
 				27E45D4A1A708C53001A3A03 /* zdlib.h */,
 				27E45D051A708969001A3A03 /* adler32.c */,
 				27E45D061A708969001A3A03 /* deflate.c */,
