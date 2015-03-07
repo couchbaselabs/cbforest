@@ -17,6 +17,9 @@
 #include <assert.h>
 #include <ostream>
 
+#define DELTA_COMPRESS_ANCESTORS 1
+
+
 namespace forestdb {
 
     VersionedDocument::VersionedDocument(KeyStore db, slice docID)
@@ -122,18 +125,37 @@ namespace forestdb {
         if (!_changed)
             return;
 
+#if DELTA_COMPRESS_ANCESTORS
+        static const size_t kMaxAncestralSize = 10000;      // # of bytes of ancestor revisions to keep
+        static const uint16_t kGenerationsToPreserve = 3;   // # of generations of ancestors to keep
+        sort();
         for (auto rev = allRevisions().begin(); rev != allRevisions().end(); ++rev) {
-#if 1
+            // Compress non-leaf revisions:
             const Revision* parent = rev->parent();
             if (parent && parent->inlineBody().size > 0)
                 parent->compressAsDeltaFrom(&*rev);
+        }
+        auto depths = computeDepths();
+        size_t ancestralSize = 0;
+        for (auto rev = allRevisions().begin(); rev != allRevisions().end(); ++rev) {
+            // Remove old revision bodies to restrict max doc size:
+            if (!rev->isLeaf()) {
+                size_t bodySize = rev->inlineBodySize();
+                if (ancestralSize + bodySize <= kMaxAncestralSize)
+                    ancestralSize += bodySize;
+                else if (depths[rev->index()] >= kGenerationsToPreserve)
+                    rev->removeBody(false);
+            }
+        }
+
 #else
+        for (auto rev = allRevisions().begin(); rev != allRevisions().end(); ++rev) {
             // Remove bodies of any already-saved revs that are no longer leaves:
             if (rev->inlineBody().size > 0 && !(rev->isLeaf() || rev->isNew())) {
                 rev->removeBody();
             }
-#endif
         }
+#endif
 
         updateMeta();
         // Don't call _doc.setBody() because it'll invalidate all the pointers from Revisions into

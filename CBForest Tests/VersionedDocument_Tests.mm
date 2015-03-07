@@ -201,4 +201,55 @@ static revidBuffer stringToRev(NSString* str) {
 }
 
 
+- (void) test05_LotsOfRevisions {
+    static const int kPruneAtDepth = 20;
+    NSString *docID = @"foo";
+    NSMutableDictionary* body = [NSMutableDictionary dictionary];
+    NSMutableArray* bodies = [NSMutableArray array];
+    for (int gen=1; gen < 50; gen++) {
+        NSLog(@"---- Generation %d ----", gen);
+        revidBuffer revID([NSString stringWithFormat: @"%d-ffff", gen]);
+
+        for (int j=0; j<100; j++) {
+            NSString* key = [NSString stringWithFormat: @"k%ld", random()%10];
+            NSMutableArray* value = body[key];
+            if (!value) {
+                value = [NSMutableArray array];
+                body[key] = value;
+            }
+            [value addObject: @(gen)];
+        }
+        NSData* bodyJSON = [NSJSONSerialization dataWithJSONObject: body options: 0 error: NULL];
+        [bodies addObject: bodyJSON];
+
+        {
+            VersionedDocument v(*db, docID);
+
+            // Read back earlier revisions:
+            for (int oldgen = std::max(1, gen-kPruneAtDepth); oldgen < gen; oldgen++) {
+                revidBuffer oldRevID([NSString stringWithFormat: @"%d-ffff", oldgen]);
+                const Revision* rev = v[oldRevID];
+                Assert(rev);
+                auto oldbody = rev->readBody();
+//                NSLog(@"Got gen %d -- inline=%d, delta=%d, body = %zd (%zd compressed)", // %.*s",
+//                      oldgen, (rev->inlineBodySize()>0), rev->isCompressed(),
+//                      (int)oldbody.size, rev->inlineBodySize());
+                AssertEqual(oldbody.uncopiedNSData(), bodies[oldgen-1]);
+            }
+
+            const Revision* parent = gen == 1 ? NULL : v[0];
+            int httpStatus;
+            v.insert(revID, slice(bodyJSON), false, false, parent, false, httpStatus);
+            AssertEq(httpStatus, 201);
+
+            v.prune(kPruneAtDepth);
+
+            Transaction t(db);
+            v.save(t);
+            NSLog(@"Body size = %zd", v.encode().size);
+        }
+    }
+}
+
+
 @end

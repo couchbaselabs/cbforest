@@ -54,6 +54,11 @@ namespace forestdb {
         std::vector<const Revision*> currentRevisions() const;
         bool hasConflict() const;
 
+        // Returns vector mapping Revision array index to depth, with leaves at depth 0.
+        // If there are branches, some revisions have ambiguous depth. If `maxDepth` is true, the
+        // _longest_ path to a leaf is counted, otherwise the _shortest_ path.
+        std::vector<uint16_t> computeDepths(bool useMax =false) const;
+
         const Revision* insert(revid, slice body,
                                bool deleted, bool hasAttachments,
                                revid parentRevID,
@@ -94,7 +99,7 @@ namespace forestdb {
         void compact();
         bool compress(Revision* target, const Revision* reference);
         bool decompress(Revision*);
-        bool removeBody(Revision*);
+        bool removeBody(Revision*, bool allowExpansion);
         RevTree(const RevTree&); // forbidden
 
         uint64_t    _bodyOffset;     // File offset of body this tree was read from
@@ -132,14 +137,16 @@ namespace forestdb {
 
         bool operator< (const Revision& rev) const;
 
-        bool removeBody() const
-            { return owner->removeBody(const_cast<Revision*>(this)); }
+        bool removeBody(bool allowExpansion =true) const
+            { return owner->removeBody(const_cast<Revision*>(this), allowExpansion); }
         bool compressAsDeltaFrom(const Revision* reference) const
             { return owner->compress(const_cast<Revision*>(this), reference); }
         bool decompress() const
             { return owner->decompress(const_cast<Revision*>(this)); }
         alloc_slice generateZDeltaFrom(const Revision* reference) const;
         alloc_slice applyZDelta(slice delta);
+
+        inline size_t inlineBodySize() const    {return body.size;}
 
     private:
         enum Flags : uint8_t {
@@ -176,7 +183,7 @@ namespace forestdb {
         return owner->readBodyOfRevision(this, oldBodyOffset);
     }
     inline slice Revision::inlineBody() const {
-        return isCompressed() ? slice::null : body;;
+        return isCompressed() ? slice::null : body;
     }
 
 }

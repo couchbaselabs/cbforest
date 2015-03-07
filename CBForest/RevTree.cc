@@ -116,15 +116,8 @@ namespace forestdb {
 
         // Allocate output buffer:
         size_t size = sizeof(uint32_t);  // start with space for trailing 0 size
-        for (auto rev = _revs.begin(); rev != _revs.end(); ++rev) {
-            if (rev->body.size > 0 && !(rev->isLeaf() || rev->isNew())) {
-                // Prune body of an already-saved rev that's no longer a leaf:
-                alloc_slice empty;
-                replaceBody(&*rev, empty);
-            }
+        for (auto rev = _revs.begin(); rev != _revs.end(); ++rev)
             size += rev->sizeToWrite();
-        }
-
         alloc_slice result(size);
 
         // Write the raw revs:
@@ -317,6 +310,7 @@ namespace forestdb {
         }
     }
 
+    // Marks a revision as a leaf, and returns true, if no revs point to it as their parent.
     bool RevTree::confirmLeaf(Revision* testRev) {
         int index = testRev->index();
         for (auto rev = _revs.begin(); rev != _revs.end(); ++rev)
@@ -324,6 +318,31 @@ namespace forestdb {
                 return false;
         testRev->addFlag(Revision::kLeaf);
         return true;
+    }
+
+    // Returns vector mapping Revision array index to depth, with leaves at depth 0.
+    // If there are branches, some revisions have ambiguous depth. If `maxDepth` is true, the
+    // _longest_ path to a leaf is counted, otherwise the _shortest_ path.
+    std::vector<uint16_t> RevTree::computeDepths(bool useMax) const {
+        std::vector<uint16_t> depths(_revs.size(), UINT16_MAX);
+        for (auto rev = _revs.begin(); rev != _revs.end(); ++rev) {
+            if (rev->isLeaf()) {
+                // Walk each ancestry starting from its leaf, assigning consecutive depths:
+                int16_t d = 0;
+                for (unsigned index = rev->index();
+                              index != Revision::kNoParent;
+                              index = _revs[index].parentIndex, ++d) {
+                    uint16_t oldDepth = depths[index];
+                    if (oldDepth == UINT16_MAX || (useMax ? d>oldDepth : d<oldDepth))
+                        depths[index] = d;
+                    else
+                        break;
+                }
+            } else if (_sorted) {
+                break;
+            }
+        }
+        return depths;
     }
     
 
@@ -474,14 +493,16 @@ namespace forestdb {
         _changed = true;
     }
 
-    bool RevTree::removeBody(Revision* rev) {
+    // Removes the body of a revision. If this revision is the delta source of another revision,
+    // either return false (if allowExpansion is false), or expand the dependent revision's body.
+    bool RevTree::removeBody(Revision* rev, bool allowExpansion) {
         if (!rev->body.buf)
             return true;
         // If this rev is the reference of a compressed revision, expand the target:
         unsigned index = rev->index();
         for (auto otherRev = _revs.begin(); otherRev != _revs.end(); ++otherRev) {
             if (otherRev->deltaRefIndex == index) {
-                if (!decompress(&*otherRev))
+                if (!allowExpansion || !decompress(&*otherRev))
                     return false;
             }
         }
@@ -490,6 +511,7 @@ namespace forestdb {
         return true;
     }
 
+    // Generates a zdelta from `reference` to the receiver.
     alloc_slice Revision::generateZDeltaFrom(const Revision* reference) const {
         assert(reference != NULL);
         assert(reference->owner == this->owner);
@@ -500,7 +522,7 @@ namespace forestdb {
         alloc_slice referenceData = reference->readBody();
         if (!targetData.buf || !referenceData.buf)
             return alloc_slice();
-#if 1
+#if 0
         alloc_slice result = CreateDelta(referenceData, targetData, kRevDeltaFlags);
         fprintf(stderr, "DELTA: %zd bytes (%lu%%) for %.*s ---> %.*s\n", result.size,
                 (result.size * 100 / targetData.size),
@@ -508,10 +530,11 @@ namespace forestdb {
                 (int)targetData.size, targetData.buf);
         return result;
 #else
-        return CreateDelta(referenceData, targetData, kDeltaFlags);
+        return CreateDelta(referenceData, targetData, kRevDeltaFlags);
 #endif
     }
 
+    // Applies a delta to the receiver.
     alloc_slice Revision::applyZDelta(slice delta) {
         if (body.buf) {
             if (!isCompressed()) {
@@ -526,6 +549,7 @@ namespace forestdb {
         return alloc_slice(); // failed
     }
 
+    // Replaces the body of revision `target` with a delta computed from revision `reference`
     bool RevTree::compress(Revision* target, const Revision* reference) {
         if (target->isCompressed())
             return true;
@@ -543,6 +567,7 @@ namespace forestdb {
         return true;
     }
 
+    // If the body of `rev` is a delta, expands it and stores the expanded body.
     bool RevTree::decompress(Revision* rev) {
         if (!rev->isCompressed())
             return true;
@@ -554,26 +579,17 @@ namespace forestdb {
         return true;
     }
 
+    // Completely removes all revisions more than `maxDepth` away from a leaf revision.
     unsigned RevTree::prune(unsigned maxDepth) {
         if (maxDepth == 0 || _revs.size() <= maxDepth)
             return 0;
 
-        // First find all the leaves, and walk from each one down to its root:
-        int numPruned = 0;
-        Revision* rev = &_revs[0];
-        for (unsigned i=0; i<_revs.size(); i++,rev++) {
-            if (rev->isLeaf()) {
-                // Starting from a leaf rev, trace its ancestry to find its depth:
-                unsigned depth = 0;
-                for (Revision* anc = rev; anc; anc = (Revision*)anc->parent()) {
-                    if (++depth > maxDepth) {
-                        // Mark revs that are too far away:
-                        anc->revID.size = 0;
-                        numPruned++;
-                    }
-                }
-            } else if (_sorted) {
-                break;
+        auto depths = computeDepths(true);
+        unsigned numPruned = 0;
+        for (unsigned i=0; i<_revs.size(); i++) {
+            if (depths[i] > maxDepth) {
+                _revs[i].revID.size = 0;
+                numPruned++;
             }
         }
         if (numPruned > 0)
@@ -581,6 +597,7 @@ namespace forestdb {
         return numPruned;
     }
 
+    // Completely removes a revision given by ID, and all its ancestors.
     int RevTree::purge(revid leafID) {
         int nPurged = 0;
         Revision* rev = (Revision*)get(leafID);
@@ -597,6 +614,7 @@ namespace forestdb {
         return nPurged;
     }
 
+    // Subroutine of prune/purge that slides surviving revisions down the _revs array.
     void RevTree::compact() {
         // Create a mapping from current to new rev indexes (after removing pruned/purged revs)
         uint16_t map[_revs.size()];
@@ -641,6 +659,7 @@ namespace forestdb {
         return rev2.revID < this->revID;
     }
 
+    // Sorts the revisions by descending revid, placing the default/winning rev at index 0.
     void RevTree::sort() {
         if (_sorted)
             return;
