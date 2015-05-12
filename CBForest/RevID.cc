@@ -19,6 +19,24 @@
 #include <assert.h>
 #include <math.h>
 
+#ifdef __ANDROID__
+// digittoint is not decleared for android
+int digittoint(char ch) {
+    int d = ch - '0';
+    if ((unsigned) d < 10) {
+        return d;
+    }
+    d = ch - 'a';
+    if ((unsigned) d < 6) {
+        return d + 10;
+    }
+    d = ch - 'A';
+    if ((unsigned) d < 6) {
+        return d + 10;
+    }
+    return -1;
+}
+#endif //__ANDROID__
 
 #ifdef __ANDROID__
 // digittoint is a BSD function, not available on Android

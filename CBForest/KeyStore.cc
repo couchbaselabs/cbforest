@@ -144,9 +144,23 @@ namespace forestdb {
             key.buf = keybuf;
         }
         fdb_doc doc = {
-            .key = (void*)key.buf,
             .keylen = key.size,
+            .key = (void*)key.buf,
         };
+        /*
+        // for GCC 4.9?? compiler
+        fdb_doc doc;
+        doc.key = (void*)key.buf;
+        doc.keylen = key.size;
+        doc.meta = (void*)0;
+        doc.metalen = 0;
+        doc.body  = (void*)0;
+        doc.bodylen = 0;
+        doc.size_ondisk = 0;
+        doc.seqnum = 0;
+        doc.offset = 0;
+        doc.deleted = (bool)0;   
+        */   
         return checkGet(fdb_del(_handle, &doc));
     }
 

@@ -21,7 +21,6 @@
 #include "Database.hh"
 #include <vector>
 
-
 namespace forestdb {
 
     class RevTree;
