@@ -130,10 +130,154 @@
 		275F1445195CC588009DADB2 /* VersionedDocument.mm in Sources */ = {isa = PBXBuildFile; fileRef = 275F1444195CC588009DADB2 /* VersionedDocument.mm */; };
 		275F1446195CC588009DADB2 /* VersionedDocument.mm in Sources */ = {isa = PBXBuildFile; fileRef = 275F1444195CC588009DADB2 /* VersionedDocument.mm */; };
 		27696AD219F5B66800B8D3D6 /* Tokenizer_Test.mm in Sources */ = {isa = PBXBuildFile; fileRef = 27696AD119F5B66800B8D3D6 /* Tokenizer_Test.mm */; };
+		276B35751BB0ECD00074D7E5 /* stem_UTF_8_dutch.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FD71914296D00A327B9 /* stem_UTF_8_dutch.c */; };
+		276B35761BB0ECD00074D7E5 /* stem_ISO_8859_1_hungarian.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FC31914296D00A327B9 /* stem_ISO_8859_1_hungarian.c */; };
+		276B35771BB0ECD00074D7E5 /* stem_UTF_8_swedish.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FF11914296D00A327B9 /* stem_UTF_8_swedish.c */; };
+		276B35781BB0ECD00074D7E5 /* stem_ISO_8859_1_dutch.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FB91914296D00A327B9 /* stem_ISO_8859_1_dutch.c */; };
+		276B35791BB0ECD00074D7E5 /* sqlite3_unicodesn_tokenizer.c in Sources */ = {isa = PBXBuildFile; fileRef = 27513A591A687E770055DC40 /* sqlite3_unicodesn_tokenizer.c */; };
+		276B357A1BB0ECD00074D7E5 /* fts3_unicodesn.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FA71914296D00A327B9 /* fts3_unicodesn.c */; };
+		276B357B1BB0ECD00074D7E5 /* stem_UTF_8_english.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FD91914296D00A327B9 /* stem_UTF_8_english.c */; };
+		276B357C1BB0ECD00074D7E5 /* stem_ISO_8859_1_german.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FC11914296D00A327B9 /* stem_ISO_8859_1_german.c */; };
+		276B357D1BB0ECD00074D7E5 /* stem_UTF_8_french.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FDD1914296D00A327B9 /* stem_UTF_8_french.c */; };
+		276B357E1BB0ECD00074D7E5 /* utilities_sq3.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FB51914296D00A327B9 /* utilities_sq3.c */; };
+		276B357F1BB0ECD00074D7E5 /* stem_UTF_8_italian.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FE31914296D00A327B9 /* stem_UTF_8_italian.c */; };
+		276B35801BB0ECD00074D7E5 /* stem_ISO_8859_1_norwegian.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FC71914296D00A327B9 /* stem_ISO_8859_1_norwegian.c */; };
+		276B35811BB0ECD00074D7E5 /* stem_KOI8_R_russian.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FD31914296D00A327B9 /* stem_KOI8_R_russian.c */; };
+		276B35821BB0ECD00074D7E5 /* stem_UTF_8_finnish.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FDB1914296D00A327B9 /* stem_UTF_8_finnish.c */; };
+		276B35831BB0ECD00074D7E5 /* stem_ISO_8859_1_english.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FBB1914296D00A327B9 /* stem_ISO_8859_1_english.c */; };
+		276B35841BB0ECD00074D7E5 /* stem_UTF_8_danish.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FD51914296D00A327B9 /* stem_UTF_8_danish.c */; };
+		276B35851BB0ECD00074D7E5 /* stem_ISO_8859_1_finnish.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FBD1914296D00A327B9 /* stem_ISO_8859_1_finnish.c */; };
+		276B35861BB0ECD00074D7E5 /* stem_UTF_8_portuguese.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FE91914296D00A327B9 /* stem_UTF_8_portuguese.c */; };
+		276B35871BB0ECD00074D7E5 /* stem_ISO_8859_1_swedish.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FCF1914296D00A327B9 /* stem_ISO_8859_1_swedish.c */; };
+		276B35881BB0ECD00074D7E5 /* fts3_unicode2.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FA61914296D00A327B9 /* fts3_unicode2.c */; };
+		276B35891BB0ECD00074D7E5 /* stem_UTF_8_russian.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FED1914296D00A327B9 /* stem_UTF_8_russian.c */; };
+		276B358A1BB0ECD00074D7E5 /* stem_ISO_8859_1_french.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FBF1914296D00A327B9 /* stem_ISO_8859_1_french.c */; };
+		276B358B1BB0ECD00074D7E5 /* stem_UTF_8_german.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FDF1914296D00A327B9 /* stem_UTF_8_german.c */; };
+		276B358C1BB0ECD00074D7E5 /* stem_UTF_8_porter.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FE71914296D00A327B9 /* stem_UTF_8_porter.c */; };
+		276B358D1BB0ECD00074D7E5 /* stem_ISO_8859_1_danish.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FB71914296D00A327B9 /* stem_ISO_8859_1_danish.c */; };
+		276B358E1BB0ECD00074D7E5 /* stem_UTF_8_norwegian.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FE51914296D00A327B9 /* stem_UTF_8_norwegian.c */; };
+		276B358F1BB0ECD00074D7E5 /* stem_ISO_8859_1_italian.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FC51914296D00A327B9 /* stem_ISO_8859_1_italian.c */; };
+		276B35901BB0ECD00074D7E5 /* stem_UTF_8_romanian.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FEB1914296D00A327B9 /* stem_UTF_8_romanian.c */; };
+		276B35911BB0ECD00074D7E5 /* api_sq3.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FB31914296D00A327B9 /* api_sq3.c */; };
+		276B35921BB0ECD00074D7E5 /* stem_UTF_8_turkish.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FF31914296D00A327B9 /* stem_UTF_8_turkish.c */; };
+		276B35931BB0ECD00074D7E5 /* libstemmer_utf8.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FAD1914296D00A327B9 /* libstemmer_utf8.c */; };
+		276B35941BB0ECD00074D7E5 /* stem_ISO_8859_1_spanish.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FCD1914296D00A327B9 /* stem_ISO_8859_1_spanish.c */; };
+		276B35951BB0ECD00074D7E5 /* stem_ISO_8859_2_romanian.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FD11914296D00A327B9 /* stem_ISO_8859_2_romanian.c */; };
+		276B35961BB0ECD00074D7E5 /* stem_UTF_8_hungarian.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FE11914296D00A327B9 /* stem_UTF_8_hungarian.c */; };
+		276B35971BB0ECD00074D7E5 /* stem_ISO_8859_1_porter.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FC91914296D00A327B9 /* stem_ISO_8859_1_porter.c */; };
+		276B35981BB0ECD00074D7E5 /* stem_UTF_8_spanish.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FEF1914296D00A327B9 /* stem_UTF_8_spanish.c */; };
+		276B35991BB0ECD00074D7E5 /* stem_ISO_8859_1_portuguese.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FCB1914296D00A327B9 /* stem_ISO_8859_1_portuguese.c */; };
+		276B359C1BB0ECD00074D7E5 /* stem_UTF_8_russian.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FEE1914296D00A327B9 /* stem_UTF_8_russian.h */; };
+		276B359D1BB0ECD00074D7E5 /* stem_ISO_8859_1_italian.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FC61914296D00A327B9 /* stem_ISO_8859_1_italian.h */; };
+		276B359E1BB0ECD00074D7E5 /* stem_ISO_8859_1_norwegian.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FC81914296D00A327B9 /* stem_ISO_8859_1_norwegian.h */; };
+		276B359F1BB0ECD00074D7E5 /* stem_ISO_8859_1_dutch.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FBA1914296D00A327B9 /* stem_ISO_8859_1_dutch.h */; };
+		276B35A01BB0ECD00074D7E5 /* stem_UTF_8_portuguese.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FEA1914296D00A327B9 /* stem_UTF_8_portuguese.h */; };
+		276B35A11BB0ECD00074D7E5 /* stem_ISO_8859_1_hungarian.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FC41914296D00A327B9 /* stem_ISO_8859_1_hungarian.h */; };
+		276B35A21BB0ECD00074D7E5 /* stem_ISO_8859_1_portuguese.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FCC1914296D00A327B9 /* stem_ISO_8859_1_portuguese.h */; };
+		276B35A31BB0ECD00074D7E5 /* stem_UTF_8_english.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FDA1914296D00A327B9 /* stem_UTF_8_english.h */; };
+		276B35A41BB0ECD00074D7E5 /* stem_ISO_8859_1_french.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FC01914296D00A327B9 /* stem_ISO_8859_1_french.h */; };
+		276B35A51BB0ECD00074D7E5 /* stem_UTF_8_italian.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FE41914296D00A327B9 /* stem_UTF_8_italian.h */; };
+		276B35A61BB0ECD00074D7E5 /* stem_UTF_8_german.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FE01914296D00A327B9 /* stem_UTF_8_german.h */; };
+		276B35A71BB0ECD00074D7E5 /* stem_UTF_8_romanian.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FEC1914296D00A327B9 /* stem_UTF_8_romanian.h */; };
+		276B35A81BB0ECD00074D7E5 /* stem_UTF_8_swedish.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FF21914296D00A327B9 /* stem_UTF_8_swedish.h */; };
+		276B35A91BB0ECD00074D7E5 /* stem_UTF_8_hungarian.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FE21914296D00A327B9 /* stem_UTF_8_hungarian.h */; };
+		276B35AA1BB0ECD00074D7E5 /* stem_KOI8_R_russian.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FD41914296D00A327B9 /* stem_KOI8_R_russian.h */; };
+		276B35AB1BB0ECD00074D7E5 /* stem_UTF_8_norwegian.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FE61914296D00A327B9 /* stem_UTF_8_norwegian.h */; };
+		276B35AC1BB0ECD00074D7E5 /* stem_UTF_8_finnish.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FDC1914296D00A327B9 /* stem_UTF_8_finnish.h */; };
+		276B35AD1BB0ECD00074D7E5 /* stem_UTF_8_dutch.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FD81914296D00A327B9 /* stem_UTF_8_dutch.h */; };
+		276B35AE1BB0ECD00074D7E5 /* stem_ISO_8859_1_finnish.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FBE1914296D00A327B9 /* stem_ISO_8859_1_finnish.h */; };
+		276B35AF1BB0ECD00074D7E5 /* stem_ISO_8859_1_german.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FC21914296D00A327B9 /* stem_ISO_8859_1_german.h */; };
+		276B35B01BB0ECD00074D7E5 /* stem_ISO_8859_1_spanish.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FCE1914296D00A327B9 /* stem_ISO_8859_1_spanish.h */; };
+		276B35B11BB0ECD00074D7E5 /* stem_ISO_8859_1_danish.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FB81914296D00A327B9 /* stem_ISO_8859_1_danish.h */; };
+		276B35B21BB0ECD00074D7E5 /* stem_ISO_8859_1_english.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FBC1914296D00A327B9 /* stem_ISO_8859_1_english.h */; };
+		276B35B31BB0ECD00074D7E5 /* stem_ISO_8859_1_swedish.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FD01914296D00A327B9 /* stem_ISO_8859_1_swedish.h */; };
+		276B35B41BB0ECD00074D7E5 /* stem_UTF_8_french.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FDE1914296D00A327B9 /* stem_UTF_8_french.h */; };
+		276B35B51BB0ECD00074D7E5 /* stem_UTF_8_danish.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FD61914296D00A327B9 /* stem_UTF_8_danish.h */; };
+		276B35B61BB0ECD00074D7E5 /* stem_UTF_8_turkish.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FF41914296D00A327B9 /* stem_UTF_8_turkish.h */; };
+		276B35B71BB0ECD00074D7E5 /* stem_UTF_8_spanish.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FF01914296D00A327B9 /* stem_UTF_8_spanish.h */; };
+		276B35B81BB0ECD00074D7E5 /* stem_ISO_8859_1_porter.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FCA1914296D00A327B9 /* stem_ISO_8859_1_porter.h */; };
+		276B35B91BB0ECD00074D7E5 /* stem_ISO_8859_2_romanian.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FD21914296D00A327B9 /* stem_ISO_8859_2_romanian.h */; };
+		276B35BA1BB0ECD00074D7E5 /* stem_UTF_8_porter.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FE81914296D00A327B9 /* stem_UTF_8_porter.h */; };
+		276B35C11BB0ED080074D7E5 /* debug.cc in Sources */ = {isa = PBXBuildFile; fileRef = 278EBF93197631B1006362F8 /* debug.cc */; };
+		276B35C21BB0ED080074D7E5 /* crc32.cc in Sources */ = {isa = PBXBuildFile; fileRef = 275072DE18E4ACE100A80C5A /* crc32.cc */; };
+		276B35C31BB0ED080074D7E5 /* docio.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2750729818E4857900A80C5A /* docio.cc */; };
+		276B35C41BB0ED080074D7E5 /* api_wrapper.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2709F296191EA10E00C5A8A3 /* api_wrapper.cc */; };
+		276B35C51BB0ED080074D7E5 /* snappy-sinksource.cc in Sources */ = {isa = PBXBuildFile; fileRef = 273AD3D418F5E8D8007D8C23 /* snappy-sinksource.cc */; };
+		276B35C61BB0ED080074D7E5 /* btreeblock.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2750729718E4857900A80C5A /* btreeblock.cc */; };
+		276B35C71BB0ED080074D7E5 /* adler32.cc in Sources */ = {isa = PBXBuildFile; fileRef = 278EBF9719763203006362F8 /* adler32.cc */; };
+		276B35C81BB0ED080074D7E5 /* transaction.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27EF007E1949297F001BF7F3 /* transaction.cc */; };
+		276B35C91BB0ED080074D7E5 /* time_utils.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27E45D001A6F01AD001A3A03 /* time_utils.cc */; };
+		276B35CA1BB0ED080074D7E5 /* filemgr.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2750729C18E4857900A80C5A /* filemgr.cc */; };
+		276B35CB1BB0ED080074D7E5 /* hbtrie.cc in Sources */ = {isa = PBXBuildFile; fileRef = 275072A018E4857900A80C5A /* hbtrie.cc */; };
+		276B35CC1BB0ED080074D7E5 /* compactor.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2709F298191EA10E00C5A8A3 /* compactor.cc */; };
+		276B35CD1BB0ED080074D7E5 /* wal.cc in Sources */ = {isa = PBXBuildFile; fileRef = 275072A318E4857900A80C5A /* wal.cc */; };
+		276B35CE1BB0ED080074D7E5 /* blockcache.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2750729418E4857900A80C5A /* blockcache.cc */; };
+		276B35CF1BB0ED080074D7E5 /* snappy.cc in Sources */ = {isa = PBXBuildFile; fileRef = 273AD3DA18F5E8D8007D8C23 /* snappy.cc */; };
+		276B35D01BB0ED080074D7E5 /* partiallock.cc in Sources */ = {isa = PBXBuildFile; fileRef = 271E03531A21A372007B843E /* partiallock.cc */; };
+		276B35D11BB0ED080074D7E5 /* Collatable.mm in Sources */ = {isa = PBXBuildFile; fileRef = 27EF008219492BD7001BF7F3 /* Collatable.mm */; };
+		276B35D21BB0ED080074D7E5 /* btree_fast_str_kv.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B62988197ED63D00F7148E /* btree_fast_str_kv.cc */; };
+		276B35D31BB0ED080074D7E5 /* snapshot.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7F8D1911A85800A327B9 /* snapshot.cc */; };
+		276B35D41BB0ED080074D7E5 /* filemgr_ops_windows.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2750729A18E4857900A80C5A /* filemgr_ops_windows.cc */; };
+		276B35D51BB0ED080074D7E5 /* btree_kv.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2750729518E4857900A80C5A /* btree_kv.cc */; };
+		276B35D61BB0ED080074D7E5 /* list.cc in Sources */ = {isa = PBXBuildFile; fileRef = 275072A218E4857900A80C5A /* list.cc */; };
+		276B35D71BB0ED080074D7E5 /* snappy-c.cc in Sources */ = {isa = PBXBuildFile; fileRef = 273AD3D118F5E8D8007D8C23 /* snappy-c.cc */; };
+		276B35D81BB0ED080074D7E5 /* fdb_errors.cc in Sources */ = {isa = PBXBuildFile; fileRef = 271E03501A21A331007B843E /* fdb_errors.cc */; };
+		276B35D91BB0ED080074D7E5 /* forestdb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2750729D18E4857900A80C5A /* forestdb.cc */; };
+		276B35DA1BB0ED080074D7E5 /* btree.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2750729618E4857900A80C5A /* btree.cc */; };
+		276B35DB1BB0ED080074D7E5 /* (null) in Sources */ = {isa = PBXBuildFile; };
+		276B35DC1BB0ED080074D7E5 /* filemgr_ops.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2750729B18E4857900A80C5A /* filemgr_ops.cc */; };
+		276B35DD1BB0ED080074D7E5 /* hash_functions.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2750729E18E4857900A80C5A /* hash_functions.cc */; };
+		276B35DE1BB0ED080074D7E5 /* kv_instance.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27DF46BF1A119860007BB4A4 /* kv_instance.cc */; };
+		276B35DF1BB0ED080074D7E5 /* iterator.cc in Sources */ = {isa = PBXBuildFile; fileRef = 275072A118E4857900A80C5A /* iterator.cc */; };
+		276B35E01BB0ED080074D7E5 /* memleak.cc in Sources */ = {isa = PBXBuildFile; fileRef = 278EBF9B19763238006362F8 /* memleak.cc */; };
+		276B35E11BB0ED080074D7E5 /* btree_str_kv.cc in Sources */ = {isa = PBXBuildFile; fileRef = 278EBF8F1976317D006362F8 /* btree_str_kv.cc */; };
+		276B35E21BB0ED080074D7E5 /* system_resource_stats.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B086BF1B3B2E0400D3D9D8 /* system_resource_stats.cc */; };
+		276B35E31BB0ED080074D7E5 /* hash.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2750729F18E4857900A80C5A /* hash.cc */; };
+		276B35E41BB0ED080074D7E5 /* configuration.cc in Sources */ = {isa = PBXBuildFile; fileRef = 273AD3BD18EF263B007D8C23 /* configuration.cc */; };
+		276B35E51BB0ED080074D7E5 /* avltree.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2750729318E4857900A80C5A /* avltree.cc */; };
+		276B35E61BB0ED080074D7E5 /* filemgr_ops_linux.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2750729918E4857900A80C5A /* filemgr_ops_linux.cc */; };
+		276B35E71BB0ED080074D7E5 /* snappy-stubs-internal.cc in Sources */ = {isa = PBXBuildFile; fileRef = 273AD3D618F5E8D8007D8C23 /* snappy-stubs-internal.cc */; };
+		276B35EA1BB0ED080074D7E5 /* fdb_errors.h in Headers */ = {isa = PBXBuildFile; fileRef = 2744151D1900E8D800964583 /* fdb_errors.h */; };
+		276B35EB1BB0ED080074D7E5 /* snappy.h in Headers */ = {isa = PBXBuildFile; fileRef = 273AD3DB18F5E8D8007D8C23 /* snappy.h */; };
+		276B35EC1BB0ED080074D7E5 /* snapshot.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7F8E1911A85800A327B9 /* snapshot.h */; };
+		276B35ED1BB0ED080074D7E5 /* config.h in Headers */ = {isa = PBXBuildFile; fileRef = 273AD3E718F5EB15007D8C23 /* config.h */; };
+		276B35EE1BB0ED080074D7E5 /* snappy-stubs-internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 273AD3D718F5E8D8007D8C23 /* snappy-stubs-internal.h */; };
+		276B35EF1BB0ED080074D7E5 /* snappy-c.h in Headers */ = {isa = PBXBuildFile; fileRef = 273AD3D218F5E8D8007D8C23 /* snappy-c.h */; };
+		276B35F01BB0ED080074D7E5 /* snappy-internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 273AD3D318F5E8D8007D8C23 /* snappy-internal.h */; };
+		276B35F11BB0ED080074D7E5 /* system_resource_stats.h in Headers */ = {isa = PBXBuildFile; fileRef = 27B086C01B3B2E0400D3D9D8 /* system_resource_stats.h */; };
+		276B35F21BB0ED080074D7E5 /* btree_var_kv_ops.h in Headers */ = {isa = PBXBuildFile; fileRef = 2709F297191EA10E00C5A8A3 /* btree_var_kv_ops.h */; };
+		276B35F31BB0ED080074D7E5 /* configuration.h in Headers */ = {isa = PBXBuildFile; fileRef = 273AD3BE18EF263B007D8C23 /* configuration.h */; };
+		276B35F41BB0ED080074D7E5 /* compactor.h in Headers */ = {isa = PBXBuildFile; fileRef = 2709F299191EA10E00C5A8A3 /* compactor.h */; };
+		276B35F51BB0ED080074D7E5 /* snappy-stubs-public.h in Headers */ = {isa = PBXBuildFile; fileRef = 273AD3E818F5EB15007D8C23 /* snappy-stubs-public.h */; };
+		276B35F61BB0ED080074D7E5 /* fdb_types.h in Headers */ = {isa = PBXBuildFile; fileRef = 2744151E1900E8D800964583 /* fdb_types.h */; };
+		276B35F71BB0ED080074D7E5 /* crc32.h in Headers */ = {isa = PBXBuildFile; fileRef = 275072DF18E4ACE100A80C5A /* crc32.h */; };
+		276B35F81BB0ED080074D7E5 /* bitwise_utils.h in Headers */ = {isa = PBXBuildFile; fileRef = 275072DD18E4ACE100A80C5A /* bitwise_utils.h */; };
+		276B35F91BB0ED080074D7E5 /* snappy-sinksource.h in Headers */ = {isa = PBXBuildFile; fileRef = 273AD3D518F5E8D8007D8C23 /* snappy-sinksource.h */; };
+		276B36041BB0ED200074D7E5 /* GeoIndex.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2722304D1A0858A100BFF25C /* GeoIndex.cc */; };
+		276B36051BB0ED200074D7E5 /* slice.mm in Sources */ = {isa = PBXBuildFile; fileRef = 27E487261923B80E007D8940 /* slice.mm */; };
+		276B36061BB0ED200074D7E5 /* Database.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27E48711192171EA007D8940 /* Database.cc */; };
+		276B36071BB0ED200074D7E5 /* KeyStore.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27C319EC1A143F5D00A89EDC /* KeyStore.cc */; };
+		276B36081BB0ED200074D7E5 /* Document.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27DF46C21A12CF46007BB4A4 /* Document.cc */; };
+		276B36091BB0ED200074D7E5 /* Geohash.cc in Sources */ = {isa = PBXBuildFile; fileRef = 272230461A0815E700BFF25C /* Geohash.cc */; };
+		276B360A1BB0ED200074D7E5 /* VersionedDocument.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27E487291923F24D007D8940 /* VersionedDocument.cc */; };
+		276B360B1BB0ED200074D7E5 /* DocEnumerator.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27E609A11951E4C000202B72 /* DocEnumerator.cc */; };
+		276B360C1BB0ED200074D7E5 /* MapReduceIndex.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27E4873819255EA8007D8940 /* MapReduceIndex.cc */; };
+		276B360D1BB0ED200074D7E5 /* Collatable.mm in Sources */ = {isa = PBXBuildFile; fileRef = 27EF008219492BD7001BF7F3 /* Collatable.mm */; };
+		276B360E1BB0ED200074D7E5 /* Collatable.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27E4872D1924178B007D8940 /* Collatable.cc */; };
+		276B360F1BB0ED200074D7E5 /* RevTree.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27E487211922A64F007D8940 /* RevTree.cc */; };
+		276B36101BB0ED200074D7E5 /* Tokenizer.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2701993919F1972E00FDC239 /* Tokenizer.cc */; };
+		276B36111BB0ED200074D7E5 /* RevID.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27DD1511193CD005009A367D /* RevID.cc */; };
+		276B36121BB0ED200074D7E5 /* RevID.mm in Sources */ = {isa = PBXBuildFile; fileRef = 277D19C6194CCE7A008E91EB /* RevID.mm */; };
+		276B36131BB0ED200074D7E5 /* slice.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27E4871A19218E5D007D8940 /* slice.cc */; };
+		276B36141BB0ED200074D7E5 /* Index.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27E487311924242C007D8940 /* Index.cc */; };
+		276B36151BB0ED200074D7E5 /* VersionedDocument.mm in Sources */ = {isa = PBXBuildFile; fileRef = 275F1444195CC588009DADB2 /* VersionedDocument.mm */; };
+		276B36161BB0ED200074D7E5 /* varint.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27FDFC0018EA58BF00AC4647 /* varint.cc */; };
+		276B36271BB0EEE30074D7E5 /* libforestdb tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 276B35FD1BB0ED080074D7E5 /* libforestdb tvOS.a */; };
+		276B36281BB0EEE30074D7E5 /* libTokenizer-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 276B35BE1BB0ECD00074D7E5 /* libTokenizer-tvOS.a */; };
 		276E74ED1956853B0030ED3D /* crc32.cc in Sources */ = {isa = PBXBuildFile; fileRef = 275072DE18E4ACE100A80C5A /* crc32.cc */; };
 		276E74EE1956853C0030ED3D /* crc32.cc in Sources */ = {isa = PBXBuildFile; fileRef = 275072DE18E4ACE100A80C5A /* crc32.cc */; };
-		276FFD741B2E03910027B51A /* get_memory_size.cc in Sources */ = {isa = PBXBuildFile; fileRef = 275D39FA1B01AC0F0013B9A9 /* get_memory_size.cc */; };
-		276FFD751B2E03920027B51A /* get_memory_size.cc in Sources */ = {isa = PBXBuildFile; fileRef = 275D39FA1B01AC0F0013B9A9 /* get_memory_size.cc */; };
+		276FFD741B2E03910027B51A /* (null) in Sources */ = {isa = PBXBuildFile; };
+		276FFD751B2E03920027B51A /* (null) in Sources */ = {isa = PBXBuildFile; };
 		27766E161982DA8E00CAA464 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27766E151982DA8E00CAA464 /* Security.framework */; };
 		27766E1D1982DED300CAA464 /* libCBForest.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 27EF81121917EEC600A327B9 /* libCBForest.a */; };
 		277D19C7194CCE7A008E91EB /* RevID.mm in Sources */ = {isa = PBXBuildFile; fileRef = 277D19C6194CCE7A008E91EB /* RevID.mm */; };
@@ -360,6 +504,20 @@
 			remoteGlobalIDString = 27EF80F91917EEC600A327B9;
 			remoteInfo = "CBForest static";
 		};
+		276B36231BB0EEB90074D7E5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2750723318E3E52800A80C5A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 276B35BF1BB0ED080074D7E5;
+			remoteInfo = "forestdb tvOS";
+		};
+		276B36251BB0EEB90074D7E5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2750723318E3E52800A80C5A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 276B35731BB0ECD00074D7E5;
+			remoteInfo = "Tokenizer-tvOS";
+		};
 		27766E1E1982DED300CAA464 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 2750723318E3E52800A80C5A /* Project object */;
@@ -399,6 +557,15 @@
 
 /* Begin PBXCopyFilesBuildPhase section */
 		27139B9318F8EE3A0021A9A3 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		276B361B1BB0ED200074D7E5 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "include/$(PRODUCT_NAME)";
@@ -514,6 +681,9 @@
 		27513A5C1A687EA70055DC40 /* sqlite3_unicodesn_tokenizer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sqlite3_unicodesn_tokenizer.h; sourceTree = "<group>"; };
 		275F1444195CC588009DADB2 /* VersionedDocument.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = VersionedDocument.mm; sourceTree = "<group>"; };
 		27696AD119F5B66800B8D3D6 /* Tokenizer_Test.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Tokenizer_Test.mm; sourceTree = "<group>"; };
+		276B35BE1BB0ECD00074D7E5 /* libTokenizer-tvOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libTokenizer-tvOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		276B35FD1BB0ED080074D7E5 /* libforestdb tvOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libforestdb tvOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		276B361F1BB0ED200074D7E5 /* libCBForest-tvOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libCBForest-tvOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		276E93B719ECA01100DDD621 /* LogInternal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = LogInternal.hh; sourceTree = "<group>"; };
 		27766E151982DA8E00CAA464 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		277D19C6194CCE7A008E91EB /* RevID.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RevID.mm; path = ../CBForest/RevID.mm; sourceTree = "<group>"; };
@@ -704,6 +874,29 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		276B359A1BB0ECD00074D7E5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		276B35E81BB0ED080074D7E5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		276B36171BB0ED200074D7E5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				276B36271BB0EEE30074D7E5 /* libforestdb tvOS.a in Frameworks */,
+				276B36281BB0EEE30074D7E5 /* libTokenizer-tvOS.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		27EF807119142C2500A327B9 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -793,6 +986,9 @@
 				27EF807419142C2500A327B9 /* libTokenizer.a */,
 				27EF81121917EEC600A327B9 /* libCBForest.a */,
 				27FA9A3F19180B5F00912F96 /* libTokenizer-iOS.a */,
+				276B35BE1BB0ECD00074D7E5 /* libTokenizer-tvOS.a */,
+				276B35FD1BB0ED080074D7E5 /* libforestdb tvOS.a */,
+				276B361F1BB0ED200074D7E5 /* libCBForest-tvOS.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1184,6 +1380,67 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		276B359B1BB0ECD00074D7E5 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				276B359C1BB0ECD00074D7E5 /* stem_UTF_8_russian.h in Headers */,
+				276B359D1BB0ECD00074D7E5 /* stem_ISO_8859_1_italian.h in Headers */,
+				276B359E1BB0ECD00074D7E5 /* stem_ISO_8859_1_norwegian.h in Headers */,
+				276B359F1BB0ECD00074D7E5 /* stem_ISO_8859_1_dutch.h in Headers */,
+				276B35A01BB0ECD00074D7E5 /* stem_UTF_8_portuguese.h in Headers */,
+				276B35A11BB0ECD00074D7E5 /* stem_ISO_8859_1_hungarian.h in Headers */,
+				276B35A21BB0ECD00074D7E5 /* stem_ISO_8859_1_portuguese.h in Headers */,
+				276B35A31BB0ECD00074D7E5 /* stem_UTF_8_english.h in Headers */,
+				276B35A41BB0ECD00074D7E5 /* stem_ISO_8859_1_french.h in Headers */,
+				276B35A51BB0ECD00074D7E5 /* stem_UTF_8_italian.h in Headers */,
+				276B35A61BB0ECD00074D7E5 /* stem_UTF_8_german.h in Headers */,
+				276B35A71BB0ECD00074D7E5 /* stem_UTF_8_romanian.h in Headers */,
+				276B35A81BB0ECD00074D7E5 /* stem_UTF_8_swedish.h in Headers */,
+				276B35A91BB0ECD00074D7E5 /* stem_UTF_8_hungarian.h in Headers */,
+				276B35AA1BB0ECD00074D7E5 /* stem_KOI8_R_russian.h in Headers */,
+				276B35AB1BB0ECD00074D7E5 /* stem_UTF_8_norwegian.h in Headers */,
+				276B35AC1BB0ECD00074D7E5 /* stem_UTF_8_finnish.h in Headers */,
+				276B35AD1BB0ECD00074D7E5 /* stem_UTF_8_dutch.h in Headers */,
+				276B35AE1BB0ECD00074D7E5 /* stem_ISO_8859_1_finnish.h in Headers */,
+				276B35AF1BB0ECD00074D7E5 /* stem_ISO_8859_1_german.h in Headers */,
+				276B35B01BB0ECD00074D7E5 /* stem_ISO_8859_1_spanish.h in Headers */,
+				276B35B11BB0ECD00074D7E5 /* stem_ISO_8859_1_danish.h in Headers */,
+				276B35B21BB0ECD00074D7E5 /* stem_ISO_8859_1_english.h in Headers */,
+				276B35B31BB0ECD00074D7E5 /* stem_ISO_8859_1_swedish.h in Headers */,
+				276B35B41BB0ECD00074D7E5 /* stem_UTF_8_french.h in Headers */,
+				276B35B51BB0ECD00074D7E5 /* stem_UTF_8_danish.h in Headers */,
+				276B35B61BB0ECD00074D7E5 /* stem_UTF_8_turkish.h in Headers */,
+				276B35B71BB0ECD00074D7E5 /* stem_UTF_8_spanish.h in Headers */,
+				276B35B81BB0ECD00074D7E5 /* stem_ISO_8859_1_porter.h in Headers */,
+				276B35B91BB0ECD00074D7E5 /* stem_ISO_8859_2_romanian.h in Headers */,
+				276B35BA1BB0ECD00074D7E5 /* stem_UTF_8_porter.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		276B35E91BB0ED080074D7E5 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				276B35EA1BB0ED080074D7E5 /* fdb_errors.h in Headers */,
+				276B35EB1BB0ED080074D7E5 /* snappy.h in Headers */,
+				276B35EC1BB0ED080074D7E5 /* snapshot.h in Headers */,
+				276B35ED1BB0ED080074D7E5 /* config.h in Headers */,
+				276B35EE1BB0ED080074D7E5 /* snappy-stubs-internal.h in Headers */,
+				276B35EF1BB0ED080074D7E5 /* snappy-c.h in Headers */,
+				276B35F01BB0ED080074D7E5 /* snappy-internal.h in Headers */,
+				276B35F11BB0ED080074D7E5 /* system_resource_stats.h in Headers */,
+				276B35F21BB0ED080074D7E5 /* btree_var_kv_ops.h in Headers */,
+				276B35F31BB0ED080074D7E5 /* configuration.h in Headers */,
+				276B35F41BB0ED080074D7E5 /* compactor.h in Headers */,
+				276B35F51BB0ED080074D7E5 /* snappy-stubs-public.h in Headers */,
+				276B35F61BB0ED080074D7E5 /* fdb_types.h in Headers */,
+				276B35F71BB0ED080074D7E5 /* crc32.h in Headers */,
+				276B35F81BB0ED080074D7E5 /* bitwise_utils.h in Headers */,
+				276B35F91BB0ED080074D7E5 /* snappy-sinksource.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		27EF807219142C2500A327B9 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -1352,6 +1609,59 @@
 			productReference = 275072C318E4AA4400A80C5A /* libforestdb.a */;
 			productType = "com.apple.product-type.library.static";
 		};
+		276B35731BB0ECD00074D7E5 /* Tokenizer-tvOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 276B35BB1BB0ECD00074D7E5 /* Build configuration list for PBXNativeTarget "Tokenizer-tvOS" */;
+			buildPhases = (
+				276B35741BB0ECD00074D7E5 /* Sources */,
+				276B359A1BB0ECD00074D7E5 /* Frameworks */,
+				276B359B1BB0ECD00074D7E5 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Tokenizer-tvOS";
+			productName = Tokenizer;
+			productReference = 276B35BE1BB0ECD00074D7E5 /* libTokenizer-tvOS.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		276B35BF1BB0ED080074D7E5 /* forestdb tvOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 276B35FA1BB0ED080074D7E5 /* Build configuration list for PBXNativeTarget "forestdb tvOS" */;
+			buildPhases = (
+				276B35C01BB0ED080074D7E5 /* Sources */,
+				276B35E81BB0ED080074D7E5 /* Frameworks */,
+				276B35E91BB0ED080074D7E5 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "forestdb tvOS";
+			productName = forestdb;
+			productReference = 276B35FD1BB0ED080074D7E5 /* libforestdb tvOS.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		276B35FE1BB0ED200074D7E5 /* CBForest-tvOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 276B361C1BB0ED200074D7E5 /* Build configuration list for PBXNativeTarget "CBForest-tvOS" */;
+			buildPhases = (
+				276B36031BB0ED200074D7E5 /* Sources */,
+				276B36171BB0ED200074D7E5 /* Frameworks */,
+				276B361B1BB0ED200074D7E5 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				276B36241BB0EEB90074D7E5 /* PBXTargetDependency */,
+				276B36261BB0EEB90074D7E5 /* PBXTargetDependency */,
+			);
+			name = "CBForest-tvOS";
+			productName = "CBForest-iOS";
+			productReference = 276B361F1BB0ED200074D7E5 /* libCBForest-tvOS.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 		27EF807319142C2500A327B9 /* Tokenizer */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 27EF807519142C2500A327B9 /* Build configuration list for PBXNativeTarget "Tokenizer" */;
@@ -1436,13 +1746,16 @@
 			targets = (
 				27EF80F91917EEC600A327B9 /* CBForest static */,
 				27139B9418F8EE3A0021A9A3 /* CBForest-iOS */,
+				276B35FE1BB0ED200074D7E5 /* CBForest-tvOS */,
 				27139B2F18F8E9750021A9A3 /* CBForest Tests */,
 				27139BA118F8EE3A0021A9A3 /* CBForest-iOS Tests */,
 				275072C218E4AA4400A80C5A /* forestdb */,
 				27139B5A18F8EDA20021A9A3 /* forestdb iOS */,
+				276B35BF1BB0ED080074D7E5 /* forestdb tvOS */,
 				27B7E0F118F8FB4700044EBA /* All */,
 				27EF807319142C2500A327B9 /* Tokenizer */,
 				27FA99F419180B5F00912F96 /* Tokenizer-iOS */,
+				276B35731BB0ECD00074D7E5 /* Tokenizer-tvOS */,
 			);
 		};
 /* End PBXProject section */
@@ -1510,7 +1823,7 @@
 				2707DEAA1ABE0A3A00A34C57 /* fdb_errors.cc in Sources */,
 				27139B6B18F8EDA20021A9A3 /* forestdb.cc in Sources */,
 				27139B6D18F8EDA20021A9A3 /* btree.cc in Sources */,
-				276FFD751B2E03920027B51A /* get_memory_size.cc in Sources */,
+				276FFD751B2E03920027B51A /* (null) in Sources */,
 				27139B6E18F8EDA20021A9A3 /* filemgr_ops.cc in Sources */,
 				27139B7018F8EDA20021A9A3 /* hash_functions.cc in Sources */,
 				27DF46C11A119860007BB4A4 /* kv_instance.cc in Sources */,
@@ -1597,7 +1910,7 @@
 				2707DEA91ABE0A3900A34C57 /* fdb_errors.cc in Sources */,
 				275072D118E4AA5000A80C5A /* forestdb.cc in Sources */,
 				275072CA18E4AA5000A80C5A /* btree.cc in Sources */,
-				276FFD741B2E03910027B51A /* get_memory_size.cc in Sources */,
+				276FFD741B2E03910027B51A /* (null) in Sources */,
 				275072CF18E4AA5000A80C5A /* filemgr_ops.cc in Sources */,
 				275072D218E4AA5000A80C5A /* hash_functions.cc in Sources */,
 				27DF46C01A119860007BB4A4 /* kv_instance.cc in Sources */,
@@ -1610,6 +1923,122 @@
 				275072C718E4AA5000A80C5A /* avltree.cc in Sources */,
 				275072CD18E4AA5000A80C5A /* filemgr_ops_linux.cc in Sources */,
 				273AD3E118F5E8D8007D8C23 /* snappy-stubs-internal.cc in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		276B35741BB0ECD00074D7E5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				276B35751BB0ECD00074D7E5 /* stem_UTF_8_dutch.c in Sources */,
+				276B35761BB0ECD00074D7E5 /* stem_ISO_8859_1_hungarian.c in Sources */,
+				276B35771BB0ECD00074D7E5 /* stem_UTF_8_swedish.c in Sources */,
+				276B35781BB0ECD00074D7E5 /* stem_ISO_8859_1_dutch.c in Sources */,
+				276B35791BB0ECD00074D7E5 /* sqlite3_unicodesn_tokenizer.c in Sources */,
+				276B357A1BB0ECD00074D7E5 /* fts3_unicodesn.c in Sources */,
+				276B357B1BB0ECD00074D7E5 /* stem_UTF_8_english.c in Sources */,
+				276B357C1BB0ECD00074D7E5 /* stem_ISO_8859_1_german.c in Sources */,
+				276B357D1BB0ECD00074D7E5 /* stem_UTF_8_french.c in Sources */,
+				276B357E1BB0ECD00074D7E5 /* utilities_sq3.c in Sources */,
+				276B357F1BB0ECD00074D7E5 /* stem_UTF_8_italian.c in Sources */,
+				276B35801BB0ECD00074D7E5 /* stem_ISO_8859_1_norwegian.c in Sources */,
+				276B35811BB0ECD00074D7E5 /* stem_KOI8_R_russian.c in Sources */,
+				276B35821BB0ECD00074D7E5 /* stem_UTF_8_finnish.c in Sources */,
+				276B35831BB0ECD00074D7E5 /* stem_ISO_8859_1_english.c in Sources */,
+				276B35841BB0ECD00074D7E5 /* stem_UTF_8_danish.c in Sources */,
+				276B35851BB0ECD00074D7E5 /* stem_ISO_8859_1_finnish.c in Sources */,
+				276B35861BB0ECD00074D7E5 /* stem_UTF_8_portuguese.c in Sources */,
+				276B35871BB0ECD00074D7E5 /* stem_ISO_8859_1_swedish.c in Sources */,
+				276B35881BB0ECD00074D7E5 /* fts3_unicode2.c in Sources */,
+				276B35891BB0ECD00074D7E5 /* stem_UTF_8_russian.c in Sources */,
+				276B358A1BB0ECD00074D7E5 /* stem_ISO_8859_1_french.c in Sources */,
+				276B358B1BB0ECD00074D7E5 /* stem_UTF_8_german.c in Sources */,
+				276B358C1BB0ECD00074D7E5 /* stem_UTF_8_porter.c in Sources */,
+				276B358D1BB0ECD00074D7E5 /* stem_ISO_8859_1_danish.c in Sources */,
+				276B358E1BB0ECD00074D7E5 /* stem_UTF_8_norwegian.c in Sources */,
+				276B358F1BB0ECD00074D7E5 /* stem_ISO_8859_1_italian.c in Sources */,
+				276B35901BB0ECD00074D7E5 /* stem_UTF_8_romanian.c in Sources */,
+				276B35911BB0ECD00074D7E5 /* api_sq3.c in Sources */,
+				276B35921BB0ECD00074D7E5 /* stem_UTF_8_turkish.c in Sources */,
+				276B35931BB0ECD00074D7E5 /* libstemmer_utf8.c in Sources */,
+				276B35941BB0ECD00074D7E5 /* stem_ISO_8859_1_spanish.c in Sources */,
+				276B35951BB0ECD00074D7E5 /* stem_ISO_8859_2_romanian.c in Sources */,
+				276B35961BB0ECD00074D7E5 /* stem_UTF_8_hungarian.c in Sources */,
+				276B35971BB0ECD00074D7E5 /* stem_ISO_8859_1_porter.c in Sources */,
+				276B35981BB0ECD00074D7E5 /* stem_UTF_8_spanish.c in Sources */,
+				276B35991BB0ECD00074D7E5 /* stem_ISO_8859_1_portuguese.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		276B35C01BB0ED080074D7E5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				276B35C11BB0ED080074D7E5 /* debug.cc in Sources */,
+				276B35C21BB0ED080074D7E5 /* crc32.cc in Sources */,
+				276B35C31BB0ED080074D7E5 /* docio.cc in Sources */,
+				276B35C41BB0ED080074D7E5 /* api_wrapper.cc in Sources */,
+				276B35C51BB0ED080074D7E5 /* snappy-sinksource.cc in Sources */,
+				276B35C61BB0ED080074D7E5 /* btreeblock.cc in Sources */,
+				276B35C71BB0ED080074D7E5 /* adler32.cc in Sources */,
+				276B35C81BB0ED080074D7E5 /* transaction.cc in Sources */,
+				276B35C91BB0ED080074D7E5 /* time_utils.cc in Sources */,
+				276B35CA1BB0ED080074D7E5 /* filemgr.cc in Sources */,
+				276B35CB1BB0ED080074D7E5 /* hbtrie.cc in Sources */,
+				276B35CC1BB0ED080074D7E5 /* compactor.cc in Sources */,
+				276B35CD1BB0ED080074D7E5 /* wal.cc in Sources */,
+				276B35CE1BB0ED080074D7E5 /* blockcache.cc in Sources */,
+				276B35CF1BB0ED080074D7E5 /* snappy.cc in Sources */,
+				276B35D01BB0ED080074D7E5 /* partiallock.cc in Sources */,
+				276B35D11BB0ED080074D7E5 /* Collatable.mm in Sources */,
+				276B35D21BB0ED080074D7E5 /* btree_fast_str_kv.cc in Sources */,
+				276B35D31BB0ED080074D7E5 /* snapshot.cc in Sources */,
+				276B35D41BB0ED080074D7E5 /* filemgr_ops_windows.cc in Sources */,
+				276B35D51BB0ED080074D7E5 /* btree_kv.cc in Sources */,
+				276B35D61BB0ED080074D7E5 /* list.cc in Sources */,
+				276B35D71BB0ED080074D7E5 /* snappy-c.cc in Sources */,
+				276B35D81BB0ED080074D7E5 /* fdb_errors.cc in Sources */,
+				276B35D91BB0ED080074D7E5 /* forestdb.cc in Sources */,
+				276B35DA1BB0ED080074D7E5 /* btree.cc in Sources */,
+				276B35DB1BB0ED080074D7E5 /* (null) in Sources */,
+				276B35DC1BB0ED080074D7E5 /* filemgr_ops.cc in Sources */,
+				276B35DD1BB0ED080074D7E5 /* hash_functions.cc in Sources */,
+				276B35DE1BB0ED080074D7E5 /* kv_instance.cc in Sources */,
+				276B35DF1BB0ED080074D7E5 /* iterator.cc in Sources */,
+				276B35E01BB0ED080074D7E5 /* memleak.cc in Sources */,
+				276B35E11BB0ED080074D7E5 /* btree_str_kv.cc in Sources */,
+				276B35E21BB0ED080074D7E5 /* system_resource_stats.cc in Sources */,
+				276B35E31BB0ED080074D7E5 /* hash.cc in Sources */,
+				276B35E41BB0ED080074D7E5 /* configuration.cc in Sources */,
+				276B35E51BB0ED080074D7E5 /* avltree.cc in Sources */,
+				276B35E61BB0ED080074D7E5 /* filemgr_ops_linux.cc in Sources */,
+				276B35E71BB0ED080074D7E5 /* snappy-stubs-internal.cc in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		276B36031BB0ED200074D7E5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				276B36041BB0ED200074D7E5 /* GeoIndex.cc in Sources */,
+				276B36051BB0ED200074D7E5 /* slice.mm in Sources */,
+				276B36061BB0ED200074D7E5 /* Database.cc in Sources */,
+				276B36071BB0ED200074D7E5 /* KeyStore.cc in Sources */,
+				276B36081BB0ED200074D7E5 /* Document.cc in Sources */,
+				276B36091BB0ED200074D7E5 /* Geohash.cc in Sources */,
+				276B360A1BB0ED200074D7E5 /* VersionedDocument.cc in Sources */,
+				276B360B1BB0ED200074D7E5 /* DocEnumerator.cc in Sources */,
+				276B360C1BB0ED200074D7E5 /* MapReduceIndex.cc in Sources */,
+				276B360D1BB0ED200074D7E5 /* Collatable.mm in Sources */,
+				276B360E1BB0ED200074D7E5 /* Collatable.cc in Sources */,
+				276B360F1BB0ED200074D7E5 /* RevTree.cc in Sources */,
+				276B36101BB0ED200074D7E5 /* Tokenizer.cc in Sources */,
+				276B36111BB0ED200074D7E5 /* RevID.cc in Sources */,
+				276B36121BB0ED200074D7E5 /* RevID.mm in Sources */,
+				276B36131BB0ED200074D7E5 /* slice.cc in Sources */,
+				276B36141BB0ED200074D7E5 /* Index.cc in Sources */,
+				276B36151BB0ED200074D7E5 /* VersionedDocument.mm in Sources */,
+				276B36161BB0ED200074D7E5 /* varint.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1744,6 +2173,16 @@
 			isa = PBXTargetDependency;
 			target = 27EF80F91917EEC600A327B9 /* CBForest static */;
 			targetProxy = 27410EA9198BFD97007EE67C /* PBXContainerItemProxy */;
+		};
+		276B36241BB0EEB90074D7E5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 276B35BF1BB0ED080074D7E5 /* forestdb tvOS */;
+			targetProxy = 276B36231BB0EEB90074D7E5 /* PBXContainerItemProxy */;
+		};
+		276B36261BB0EEB90074D7E5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 276B35731BB0ECD00074D7E5 /* Tokenizer-tvOS */;
+			targetProxy = 276B36251BB0EEB90074D7E5 /* PBXContainerItemProxy */;
 		};
 		27766E1F1982DED300CAA464 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -2150,6 +2589,156 @@
 			};
 			name = Release;
 		};
+		276B35BC1BB0ECD00074D7E5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
+				GCC_WARN_SHADOW = NO;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CFLAGS = (
+					"-DDOC_COMP",
+					"-DSQLITE_ENABLE_FTS4_UNICODE61",
+					"-DSQLITE_ENABLE_FTS4",
+					"-DWITH_STEMMER_english",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = appletvos;
+			};
+			name = Debug;
+		};
+		276B35BD1BB0ECD00074D7E5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
+				GCC_WARN_SHADOW = NO;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CFLAGS = (
+					"-DDOC_COMP",
+					"-DSQLITE_ENABLE_FTS4_UNICODE61",
+					"-DSQLITE_ENABLE_FTS4",
+					"-DWITH_STEMMER_english",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = appletvos;
+			};
+			name = Release;
+		};
+		276B35FB1BB0ED080074D7E5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = NO;
+				EXECUTABLE_PREFIX = lib;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = NO;
+				GCC_WARN_SHADOW = NO;
+				GCC_WARN_UNINITIALIZED_AUTOS = NO;
+				GCC_WARN_UNUSED_FUNCTION = NO;
+				GCC_WARN_UNUSED_VALUE = NO;
+				GCC_WARN_UNUSED_VARIABLE = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"vendor/forestdb/**",
+				);
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = appletvos;
+				WARNING_CFLAGS = (
+					"-Wformat-security",
+					"-Wmissing-declarations",
+					"-Woverriding-method-mismatch",
+					"-Wbool-conversion",
+					"-Wno-arc-retain-cycles",
+				);
+			};
+			name = Debug;
+		};
+		276B35FC1BB0ED080074D7E5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = NO;
+				EXECUTABLE_PREFIX = lib;
+				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = NO;
+				GCC_WARN_SHADOW = NO;
+				GCC_WARN_UNINITIALIZED_AUTOS = NO;
+				GCC_WARN_UNUSED_FUNCTION = NO;
+				GCC_WARN_UNUSED_VALUE = NO;
+				GCC_WARN_UNUSED_VARIABLE = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"vendor/forestdb/**",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = appletvos;
+				WARNING_CFLAGS = (
+					"-Wformat-security",
+					"-Wmissing-declarations",
+					"-Woverriding-method-mismatch",
+					"-Wbool-conversion",
+					"-Wno-arc-retain-cycles",
+				);
+			};
+			name = Release;
+		};
+		276B361D1BB0ED200074D7E5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DSTROOT = /tmp/CBForest_iOS.dst;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "CBForest/CBForest-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"$(SRCROOT)/vendor/forestdb/include/**",
+				);
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = appletvos;
+				SKIP_INSTALL = YES;
+				STRIP_INSTALLED_PRODUCT = NO;
+			};
+			name = Debug;
+		};
+		276B361E1BB0ED200074D7E5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				DSTROOT = /tmp/CBForest_iOS.dst;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "CBForest/CBForest-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"$(SRCROOT)/vendor/forestdb/include/**",
+				);
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = appletvos;
+				SKIP_INSTALL = YES;
+				STRIP_INSTALLED_PRODUCT = NO;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 		27B7E0F318F8FB4800044EBA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -2344,6 +2933,33 @@
 			buildConfigurations = (
 				275072C518E4AA4400A80C5A /* Debug */,
 				275072C618E4AA4400A80C5A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		276B35BB1BB0ECD00074D7E5 /* Build configuration list for PBXNativeTarget "Tokenizer-tvOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				276B35BC1BB0ECD00074D7E5 /* Debug */,
+				276B35BD1BB0ECD00074D7E5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		276B35FA1BB0ED080074D7E5 /* Build configuration list for PBXNativeTarget "forestdb tvOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				276B35FB1BB0ED080074D7E5 /* Debug */,
+				276B35FC1BB0ED080074D7E5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		276B361C1BB0ED200074D7E5 /* Build configuration list for PBXNativeTarget "CBForest-tvOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				276B361D1BB0ED200074D7E5 /* Debug */,
+				276B361E1BB0ED200074D7E5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
