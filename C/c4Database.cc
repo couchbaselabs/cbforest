@@ -644,7 +644,7 @@ int c4doc_insertRevisionWithHistory(C4Document *doc,
     try {
         std::vector<revidBuffer> revIDBuffers;
         std::vector<revid> revIDs;
-        revIDs.push_back(revidBuffer(revID));
+        //revIDs.push_back(revidBuffer(revID));
         for (unsigned i = 0; i < historyCount; i++) {
             revIDBuffers.push_back(revidBuffer(history[i]));
             revIDs.push_back(revIDBuffers.back());
