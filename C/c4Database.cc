@@ -642,17 +642,21 @@ int c4doc_insertRevisionWithHistory(C4Document *doc,
         return false;
     int commonAncestor = -1;
     try {
-        std::vector<revidBuffer> revIDBuffers;
-        std::vector<revid> revIDs;
-        //revIDs.push_back(revidBuffer(revID));
+        std::vector <revidBuffer*> revIDBuffers;
+        std::vector <revid> revIDs;
         for (unsigned i = 0; i < historyCount; i++) {
-            revIDBuffers.push_back(revidBuffer(history[i]));
-            revIDs.push_back(revIDBuffers.back());
+            revIDBuffers.push_back(new revidBuffer(history[i]));
+            revIDs.push_back(*revIDBuffers.back());
         }
+        
         commonAncestor = idoc->_versionedDoc.insertHistory(revIDs,
                                                            body,
                                                            deleted,
                                                            hasAttachments);
+
+        for (unsigned i = 0; i < historyCount; i++)
+            delete revIDBuffers.at(i);
+
         if (commonAncestor >= 0) {
             idoc->updateMeta();
             idoc->selectRevision(idoc->_versionedDoc[revidBuffer(revID)]);

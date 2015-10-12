@@ -280,8 +280,10 @@ JNIEXPORT jint JNICALL Java_com_couchbase_cbforest_Document_insertRevisionWithHi
             delete historyAlloc.at(i);
         historyAlloc.clear();
     }
-    if (inserted >= 0)
+    if (inserted >= 0) {
+        updateSelection(env, self, doc);
         updateRevIDAndFlags(env, self, doc);
+    }
     else
         throwError(env, error);
     return inserted;
