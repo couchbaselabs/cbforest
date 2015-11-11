@@ -18,6 +18,7 @@
 
 #include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
 #include <string>
 #include <memory>
 
@@ -51,6 +52,8 @@ namespace forestdb {
 
         slice read(size_t nBytes);
         bool readInto(slice dst);
+
+        bool writeFrom(slice);
 
         const void* findByte(uint8_t byte) const    {return ::memchr(buf, byte, size);}
 

@@ -13,7 +13,8 @@
 
 using namespace forestdb;
 
-#define kDBPath "/tmp/temp.fdbindex"
+static std::string kDBPath;
+static NSString* kDBPathStr;
 
 
 class Scoped {
@@ -65,11 +66,18 @@ static boolBlock scopedEnumerate() {
     uint64_t _rowCount;
 }
 
++ (void) initialize {
+    if (self == [Index_Test class]) {
+        LogLevel = kWarning;
+        kDBPathStr = [NSTemporaryDirectory() stringByAppendingPathComponent: @"forest_temp.fdb"];
+        kDBPath = kDBPathStr.fileSystemRepresentation;
+    }
+}
 
 - (void) setUp {
     NSError* error;
-    [[NSFileManager defaultManager] removeItemAtPath: @"" kDBPath error: &error];
-    database = new Database(kDBPath, FDB_OPEN_FLAG_CREATE, Database::defaultConfig());
+    [[NSFileManager defaultManager] removeItemAtPath: kDBPathStr error: &error];
+    database = new Database(kDBPath, Database::defaultConfig());
     index = new Index(database, "index");
 }
 
@@ -97,7 +105,26 @@ static boolBlock scopedEnumerate() {
 }
 
 
+- (int) doQuery {
+    unsigned nRows = 0;
+    for (IndexEnumerator e(index, Collatable(), forestdb::slice::null,
+                           Collatable(), forestdb::slice::null,
+                           DocEnumerator::Options::kDefault); e.next(); ) {
+        nRows++;
+        alloc_slice keyStr = e.key().readString();
+        alloc_slice valueStr = e.value().readString();
+        NSLog(@"key = %.*s, value = %.*s, docID = %.*s",
+              (int)keyStr.size, keyStr.buf,
+              (int)valueStr.size, valueStr.buf,
+              (int)e.docID().size, e.docID().buf);
+    }
+    AssertEq(nRows, _rowCount);
+    return nRows;
+}
+
+
 - (void) testBasics {
+    //LogLevel = kDebug;
     NSDictionary* docs = @{
         @"CA": @[@"California", @"San Jose", @"San Francisco", @"Cambria"],
         @"WA": @[@"Washington", @"Seattle", @"Port Townsend", @"Skookumchuk"],
@@ -111,17 +138,7 @@ static boolBlock scopedEnumerate() {
     }
 
     NSLog(@"--- First query");
-    __block int nRows = 0;
-    for (IndexEnumerator e(index, Collatable(), forestdb::slice::null,
-                                   Collatable(), forestdb::slice::null,
-                           DocEnumerator::Options::kDefault); e.next(); ) {
-        nRows++;
-        alloc_slice keyStr = e.key().readString();
-        NSLog(@"key = %.*s, docID = %.*s",
-              (int)keyStr.size, keyStr.buf, (int)e.docID().size, e.docID().buf);
-    }
-    XCTAssertEqual(nRows, 8);
-    AssertEq(_rowCount, nRows);
+    XCTAssertEqual([self doQuery], 8);
 
     {
         Transaction trans(database);
@@ -130,17 +147,7 @@ static boolBlock scopedEnumerate() {
         [self updateDoc: @"OR" body: @[@"Oregon", @"Portland", @"Walla Walla", @"Salem"]
                  writer: writer];
     }
-    nRows = 0;
-    for (IndexEnumerator e(index, Collatable(), forestdb::slice::null,
-                                   Collatable(), forestdb::slice::null,
-                                   DocEnumerator::Options::kDefault); e.next(); ) {
-        nRows++;
-        alloc_slice keyStr = e.key().readString();
-        NSLog(@"key = %.*s, docID = %.*s",
-              (int)keyStr.size, keyStr.buf, (int)e.docID().size, e.docID().buf);
-    }
-    XCTAssertEqual(nRows, 9);
-    AssertEq(_rowCount, nRows);
+    XCTAssertEqual([self doQuery], 9);
 
     {
         NSLog(@"--- Removing CA");
@@ -148,20 +155,10 @@ static boolBlock scopedEnumerate() {
         IndexWriter writer(index, trans);
         [self updateDoc: @"CA" body: @[] writer: writer];
     }
-    nRows = 0;
-    for (IndexEnumerator e(index, Collatable(), forestdb::slice::null,
-                           Collatable(), forestdb::slice::null,
-                           DocEnumerator::Options::kDefault); e.next(); ) {
-        nRows++;
-        alloc_slice keyStr = e.key().readString();
-        NSLog(@"key = %.*s, docID = %.*s",
-              (int)keyStr.size, keyStr.buf, (int)e.docID().size, e.docID().buf);
-    }
-    XCTAssertEqual(nRows, 6);
-    AssertEq(_rowCount, nRows);
+    XCTAssertEqual([self doQuery], 6);
 
     NSLog(@"--- Reverse enumeration");
-    nRows = 0;
+    unsigned nRows = 0;
     auto options = DocEnumerator::Options::kDefault;
     options.descending = true;
     for (IndexEnumerator e(index, Collatable(), forestdb::slice::null,
@@ -172,7 +169,7 @@ static boolBlock scopedEnumerate() {
         NSLog(@"key = %.*s, docID = %.*s",
               (int)keyStr.size, keyStr.buf, (int)e.docID().size, e.docID().buf);
     }
-    XCTAssertEqual(nRows, 6);
+    XCTAssertEqual(nRows, 6u);
     AssertEq(_rowCount, nRows);
 
     // Enumerate a vector of keys:
@@ -189,7 +186,7 @@ static boolBlock scopedEnumerate() {
         NSLog(@"key = %.*s, docID = %.*s",
               (int)keyStr.size, keyStr.buf, (int)e.docID().size, e.docID().buf);
     }
-    XCTAssertEqual(nRows, 2);
+    XCTAssertEqual(nRows, 2u);
 
     // Enumerate a vector of key ranges:
     NSLog(@"--- Enumerating a vector of key ranges");
@@ -203,7 +200,43 @@ static boolBlock scopedEnumerate() {
         NSLog(@"key = %.*s, docID = %.*s",
               (int)keyStr.size, keyStr.buf, (int)e.docID().size, e.docID().buf);
     }
-    XCTAssertEqual(nRows, 3);
+    XCTAssertEqual(nRows, 3u);
+}
+
+- (void) testDuplicateKeys {
+    NSLog(@"--- Populate index");
+    {
+        Transaction trans(database);
+        IndexWriter writer(index, trans);
+        std::vector<Collatable> keys, values;
+        Collatable key("Schlage");
+        keys.push_back(key);
+        values.push_back(Collatable("purple"));
+        keys.push_back(key);
+        values.push_back(Collatable("red"));
+        bool changed = writer.update(slice("doc1"), 1, keys, values, _rowCount);
+        Assert(changed);
+        AssertEq(_rowCount, 2u);
+    }
+    NSLog(@"--- First query");
+    XCTAssertEqual([self doQuery], 2);
+    {
+        Transaction trans(database);
+        IndexWriter writer(index, trans);
+        std::vector<Collatable> keys, values;
+        Collatable key("Schlage");
+        keys.push_back(key);
+        values.push_back(Collatable("purple"));
+        keys.push_back(key);
+        values.push_back(Collatable("crimson"));
+        keys.push_back(Collatable("Master"));
+        values.push_back(Collatable("gray"));
+        bool changed = writer.update(slice("doc1"), 2, keys, values, _rowCount);
+        Assert(changed);
+        AssertEq(_rowCount, 3u);
+    }
+    NSLog(@"--- Second query");
+    XCTAssertEqual([self doQuery], 3);
 }
 
 - (void) testBlockScopedObjects {

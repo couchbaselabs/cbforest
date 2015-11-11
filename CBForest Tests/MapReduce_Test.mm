@@ -30,8 +30,8 @@ static Collatable StringToCollatable(NSString* str) {
 }
 
 
-#define kDBPath "/tmp/temp.fdb"
-#define kIndexPath "/tmp/temp.fdbindex"
+static NSString *kDBPathStr, *kIndexPathStr;
+static std::string kDBPath, kIndexPath;
 
 
 class TestJSONMappable : public Mappable {
@@ -65,17 +65,11 @@ int TestMapFn::numMapCalls;
 class TestIndexer : public MapReduceIndexer {
 public:
     static bool updateIndex(Database* database, MapReduceIndex* index) {
-        std::vector<MapReduceIndex*> indexes;
-        indexes.push_back(index);
-        Transaction trans(database);
-        TestIndexer indexer(indexes, trans);
+        TestIndexer indexer;
+        indexer.addIndex(index, new Transaction(database));
         return indexer.run();
     }
 
-    TestIndexer(std::vector<MapReduceIndex*> indexes, Transaction& t)
-    :MapReduceIndexer(indexes, t)
-    { }
-    
     virtual void addDocument(const Document& doc) {
         TestJSONMappable mappable(doc);
         addMappable(mappable);
@@ -93,12 +87,22 @@ public:
     MapReduceIndex* index;
 }
 
++ (void) initialize {
+    if (self == [MapReduce_Test class]) {
+        LogLevel = kWarning;
+        kDBPathStr = [NSTemporaryDirectory() stringByAppendingPathComponent: @"forest_temp.fdb"];
+        kDBPath = kDBPathStr.fileSystemRepresentation;
+        kIndexPathStr = [kDBPathStr stringByAppendingString: @"index"];
+        kIndexPath = kIndexPathStr.fileSystemRepresentation;
+    }
+}
+
 - (void) setUp {
     NSError* error;
-    [[NSFileManager defaultManager] removeItemAtPath: @"" kDBPath error: &error];
-    db = new Database(kDBPath, FDB_OPEN_FLAG_CREATE, Database::defaultConfig());
+    [[NSFileManager defaultManager] removeItemAtPath: kDBPathStr error: &error];
+    db = new Database(kDBPath, Database::defaultConfig());
     source = (KeyStore)*db;
-    [[NSFileManager defaultManager] removeItemAtPath: @"" kIndexPath error: &error];
+    [[NSFileManager defaultManager] removeItemAtPath: kIndexPathStr error: &error];
     index = new MapReduceIndex(db, "index", source);
     Assert(index, @"Couldn't open index: %@", error);
 }
@@ -115,7 +119,7 @@ public:
     TestMapFn::numMapCalls = 0;
     XCTAssertTrue(TestIndexer::updateIndex(db, index));
 
-    int nRows = 0;
+    unsigned nRows = 0;
     for (IndexEnumerator e(index, Collatable(), forestdb::slice::null,
                            Collatable(), forestdb::slice::null,
                            DocEnumerator::Options::kDefault); e.next(); ) {

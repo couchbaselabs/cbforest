@@ -20,7 +20,8 @@ using namespace forestdb;
     Database* db;
 }
 
-#define kDBPath "/tmp/forest.db"
+
+static std::string kDBPath;
 
 
 static revidBuffer stringToRev(NSString* str) {
@@ -28,11 +29,18 @@ static revidBuffer stringToRev(NSString* str) {
     return buf;
 }
 
++ (void) initialize {
+    if (self == [VersionedDocument_Tests class]) {
+        LogLevel = kWarning;
+        kDBPath = [NSTemporaryDirectory() stringByAppendingPathComponent: @"forest_temp.fdb"].fileSystemRepresentation;
+    }
+}
+
 - (void)setUp
 {
-    ::unlink(kDBPath);
+    ::unlink(kDBPath.c_str());
     [super setUp];
-    db = new Database(kDBPath, FDB_OPEN_FLAG_CREATE, Database::defaultConfig());
+    db = new Database(kDBPath, Database::defaultConfig());
 }
 
 - (void)tearDown
@@ -89,8 +97,8 @@ static revidBuffer stringToRev(NSString* str) {
     tree.sort();
     AssertEq(tree[0], rev2);
     AssertEq(tree[1], rev);
-    AssertEq(rev->index(), 1);
-    AssertEq(rev2->index(), 0);
+    AssertEq(rev->index(), 1u);
+    AssertEq(rev2->index(), 0u);
 
     alloc_slice ext = tree.encode();
 
@@ -110,9 +118,32 @@ static revidBuffer stringToRev(NSString* str) {
     Assert(!node->isDeleted());
     Assert(node->isLeaf());
     Assert(node->isActive());
-    AssertEq(v.size(), 1);
-    AssertEq(v.currentRevisions().size(), 1);
+    AssertEq(v.size(), 1u);
+    AssertEq(v.currentRevisions().size(), 1u);
     AssertEq(v.currentRevisions()[0], v.currentRevision());
+}
+
+- (void) test04_DocType {
+    revidBuffer rev1ID(forestdb::slice("1-aaaa"));
+    {
+        VersionedDocument v(*db, @"foo");
+
+        forestdb::slice rev1Data("body of revision");
+        int httpStatus;
+        v.insert(rev1ID, rev1Data, true /*deleted*/, false,
+                 revid(), false, httpStatus);
+
+        v.setDocType(slice("moose"));
+        AssertEq(v.docType(), slice("moose"));
+        Transaction t(db);
+        v.save(t);
+    }
+    {
+        VersionedDocument v(*db, @"foo");
+        AssertEq(v.flags(), VersionedDocument::kDeleted);
+        AssertEq(v.revID(), rev1ID);
+        AssertEq(v.docType(), slice("moose"));
+    }
 }
 
 @end

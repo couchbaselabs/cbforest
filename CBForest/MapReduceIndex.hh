@@ -42,7 +42,7 @@ namespace forestdb {
 
         /** Emits the text for full-text indexing. Each word in the text will be emitted separately
             as a string key. When querying, use IndexEnumerator::getTextToken to read the info. */
-        virtual void emitTextTokens(slice text) =0;
+        virtual void emitTextTokens(slice text, Collatable value) =0;
 
         inline void operator() (const Collatable& key, const Collatable& value) {emit(key, value);}
     };
@@ -79,9 +79,10 @@ namespace forestdb {
 
         /** Reads the full text passed to the call to emitTextTokens(), given some info about the
             document and the fullTextID available from IndexEnumerator::getTextToken(). */
-        alloc_slice readFullText(slice docID, sequence seq, unsigned fullTextID) {
-            return getEntry(docID, seq, Collatable(fullTextID), 0);
-        }
+        alloc_slice readFullText(slice docID, sequence seq, unsigned fullTextID);
+
+        /** Reads the value that was emitted along with a full-text key. */
+        alloc_slice readFullTextValue(slice docID, sequence seq, unsigned fullTextID);
 
     protected:
         void deleted(); // called by Transaction::deleteDatabase()
@@ -106,14 +107,17 @@ namespace forestdb {
     /** An activity that updates one or more map-reduce indexes. */
     class MapReduceIndexer {
     public:
-        MapReduceIndexer(std::vector<MapReduceIndex*> indexes,
-                         Transaction&);
+        MapReduceIndexer();
         ~MapReduceIndexer();
+
+        void addIndex(MapReduceIndex*, Transaction*);
 
         /** If set, indexing will only occur if this index needs to be updated. */
         void triggerOnIndex(MapReduceIndex* index)  {_triggerIndex = index;}
 
         bool run();
+
+        sequence latestDbSequence() const           {return _latestDbSequence;}
 
     protected:
         /** Transforms the Document to a Mappable and invokes addMappable.
@@ -129,14 +133,15 @@ namespace forestdb {
 
         void updateDocInIndex(size_t i, const Mappable& mappable) {
             if (mappable.document().sequence() > _lastSequences[i])
-                _indexes[i]->updateDocInIndex(_transaction, mappable);
+                _indexes[i]->updateDocInIndex(*_transactions[i], mappable);
         }
 
     protected:
-        Transaction& _transaction;
         std::vector<MapReduceIndex*> _indexes;
+        std::vector<Transaction*> _transactions;
         std::vector<sequence> _lastSequences;
         MapReduceIndex* _triggerIndex;
+        sequence _latestDbSequence;
         bool _finished;
     };
 }

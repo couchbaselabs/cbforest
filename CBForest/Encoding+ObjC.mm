@@ -22,8 +22,8 @@ namespace forestdb {
 
 
     id value::asNSObject(__unsafe_unretained NSArray* externStrings) const {
-        if (this == NULL)
-            return nil;
+//        if (this == NULL)
+//            return nil;
         return asNSObject(createSharedStringsTable(), externStrings);
     }
 
@@ -31,8 +31,8 @@ namespace forestdb {
     id value::asNSObject(__unsafe_unretained NSMapTable *sharedStrings,
                          __unsafe_unretained NSArray* externStrings) const
     {
-        if (this == NULL)
-            return nil;
+//        if (this == NULL)
+//            return nil;
         switch (_typeCode) {
             case kNullCode:
                 return [NSNull null];

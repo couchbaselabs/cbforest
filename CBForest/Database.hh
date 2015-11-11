@@ -42,13 +42,12 @@ namespace forestdb {
         A Database also acts as its default KeyStore. */
     class Database : public KeyStore {
     public:
-        typedef fdb_open_flags openFlags;
         typedef fdb_config config;
         typedef fdb_file_info info;
 
         static config defaultConfig()           {return fdb_get_default_config();}
 
-        Database(std::string path, openFlags, const config&);
+        Database(std::string path, const config&);
         Database(Database* original, sequence snapshotSequence);
         virtual ~Database();
 
@@ -68,6 +67,8 @@ namespace forestdb {
         /** The Database's default key-value store. (You can also just use the Database
             instance directly as a KeyStore since it inherits from it.) */
         KeyStore defaultKeyStore() const        {return *this;}
+
+        bool contains(KeyStore&) const;
 
         void closeKeyStore(std::string name);
         void deleteKeyStore(std::string name);
@@ -89,7 +90,6 @@ namespace forestdb {
         Database& operator=(const Database&);   // forbidden
 
         File* _file;
-        openFlags _openFlags;
         config _config;
         fdb_file_handle* _fileHandle;
         std::unordered_map<std::string, fdb_kvs_handle*> _kvHandles;

@@ -18,6 +18,7 @@
 #include "LogInternal.hh"
 #include <assert.h>
 #include <errno.h>
+#include <stdarg.h>           // va_start, va_end
 #include <stdio.h>
 #include <unistd.h>
 #include <mutex>              // std::mutex, std::unique_lock
@@ -89,13 +90,16 @@ namespace forestdb {
     }
 
     static void logCallback(int err_code, const char *err_msg, void *ctx_data) {
+        // don't warn about read errors: VersionedDocument can trigger them when it looks for a
+        // revision that's been compacted away.
+        if (err_code == FDB_RESULT_READ_FAIL)
+            return;
         WarnError("ForestDB error %d: %s (handle=%p)", err_code, err_msg, ctx_data);
     }
 
-    Database::Database(std::string path, openFlags flags, const config& cfg)
+    Database::Database(std::string path, const config& cfg)
     :KeyStore(NULL),
      _file(File::forPath(path)),
-     _openFlags(flags),
      _config(cfg),
      _fileHandle(NULL)
     {
@@ -121,7 +125,7 @@ namespace forestdb {
     }
 
     bool Database::isReadOnly() const {
-        return (_openFlags & FDB_OPEN_FLAG_RDONLY) != 0;
+        return (_config.flags & FDB_OPEN_FLAG_RDONLY) != 0;
     }
 
     void Database::deleted() {
@@ -152,6 +156,11 @@ namespace forestdb {
     void Database::deleteKeyStore(std::string name) {
         closeKeyStore(name);
         check(fdb_kvs_remove(_fileHandle, name.c_str()));
+    }
+
+    bool Database::contains(KeyStore& store) const {
+        auto i = _kvHandles.find(store.name());
+        return i != _kvHandles.end() && i->second == store.handle();
     }
 
 

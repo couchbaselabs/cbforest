@@ -21,16 +21,23 @@ namespace forestdb {
 
     static const size_t kDefaultBufferSize = 64;
 
+    static uint8_t kCharPriority[256];
+    static uint8_t kCharInversePriority[256];
+
+    static void initCharPriorityMap();
+
+
     static inline void _invertDouble(swappedDouble& swapped) {
         swapped.asRaw ^= 0xFFFFFFFFFFFFFFFF;
     }
 
-    static uint8_t* getCharPriorityMap();
 
 
     Collatable::Collatable()
     :_out(kDefaultBufferSize)
-    { }
+    {
+        initCharPriorityMap();
+    }
 
     Collatable::Collatable(const Collatable& c)
     :_out(c._out)
@@ -39,6 +46,11 @@ namespace forestdb {
     Collatable::Collatable(Collatable&& c)
     :_out((Writer&&)c._out)
     { }
+
+    Collatable::Collatable(slice s, bool)
+    {
+        _out << s;
+    }
 
     Collatable& Collatable::addBool (bool b) {
         addTag(b ? kTrue : kFalse);
@@ -59,13 +71,12 @@ namespace forestdb {
     }
 
     Collatable& Collatable::operator<< (slice s) {
-        const uint8_t* priority = getCharPriorityMap();
         addTag(kString);
         size_t first = _out.length();
         add(s);
         slice output = _out.output();
         for (auto c = (uint8_t*)&output[first]; c != output.end(); ++c) {
-            *c = priority[(uint8_t)*c];
+            *c = kCharPriority[(uint8_t)*c];
         }
         _out << 0;
         return *this;
@@ -76,13 +87,20 @@ namespace forestdb {
         return *this;
     }
 
-    std::string Collatable::dump() {
+    std::string Collatable::dump() const {
         return CollatableReader(*this).dump();
     }
 
 
 
 #pragma mark - READER:
+
+
+    CollatableReader::CollatableReader(slice s)
+    :_data(s)
+    {
+        getInverseCharPriorityMap(); // make sure it's initialized
+    }
 
 
     CollatableReader::Tag CollatableReader::peekTag() const {
@@ -126,9 +144,8 @@ namespace forestdb {
 
         alloc_slice result(nBytes);
 
-        const uint8_t* toChar = getInverseCharPriorityMap();
         for (int i=0; i<nBytes; i++)
-            (uint8_t&)result[i] = toChar[_data[i]];
+            (uint8_t&)result[i] = kCharInversePriority[_data[i]];
         _data.moveStart(nBytes+1);
         return result;
     }
@@ -242,8 +259,7 @@ namespace forestdb {
 
     // Returns a 256-byte table that maps each ASCII character to its relative priority in Unicode
     // ordering. Bytes 0x80--0xFF (i.e. UTF-8 encoded sequences) map to themselves.
-    static uint8_t* getCharPriorityMap() {
-        static uint8_t kCharPriority[256];
+    static void initCharPriorityMap() {
         static bool initialized;
         if (!initialized) {
             // Control characters have zero priority:
@@ -255,20 +271,18 @@ namespace forestdb {
                 kCharPriority[i] = (uint8_t)i;
             initialized = true;
         }
-        return kCharPriority;
     }
 
     uint8_t* CollatableReader::getInverseCharPriorityMap() {
-        static uint8_t kMap[256];
         static bool initialized;
         if (!initialized) {
             // Control characters have zero priority:
-            uint8_t* priorityMap = getCharPriorityMap();
+            initCharPriorityMap();
             for (int i=0; i<256; i++)
-                kMap[priorityMap[i]] = (uint8_t)i;
+                kCharInversePriority[kCharPriority[i]] = (uint8_t)i;
             initialized = true;
         }
-        return kMap;
+        return kCharInversePriority;
     }
 
 }
