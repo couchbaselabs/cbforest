@@ -17,10 +17,11 @@
 #include "Collatable.hh"
 #include "varint.hh"
 #include "LogInternal.hh"
-#include <assert.h>
 
 
 namespace forestdb {
+
+    const slice Index::kSpecialValue("*", 1);
 
     bool KeyRange::isKeyPastEnd(slice key) const {
         return inclusiveEnd ? (key > end) : !(key < end);
@@ -33,7 +34,7 @@ namespace forestdb {
     IndexWriter::IndexWriter(Index* index, Transaction& t)
     :KeyStoreWriter(*index, t)
     {
-        assert(t.database()->contains(*index));
+        CBFAssert(t.database()->contains(*index));
     }
 
 
@@ -71,11 +72,15 @@ namespace forestdb {
 
     bool IndexWriter::update(slice docID, sequence docSequence,
                              const std::vector<Collatable>& keys,
-                             const std::vector<Collatable>& values,
+                             const std::vector<alloc_slice>& values,
                              uint64_t &rowCount)
     {
         Collatable collatableDocID;
         collatableDocID << docID;
+
+        // Metadata of emitted rows contains doc sequence as varint:
+        uint8_t metaBuf[10];
+        slice meta(metaBuf, PutUVarInt(metaBuf, docSequence));
 
         // Get the previously emitted keys:
         std::vector<Collatable> oldStoredKeys, newStoredKeys;
@@ -85,8 +90,8 @@ namespace forestdb {
         // Compute a hash of the values and see whether it's the same as the previous values' hash:
         uint32_t newStoredHash = kInitialHash;
         for (auto value = values.begin(); value != values.end(); ++value) {
-            if (((slice)*value)[0] == Collatable::kSpecial) {
-                // kSpecial is placeholder for entire doc, and always considered to have changed.
+            if (*value == Index::kSpecialValue) {
+                // kSpecialValue is placeholder for entire doc, and always considered changed.
                 oldStoredHash = newStoredHash - 1; // force comparison to fail
                 break;
             }
@@ -101,14 +106,14 @@ namespace forestdb {
         unsigned emitIndex = 0;
         auto oldKey = oldStoredKeys.begin();
         for (auto key = keys.begin(); key != keys.end(); ++key,++value,++emitIndex) {
-            // Create a key for the index db by combining the emitted key and doc ID:
+            // Create a key for the index db by combining the emitted key, doc ID, and emit#:
             Collatable realKey;
             realKey.beginArray() << *key << collatableDocID;
             if (emitIndex > 0)
                 realKey << emitIndex;
             realKey.endArray();
             if (realKey.size() > Document::kMaxKeyLength
-                    || value->size() > Document::kMaxBodyLength) {
+                    || value->size > Document::kMaxBodyLength) {
                 Warn("Index key or value too long"); //FIX: Need more-official warning
                 continue;
             }
@@ -124,16 +129,9 @@ namespace forestdb {
                     // read the old row so we can compare the value too:
                     Document oldRow = get(realKey);
                     if (oldRow.exists()) {
-                        CollatableReader body(oldRow.body());
-                        body.beginArray();
-                        (void)body.readInt(); // old doc sequence
-                        slice oldValue = slice::null;
-                        if (body.peekTag() != Collatable::kEndSequence)
-                            oldValue = body.read();
-
-                        if (oldValue == (slice)*value) {
+                        if (oldRow.body() == *value) {
                             Log("Old k/v pair (%s, %s) unchanged",
-                                  key->dump().c_str(), value->dump().c_str());
+                                key->toJSON().c_str(), ((std::string)*value).c_str());
                             continue;  // Value is unchanged, so this is a no-op; skip to next key!
                         }
                     } else {
@@ -144,10 +142,8 @@ namespace forestdb {
             }
 
             // Store the key & value:
-            Collatable realValue;
-            realValue.beginArray() << docSequence << *value;
-            realValue.endArray();
-            set(realKey, slice::null, realValue);
+            Log("**** update: realKey = %s", realKey.toJSON().c_str());
+            set(realKey, meta, *value);
             newStoredKeys.push_back(*key);
             ++rowsAdded;
         }
@@ -184,6 +180,8 @@ namespace forestdb {
                                 const Collatable& key, unsigned emitIndex) {
         Collatable collatableDocID;
         collatableDocID << docID;
+
+        // realKey matches the key generated in update(), above
         Collatable realKey;
         realKey.beginArray();
         realKey << key << collatableDocID;
@@ -191,14 +189,10 @@ namespace forestdb {
             realKey << emitIndex;
         realKey.endArray();
 
+        Log("**** getEntry: realKey = %s", realKey.toJSON().c_str());
         Document doc = get(realKey);
-
-        CollatableReader realValue(doc.body());
-        realValue.beginArray();
-        (void)realValue.readInt(); // doc sequence
-        if (realValue.peekTag() == Collatable::kEndSequence)
-            return alloc_slice();
-        return alloc_slice(realValue.read());
+        CBFAssert(doc.exists());
+        return alloc_slice(doc.body());
     }
 
 
@@ -228,6 +222,7 @@ namespace forestdb {
     static DocEnumerator::Options docOptions(DocEnumerator::Options options) {
         options.limit = DocEnumerator::Options::kDefault.limit;
         options.skip = DocEnumerator::Options::kDefault.skip;
+        options.contentOptions = KeyStore::kDefaultContent; // read() method needs the doc bodies
         return options;
     }
 
@@ -265,7 +260,7 @@ namespace forestdb {
     {
         Debug("IndexEnumerator(%p), key ranges:", this);
         for (auto i = _keyRanges.begin(); i != _keyRanges.end(); ++i)
-            Debug("    key range: %s -- %s (%d)", i->start.dump().c_str(), i->end.dump().c_str(), i->inclusiveEnd);
+            Debug("    key range: %s -- %s (%d)", i->start.toJSON().c_str(), i->end.toJSON().c_str(), i->inclusiveEnd);
         nextKeyRange();
     }
 
@@ -307,6 +302,10 @@ namespace forestdb {
                     return false;
             }
 
+            _docID = keyReader.readString();
+            GetUVarInt(doc.meta(), &_sequence);
+            _value = doc.body();
+
             // Subclasses can ignore rows:
             if (!this->approve(_key)) {
                 _dbEnum.next();
@@ -325,42 +324,32 @@ namespace forestdb {
             }
 
             // Return it as the next row:
-            _docID = keyReader.readString();
-
-            CollatableReader valueReader(doc.body());
-            valueReader.beginArray();
-            _sequence = valueReader.readInt();
-            if (valueReader.peekTag() == Collatable::kEndSequence)
-                _value = slice::null;
-            else
-                _value = valueReader.read();
             Debug("IndexEnumerator: found key=%s",
-                    forestdb::CollatableReader(_key).dump().c_str());
+                    forestdb::CollatableReader(_key).toJSON().c_str());
             return true;
         }
     }
 
-    void IndexEnumerator::getTextToken(std::string &token,
-                                       size_t &wordStart, size_t &wordLength,
-                                       unsigned &fullTextID)
-    {
+    std::vector<size_t> IndexEnumerator::getTextTokenInfo(unsigned &fullTextID) {
         CollatableReader reader(value());
         reader.beginArray();
         fullTextID = (unsigned)reader.readInt();
-        wordStart = (size_t)reader.readDouble();
-        wordLength = (size_t)reader.readDouble();
+        std::vector<size_t> tokens;
+        do {
+            tokens.push_back((size_t)reader.readInt());
+            tokens.push_back((size_t)reader.readInt());
+        } while (reader.peekTag() != CollatableReader::kEndSequence);
+        return tokens;
     }
 
     void IndexEnumerator::nextKeyRange() {
-        if (_keyRanges.size() == 0)
-            return;
         if (++_currentKeyIndex >= _keyRanges.size()) {
             _dbEnum.close();
             return;
         }
 
         Collatable& startKey = _keyRanges[_currentKeyIndex].start;
-        Debug("IndexEnumerator: Advance to key '%s'", startKey.dump().c_str());
+        Debug("IndexEnumerator: Advance to key '%s'", startKey.toJSON().c_str());
         if (!_dbEnum)
             _dbEnum = DocEnumerator(*_index, slice::null, slice::null, docOptions(_options));
         _dbEnum.seek(makeRealKey(startKey, slice::null, false, _options.descending));

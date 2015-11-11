@@ -6,6 +6,12 @@
 //  Copyright (c) 2014 Couchbase. All rights reserved.
 //
 
+#import "Database.hh"
+
 #define Assert      XCTAssert
 #define AssertEq    XCTAssertEqual
 #define AssertEqual XCTAssertEqualObjects
+
+void CreateTestDir();
+std::string PathForDatabaseNamed(NSString *name);
+forestdb::Database::config TestDBConfig();

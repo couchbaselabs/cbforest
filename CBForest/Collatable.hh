@@ -19,6 +19,7 @@
 #include <string>
 #include "Writer.hh"
 #include "slice.hh"
+#include "Geohash.hh"
 
 namespace forestdb {
 
@@ -34,13 +35,15 @@ namespace forestdb {
             kString,
             kArray,
             kMap,
-            kSpecial,
-            kError = 255        // Something went wrong...
+            kGeohash,           // Geohash string
+            kSpecial,           // Placeholder for doc (Only used in values, not keys)
+            kError = 255        // Something went wrong. (Never stored, only returned from peekTag)
         } Tag;
     };
 
     /** A binary encoding of JSON-compatible data, that collates with CouchDB-compatible semantics
         using a dumb binary compare (like memcmp).
+        Data format spec: https://github.com/couchbaselabs/cbforest/wiki/Collatable-Data-Format
         Collatable owns its data, in the form of a C++ string object. */
     class Collatable : public CollatableTypes {
     public:
@@ -51,15 +54,19 @@ namespace forestdb {
 
         template<typename T> explicit Collatable(const T &t)    {*this << t;}
 
+        Collatable& operator= (Collatable&&);
+
         Collatable& addNull()                       {addTag(kNull); return *this;}
         Collatable& addBool (bool); // overriding <<(bool) is dangerous due to implicit conversion
 
         Collatable& operator<< (double);
 
         Collatable& operator<< (const Collatable&);
-        Collatable& operator<< (std::string);
+        Collatable& operator<< (std::string str)    {return addEncoded(kString, slice(str));}
         Collatable& operator<< (const char* cstr)   {return operator<<(slice(cstr));}
-        Collatable& operator<< (slice);             // interpreted as a string
+        Collatable& operator<< (slice str)          {return addEncoded(kString, str);}
+
+        Collatable& operator<< (const geohash::hash& h)   {return addEncoded(kGeohash, slice(h));}
 
         Collatable& beginArray()                    {addTag(kArray); return *this;}
         Collatable& endArray()                      {addTag(kEndSequence); return *this;}
@@ -80,17 +87,17 @@ namespace forestdb {
         bool operator< (const Collatable& c) const  {return _out.output().compare(c) < 0;}
         bool operator== (const Collatable& c) const {return _out.output().compare(c) == 0;}
 
-        std::string dump() const;
+        std::string toJSON() const;
 
     private:
         void addTag(Tag t)                          {_out << (uint8_t)t;}
         void add(slice s)                           {_out << s;}
-
+        Collatable& addEncoded(Tag t, slice s);
         Writer _out;
     };
 
 
-    /** A decoder of Collatable-format data. Does not own its data (reads from a slice.) */
+    /** A decoder of Collatable-format data. Does _not_ own its data (reads from a slice.) */
     class CollatableReader : public CollatableTypes {
     public:
         CollatableReader(slice s);
@@ -99,10 +106,12 @@ namespace forestdb {
         bool atEnd() const                  {return _data.size == 0;}
         
         Tag peekTag() const;
+        void skipTag()                      {if (_data.size > 0) _skipTag();}
 
         int64_t readInt();
         double readDouble();
         alloc_slice readString();
+        geohash::hash readGeohash();
 
 #ifdef __OBJC__
         id readNSObject();
@@ -117,15 +126,16 @@ namespace forestdb {
         void beginMap();
         void endMap();
 
-        void dumpTo(std::ostream &out);
-        std::string dump();
+        void writeJSONTo(std::ostream &out);
+        std::string toJSON();
 
         static uint8_t* getInverseCharPriorityMap();
 
     private:
         void expectTag(Tag tag);
-        void skipTag()                      {_data.moveStart(1);}
-        
+        void _skipTag()                     {_data.moveStart(1);} // like skipTag but unsafe
+        alloc_slice readString(Tag);
+
         slice _data;
     };
 

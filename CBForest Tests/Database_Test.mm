@@ -14,7 +14,7 @@
 using namespace forestdb;
 
 
-static std::string kDBPath;
+#define ENCRYPT_DATABASES 1
 
 
 @interface Database_Test : XCTestCase
@@ -22,26 +22,63 @@ static std::string kDBPath;
 
 @implementation Database_Test
 {
+    std::string dbPath;
     Database* db;
+}
+
+static NSString* sTestDir;
+
+void CreateTestDir() {
+    if (!sTestDir)
+        sTestDir = [NSTemporaryDirectory() stringByAppendingPathComponent: @"CBForest_Unit_Tests"];
+    NSError* error;
+    [[NSFileManager defaultManager] removeItemAtPath: sTestDir error: nil];
+    BOOL ok = [[NSFileManager defaultManager] createDirectoryAtPath: sTestDir
+                                        withIntermediateDirectories: NO
+                                                         attributes: nil
+                                                              error: &error];
+    assert(ok);
+}
+
+std::string PathForDatabaseNamed(NSString *name) {
+    const char *path = [sTestDir stringByAppendingPathComponent: name].fileSystemRepresentation;
+    ::unlink(path);
+    return std::string(path);
+}
+
+static void randomAESKey(fdb_encryption_key &key) {
+    key.algorithm = FDB_ENCRYPTION_AES256;
+    SecRandomCopyBytes(kSecRandomDefault, sizeof(key.bytes), (uint8_t*)&key.bytes);
+}
+
+Database::config TestDBConfig() {
+    auto config = Database::defaultConfig();
+#if ENCRYPT_DATABASES
+    randomAESKey(config.encryption_key);
+#endif
+    return config;
 }
 
 + (void) initialize {
     if (self == [Database_Test class]) {
         LogLevel = kWarning;
-        kDBPath = [NSTemporaryDirectory() stringByAppendingPathComponent: @"forest_temp.fdb"].fileSystemRepresentation;
     }
 }
 
 - (void)setUp
 {
-    ::unlink(kDBPath.c_str());
     [super setUp];
-    db = new Database(kDBPath, Database::defaultConfig());
+    CreateTestDir();
+    dbPath = PathForDatabaseNamed(@"forest_temp.fdb");
+    db = new Database(dbPath, TestDBConfig());
 }
 
 - (void)tearDown
 {
-    delete db;
+    if (db) {
+        db->deleteDatabase();
+        delete db;
+    }
     [super tearDown];
 }
 
@@ -49,7 +86,7 @@ static std::string kDBPath;
     try{
         [super invokeTest];
     } catch (error e) {
-        XCTFail(@"Exception: %d", e.status);
+        XCTFail(@"Exception: %s (%d)", e.message(), e.status);
     }
 }
 
@@ -78,7 +115,7 @@ static std::string kDBPath;
 - (void) test03_SaveDocs {
     Transaction(db).set(nsstring_slice(@"a"), nsstring_slice(@"A"));   //WORKAROUND: Add a doc before the main transaction so it doesn't start at sequence 0
 
-    Database aliased_db(kDBPath, Database::defaultConfig());
+    Database aliased_db(dbPath, TestDBConfig());
     AssertEqual((NSString*)aliased_db.get(nsstring_slice(@"a")).body(), @"A");
 
     {
@@ -302,7 +339,7 @@ static std::string kDBPath;
 
 // Test for MB-12287
 - (void) test06_TransactionsThenIterate {
-    Database db2(kDBPath, Database::defaultConfig());
+    Database db2(dbPath, TestDBConfig());
 
     const NSUInteger kNTransactions = 42; // 41 is ok, 42+ fails
     const NSUInteger kNDocs = 100;
@@ -400,11 +437,13 @@ static std::string kDBPath;
         t.set(slice("key"), nsstring_slice(@"value"));
     }
     // Reopen db as read-only:
+    Database::config config = db->getConfig();
+    NSLog(@"//// Closing db");
     delete db;
     db = nil;
-    auto config = Database::defaultConfig();
+    NSLog(@"//// Reopening db");
     config.flags = FDB_OPEN_FLAG_RDONLY;
-    db = new Database(kDBPath, config);
+    db = new Database(dbPath, config);
 
     auto doc = db->get(slice("key"));
     Assert(doc.exists());
@@ -428,6 +467,89 @@ static std::string kDBPath;
         status = x.status;
     }
     AssertEq(status, FDB_RESULT_NO_SUCH_FILE);
+}
+
+#if 0
+- (void) test12_Copy {
+    [self createNumberedDocs];
+
+    std::string newPath = PathForDatabaseNamed(@"encryptedCopy");
+    Database::encryptionConfig enc;
+#if ENCRYPT_DATABASES
+    enc.encrypted = true;
+    SecRandomCopyBytes(kSecRandomDefault, sizeof(enc.encryptionKey),
+                       (uint8_t*)&enc.encryptionKey);
+#else
+    enc.encrypted = false;
+#endif
+
+    std::string filename = db->filename();
+    db->copyToFile(newPath, enc);
+    AssertEq(db->filename(), filename);
+
+    Database::config config = Database::defaultConfig();
+    *(Database::encryptionConfig*)&config = enc;
+    Database newDB(newPath, config);
+
+    Document doc = newDB.get(slice("doc-001"));
+    Assert(doc.exists());
+}
+#endif
+
+
+static Database_Test *sCurrentTest;
+static Database* sExpectedCompactingDB;
+static int sNumCompactCalls;
+
+static void onCompact(Database* db, bool compacting) {
+    id self = sCurrentTest;
+    AssertEq(db, sExpectedCompactingDB);
+    Assert(sNumCompactCalls < 2);
+    if (sNumCompactCalls == 0)
+        Assert(compacting);
+    else
+        Assert(!compacting);
+    ++sNumCompactCalls;
+}
+
+- (void) test13_Compact {
+    [self createNumberedDocs];
+
+    {
+        Transaction t(db);
+        for (int i = 1; i <= 100; i += 3) {
+            NSString* docID = [NSString stringWithFormat: @"doc-%03d", i];
+            Document doc = db->get((nsstring_slice)docID);
+            t.del(doc);
+        }
+    }
+
+    Database::onCompactCallback = onCompact;
+    sCurrentTest = self;
+    sExpectedCompactingDB = db;
+    sNumCompactCalls = 0;
+
+    db->compact();
+
+    Database::onCompactCallback = NULL;
+    AssertEq(sNumCompactCalls, 2);
+}
+
+
+- (void) test14_rekey {
+    Database::config config = db->getConfig();
+    [self createNumberedDocs];
+    fdb_encryption_key newKey;
+    randomAESKey(newKey);
+
+    db->rekey(newKey);
+    delete db;
+    db = nil;
+
+    config.encryption_key = newKey;
+    db = new Database(dbPath, config);
+    Document doc = db->get((slice)"doc-001");
+    Assert(doc.exists());
 }
 
 @end

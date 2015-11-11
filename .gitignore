@@ -4,3 +4,16 @@
 xcuserdata/
 build/
 DerivedData/
+*.userprefs
+bin/
+obj/
+[dD]ebug
+*.o
+*.class
+packages/
+*.sdf
+*.opensdf
+[Rr]elease
+*.xcscmblueprint
+CSharp/prebuilt/*
+!CSharp/prebuilt/README.txt

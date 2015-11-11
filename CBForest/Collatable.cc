@@ -15,7 +15,11 @@
 
 #include "Collatable.hh"
 #include "Endian.h"
+//#include "forestdb_endian.h"
+#include "Geohash.hh"
+#include "Error.hh"
 #include <sstream>
+#include <iomanip> // std::setprecision
 
 namespace forestdb {
 
@@ -25,6 +29,7 @@ namespace forestdb {
     static uint8_t kCharInversePriority[256];
 
     static void initCharPriorityMap();
+    static bool sCharPriorityMapInitialized;
 
 
     static inline void _invertDouble(swappedDouble& swapped) {
@@ -35,9 +40,7 @@ namespace forestdb {
 
     Collatable::Collatable()
     :_out(kDefaultBufferSize)
-    {
-        initCharPriorityMap();
-    }
+    { }
 
     Collatable::Collatable(const Collatable& c)
     :_out(c._out)
@@ -51,6 +54,12 @@ namespace forestdb {
     {
         _out << s;
     }
+
+    Collatable& Collatable::operator= (Collatable&& c) {
+        _out = (Writer&&)c._out;
+        return *this;
+    }
+
 
     Collatable& Collatable::addBool (bool b) {
         addTag(b ? kTrue : kFalse);
@@ -66,12 +75,10 @@ namespace forestdb {
         return *this;
     }
 
-    Collatable& Collatable::operator<< (std::string str) {
-        return (*this) << slice(str);
-    }
-
-    Collatable& Collatable::operator<< (slice s) {
-        addTag(kString);
+    Collatable& Collatable::addEncoded(Tag t, slice s) {
+        addTag(t);
+        if (!sCharPriorityMapInitialized)
+            initCharPriorityMap();
         size_t first = _out.length();
         add(s);
         slice output = _out.output();
@@ -87,8 +94,8 @@ namespace forestdb {
         return *this;
     }
 
-    std::string Collatable::dump() const {
-        return CollatableReader(*this).dump();
+    std::string Collatable::toJSON() const {
+        return CollatableReader(*this).toJSON();
     }
 
 
@@ -111,9 +118,9 @@ namespace forestdb {
     void CollatableReader::expectTag(Tag tag) {
         slice tagSlice = _data.read(1);
         if (tagSlice.size == 0)
-            throw "unexpected end of collatable data";
+            throw error(error::CorruptIndexData); // unexpected end of collatable data
         else if (tagSlice[0] != tag)
-            throw "unexpected tag";
+            throw error(error::CorruptIndexData); // unexpected tag"
     }
 
     int64_t CollatableReader::readInt() {
@@ -127,7 +134,7 @@ namespace forestdb {
     double CollatableReader::readDouble() {
         slice tagSlice = _data.read(1);
         if (tagSlice[0] != kNegative && tagSlice[0] != kPositive)
-            throw "unexpected tag";
+            throw error(error::CorruptIndexData); // unexpected tag
         swappedDouble swapped;
         _data.readInto(slice(&swapped, sizeof(swapped)));
         if (tagSlice[0] == kNegative)
@@ -136,10 +143,18 @@ namespace forestdb {
     }
 
     alloc_slice CollatableReader::readString() {
-        expectTag(kString);
+        return readString(kString);
+    }
+
+    geohash::hash CollatableReader::readGeohash() {
+        return geohash::hash(readString(kGeohash));
+    }
+
+    alloc_slice CollatableReader::readString(Tag tag) {
+        expectTag(tag);
         const void* end = _data.findByte(0);
         if (!end)
-            throw "malformed string";
+            throw error(error::CorruptIndexData); // malformed string
         size_t nBytes = _data.offsetOf(end);
 
         alloc_slice result(nBytes);
@@ -149,18 +164,23 @@ namespace forestdb {
         _data.moveStart(nBytes+1);
         return result;
     }
-
+    
     slice CollatableReader::read() {
         const void* start = _data.buf;
         switch(_data.read(1)[0]) {
+            case kNull:
+            case kFalse:
+            case kTrue:
+                break;
             case kNegative:
             case kPositive:
                 _data.moveStart(sizeof(double));
                 break;
-            case kString: {
+            case kString:
+            case kGeohash: {
                 const void* end = _data.findByte(0);
                 if (!end)
-                    throw "malformed string";
+                    throw error(error::CorruptIndexData); // malformed string
                 _data.moveStart(_data.offsetOf(end)+1);
                 break;
             }
@@ -178,6 +198,10 @@ namespace forestdb {
                 _data.moveStart(1);
                 break;
             }
+            case kSpecial:
+                break;
+            default:
+                throw error(error::CorruptIndexData); // Unexpected tag in read()
         }
         return slice(start, _data.buf);
     }
@@ -198,58 +222,114 @@ namespace forestdb {
         expectTag(kEndSequence);
     }
 
-    void CollatableReader::dumpTo(std::ostream &out) {
+    static void writeJSONString(std::ostream& out, slice str) {
+        out << "\"";
+        auto start = (const uint8_t*)str.buf;
+        auto end = (const uint8_t*)str.end();
+        for (auto p = start; p < end; p++) {
+            uint8_t ch = *p;
+            if (ch == '"' || ch == '\\' || ch < 32 || ch == 127) {
+                // Write characters from start up to p-1:
+                out << std::string((char*)start, p-start);
+                start = p + 1;
+                switch (ch) {
+                    case '"':
+                    case '\\':
+                        out << "\\";
+                        --start; // ch will be written in next pass
+                        break;
+                    case '\n':
+                        out << "\\n";
+                        break;
+                    case '\t':
+                        out << "\\t";
+                        break;
+                    default: {
+                        char buf[7];
+                        sprintf(buf, "\\u%04u", (unsigned)ch);
+                        out << buf;
+                        break;
+                    }
+                }
+            }
+        }
+        out << std::string((char*)start, end-start);
+        out << "\"";
+    }
+
+    void CollatableReader::writeJSONTo(std::ostream &out) {
+        if (_data.size == 0) {
+            return;
+        }
         switch(peekTag()) {
             case kNull:
-                skipTag();
+                _skipTag();
                 out << "null";
                 break;
             case kFalse:
-                skipTag();
+                _skipTag();
                 out << "false";
                 break;
             case kTrue:
-                skipTag();
+                _skipTag();
                 out << "true";
                 break;
             case kNegative:
             case kPositive:
-                out << readDouble();
+                // default precision is around 5, it makes double number rounded.
+                // double's precision should be 16.
+                out << std::setprecision(16) << readDouble();
                 break;
             case kString:
-                out << '"' << (std::string)readString() << '"';
+                writeJSONString(out, readString());
                 break;
-            case kArray:
+            case kArray: {
                 out << '[';
                 beginArray();
-                while (peekTag() != kEndSequence)
-                    dumpTo(out);
+                bool first = true;
+                while (peekTag() != kEndSequence) {
+                    if (first)
+                        first = false;
+                    else
+                        out << ",";
+                    writeJSONTo(out);
+                }
                 endArray();
                 out << ']';
                 break;
-            case kMap:
+            }
+            case kMap: {
                 out << '{';
                 beginMap();
+                bool first = true;
                 while (peekTag() != kEndSequence) {
-                    dumpTo(out);
+                    if (first)
+                        first = false;
+                    else
+                        out << ",";
+                    writeJSONTo(out);
                     out << ':';
-                    dumpTo(out);
+                    writeJSONTo(out);
                 }
                 out << '}';
                 endMap();
                 break;
+            }
             case kSpecial:
                 out << "<special>";
                 break;
+            case kGeohash:
+                out << "geohash(" << (std::string)readGeohash() << ')';
+                break;
             default:
-                out << "???";
+                out << "¿" << (int)peekTag() << "?";
                 break;
         }
     }
 
-    std::string CollatableReader::dump() {
+    std::string CollatableReader::toJSON() {
         std::stringstream out;
-        dumpTo(out);
+        writeJSONTo(out);
         return out.str();
     }
 
@@ -259,26 +339,28 @@ namespace forestdb {
 
     // Returns a 256-byte table that maps each ASCII character to its relative priority in Unicode
     // ordering. Bytes 0x80--0xFF (i.e. UTF-8 encoded sequences) map to themselves.
+    // The table cannot contain any 0 values, because 0 is reserved as an end-of-string marker.
     static void initCharPriorityMap() {
-        static bool initialized;
-        if (!initialized) {
-            // Control characters have zero priority:
+        if (!sCharPriorityMapInitialized) {
             static const char* const kInverseMap = "\t\n\r `^_-,;:!?.'\"()[]{}@*/\\&#%+<=>|~$0123456789aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ";
             uint8_t priority = 1;
             for (int i=0; i<strlen(kInverseMap); i++)
                 kCharPriority[(uint8_t)kInverseMap[i]] = priority++;
+            for (int i=0; i<127; i++)
+                if (kCharPriority[i] == 0)
+                    kCharPriority[i] = priority++;  // fill in ctrl chars
+            kCharPriority[127] = kCharPriority[(int)' '];// and DEL (there's no room for a unique #)
             for (int i=128; i<256; i++)
                 kCharPriority[i] = (uint8_t)i;
-            initialized = true;
+            sCharPriorityMapInitialized = true;
         }
     }
 
     uint8_t* CollatableReader::getInverseCharPriorityMap() {
         static bool initialized;
         if (!initialized) {
-            // Control characters have zero priority:
             initCharPriorityMap();
-            for (int i=0; i<256; i++)
+            for (int i=255; i>=0; i--)
                 kCharInversePriority[kCharPriority[i]] = (uint8_t)i;
             initialized = true;
         }

@@ -36,6 +36,13 @@ namespace forestdb {
         ::free((void*)_buffer.buf);
     }
 
+    Writer& Writer::operator= (Writer&& w) {
+        _buffer = w._buffer;
+        _available = w._available;
+        w._buffer = slice::null;
+        return *this;
+    }
+
     void Writer::write(const void* data, size_t length) {
         if (_available.size < length)
             growToFit(length);

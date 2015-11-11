@@ -32,7 +32,8 @@ namespace forestdb {
         kDebug,
         kInfo,
         kWarning,
-        kError
+        kError,
+        kNone
     };
     extern logLevel LogLevel;
     extern void (*LogCallback)(logLevel, const char *message);
@@ -42,10 +43,12 @@ namespace forestdb {
         A Database also acts as its default KeyStore. */
     class Database : public KeyStore {
     public:
-        typedef fdb_config config;
-        typedef fdb_file_info info;
 
-        static config defaultConfig()           {return fdb_get_default_config();}
+        typedef ::fdb_file_info info;
+        typedef ::fdb_config config;
+
+        static config defaultConfig();
+        static void setDefaultConfig(const config&);
 
         Database(std::string path, const config&);
         Database(Database* original, sequence snapshotSequence);
@@ -53,13 +56,24 @@ namespace forestdb {
 
         std::string filename() const;
         info getInfo() const;
+        config getConfig()                      {return _config;}
 
         bool isReadOnly() const;
 
         void deleteDatabase()                   {deleteDatabase(false);}
         void erase()                            {deleteDatabase(true);}
 
+        /** Deletes a database that isn't open. */
+        static void deleteDatabase(std::string path, const config&);
+
         void compact();
+        bool isCompacting() const               {return _isCompacting;}
+        static bool isAnyCompacting();
+        void setCompactionMode(fdb_compaction_mode_t);
+
+        static void (*onCompactCallback)(Database* db, bool compacting);
+
+        void rekey(const fdb_encryption_key&);
 
         /** Records a commit before the transaction exits scope. Not normally needed. */
         void commit();
@@ -76,6 +90,12 @@ namespace forestdb {
     protected:
         virtual void deleted();
 
+        virtual bool onCompact(fdb_compaction_status status,
+                               const char *kv_store_name,
+                               fdb_doc *doc,
+                               uint64_t lastOldFileOffset,
+                               uint64_t lastNewFileOffset);
+
     private:
         class File;
         friend class KeyStore;
@@ -89,10 +109,18 @@ namespace forestdb {
         Database(const Database&);              // forbidden
         Database& operator=(const Database&);   // forbidden
 
+        static fdb_compact_decision compactionCallback(fdb_file_handle *fhandle,
+                                                       fdb_compaction_status status,
+                                                       const char *kv_store_name,
+                                                       fdb_doc *doc,
+                                                       uint64_t last_oldfile_offset,
+                                                       uint64_t last_newfile_offset,
+                                                       void *ctx);
         File* _file;
         config _config;
         fdb_file_handle* _fileHandle;
         std::unordered_map<std::string, fdb_kvs_handle*> _kvHandles;
+        bool _isCompacting;
     };
 
 

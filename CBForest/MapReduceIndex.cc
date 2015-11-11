@@ -15,15 +15,15 @@
 
 #include "MapReduceIndex.hh"
 #include "Collatable.hh"
+#include "GeoIndex.hh"
 #include "Tokenizer.hh"
 #include "LogInternal.hh"
-#include <assert.h>
-
+#include <algorithm>
 
 namespace forestdb {
 
-    static int64_t kMinFormatVersion = 1;
-    static int64_t kCurFormatVersion = 1;
+    static int64_t kMinFormatVersion = 4;
+    static int64_t kCurFormatVersion = 4;
 
     MapReduceIndex::MapReduceIndex(Database* db, std::string name, KeyStore sourceStore)
     :Index(db, name),
@@ -62,7 +62,7 @@ namespace forestdb {
     }
 
     void MapReduceIndex::saveState(Transaction& t) {
-        assert(t.database()->contains(*this));
+        CBFAssert(t.database()->contains(*this));
         _lastMapVersion = _mapVersion;
 
         Collatable stateKey;
@@ -106,8 +106,7 @@ namespace forestdb {
     void MapReduceIndex::setup(Transaction &t, int indexType, MapFn *map, std::string mapVersion) {
         Debug("MapReduceIndex<%p>: Setup (indexType=%ld, mapFn=%p, mapVersion='%s')",
               this, indexType, map, mapVersion.c_str());
-        assert(t.database()->contains(*this));
-        assert(map != NULL);
+        CBFAssert(t.database()->contains(*this));
         readState();
         _map = map;
         _mapVersion = mapVersion;
@@ -125,33 +124,58 @@ namespace forestdb {
 
     void MapReduceIndex::erase(Transaction& t) {
         Debug("MapReduceIndex: Erasing");
-        assert(t.database()->contains(*this));
+        CBFAssert(t.database()->contains(*this));
         KeyStore::erase(t);
         _lastSequenceIndexed = _lastSequenceChangedAt = 0;
         _rowCount = 0;
         _stateReadAt = 0;
     }
 
-    alloc_slice MapReduceIndex::readFullText(slice docID, sequence seq, unsigned fullTextID) {
+    alloc_slice MapReduceIndex::getSpecialEntry(slice docID, sequence seq, unsigned entryID)
+    {
         // This data was written by emitter::emitTextTokens, below
-        alloc_slice entry = getEntry(docID, seq, Collatable(fullTextID), 0);
+        Collatable key;
+        key.addNull();
+        return getEntry(docID, seq, key, entryID);
+    }
+
+    alloc_slice MapReduceIndex::readFullText(slice docID, sequence seq, unsigned fullTextID) {
+        alloc_slice entry = getSpecialEntry(docID, seq, fullTextID);
         CollatableReader reader(entry);
         reader.beginArray();
         return reader.readString();
     }
 
-    alloc_slice MapReduceIndex::readFullTextValue(slice docID,
-                                                       sequence seq,
-                                                       unsigned fullTextID)
-    {
+    alloc_slice MapReduceIndex::readFullTextValue(slice docID, sequence seq, unsigned fullTextID) {
         // This data was written by emitter::emitTextTokens, below
-        alloc_slice entry = getEntry(docID, seq, Collatable(fullTextID), 0);
+        alloc_slice entry = getSpecialEntry(docID, seq, fullTextID);
         CollatableReader reader(entry);
         reader.beginArray();
         (void)reader.read(); // skip text
         if (reader.peekTag() == Collatable::kEndSequence)
             return alloc_slice();
-        return alloc_slice(reader.read());
+        return alloc_slice(reader.readString());
+    }
+
+    void MapReduceIndex::readGeoArea(slice docID, sequence seq, unsigned geoID,
+                                     geohash::area &outArea,
+                                     alloc_slice& outGeoJSON,
+                                     alloc_slice& outValue)
+    {
+        // Reads data written by emitter::emit(const geohash::area&,...), below
+        alloc_slice entry = getSpecialEntry(docID, seq, geoID);
+        CollatableReader reader(entry);
+        reader.beginArray();
+        outArea = ::forestdb::readGeoArea(reader);
+        outGeoJSON = outValue = slice::null;
+        if (reader.peekTag() != CollatableReader::kEndSequence) {
+            if (reader.peekTag() == CollatableReader::kString)
+                outGeoJSON = alloc_slice(reader.readString());
+            else
+                (void)reader.read();
+            if (reader.peekTag() != CollatableReader::kEndSequence)
+                outValue = alloc_slice(reader.readString());
+        }
     }
 
 
@@ -163,68 +187,124 @@ namespace forestdb {
     public:
         emitter()
         :_tokenizer(NULL),
-         _emitTextCount(0)
+         _emitCount(0)
         { }
 
         virtual ~emitter() {
             delete _tokenizer;
         }
 
-        inline void emit(const Collatable &key, const Collatable &value) {
+        inline void emit(const Collatable &key, slice value) {
             keys.push_back(key);
-            values.push_back(value);
+            values.push_back(alloc_slice(value));
+            ++_emitCount;
         }
 
         virtual void operator() (const Collatable& key, const Collatable& value) {
             emit(key, value);
         }
 
-        void emitTextTokens(slice text, Collatable value) {
+        void emitTextTokens(slice text, slice value) {
             if (!_tokenizer)
-                _tokenizer = new Tokenizer("en", true);
-            bool emittedText = false;
-            for (TokenIterator i(*_tokenizer, slice(text), true); i; ++i) {
-                if (!emittedText) {
-                    // Emit the string that was indexed, and the value, under a special key.
-                    Collatable collKey(++_emitTextCount);
-                    Collatable collValue;
-                    collValue.beginArray();
-                    collValue << text;
-                    if (value.size() > 0)
-                        collValue << value;
-                    collValue.endArray();
-                    emit(collKey, collValue);
-                    emittedText = true;
+                _tokenizer = new Tokenizer();
+            std::unordered_map<std::string, Collatable> tokens;
+            int specialKey = -1;
+            for (TokenIterator i(*_tokenizer, slice(text), false); i; ++i) {
+                if (specialKey < 0) {
+                    // Emit the full text being indexed, and the value, under a special key.
+                    specialKey = emitSpecial(text, value);
                 }
+                // Add the word position to the value array for this token:
+                Collatable& tokValue = tokens[i.token()];
+                if (tokValue.empty()) {
+                    tokValue.beginArray();
+                    tokValue << specialKey;
+                }
+                tokValue << i.wordOffset() << i.wordLength();
+            }
 
-                // Emit each token string as a key
-                Collatable collKey(i.token()), collValue;
-                collValue.beginArray();
-                collValue << _emitTextCount << i.wordOffset() << i.wordLength();
+            // Emit each token string and value array as a key:
+            for (auto kv = tokens.begin(); kv != tokens.end(); ++kv) {
+                Collatable collKey(kv->first);
+                Collatable& collValue = kv->second;
                 collValue.endArray();
                 emit(collKey, collValue);
             }
         }
 
+        static const unsigned kMaxCoveringHashes = 4;
+
+        virtual void emit(const geohash::area& boundingBox, slice geoJSON, slice value) {
+            Debug("emit {%g ... %g, %g ... %g}",
+                  boundingBox.latitude.min, boundingBox.latitude.max,
+                  boundingBox.longitude.min, boundingBox.longitude.max);
+            // Emit the bbox, geoJSON, and value, under a special key:
+            unsigned specialKey = emitSpecial(boundingBox, geoJSON, value);
+            Collatable collValue(specialKey);
+
+            // Now emit a set of geohashes that cover the given area:
+            auto hashes = boundingBox.coveringHashes();
+            for (auto iHash = hashes.begin(); iHash != hashes.end(); ++iHash) {
+                Debug("    hash='%s'", (const char*)(*iHash));
+                Collatable collKey(*iHash);
+                emit(collKey, collValue);
+            }
+        }
+
+        // Saves a special key-value pair in the index that can store auxiliary data associated
+        // with an emit, such as the full text or the geo-JSON. This data is read by
+        // MapReduceIndex::getSpecialEntry
+        template <typename KEY>
+        unsigned emitSpecial(const KEY &key, slice value1, slice value2 = slice::null) {
+            Collatable collKey;
+            collKey.addNull();
+
+            Collatable collValue;
+            collValue.beginArray();
+            collValue << key;
+            // Write value1 (or a null placeholder) then value2
+            if (value1.size > 0 || value2.size > 0) {
+                if (value1.size > 0)
+                    collValue << value1;
+                else
+                    collValue.addNull();
+                if (value2.size > 0)
+                    collValue << value2;
+            }
+            collValue.endArray();
+
+            unsigned result = _emitCount;
+            emit(collKey, collValue);
+            return result;
+        }
+
         std::vector<Collatable> keys;
-        std::vector<Collatable> values;
+        std::vector<alloc_slice> values;
 
     private:
         Tokenizer* _tokenizer;
-        unsigned _emitTextCount;
+        unsigned _emitCount;
     };
 
 
     bool MapReduceIndex::updateDocInIndex(Transaction& t, const Mappable& mappable) {
-        assert(t.database()->contains(*this));
+        CBFAssert(t.database()->contains(*this));
+        CBFAssert(_map != NULL);
         const Document& doc = mappable.document();
         if (doc.sequence() <= _lastSequenceIndexed)
             return false;
         emitter emit;
         if (!doc.deleted())
             (*_map)(mappable, emit); // Call map function!
-        _lastSequenceIndexed = doc.sequence();
-        if (IndexWriter(this,t).update(doc.key(), doc.sequence(), emit.keys, emit.values, _rowCount)) {
+        return emitForDocument(t, doc.key(), doc.sequence(), emit.keys, emit.values);
+    }
+
+    bool MapReduceIndex::emitForDocument(Transaction& t, slice docID, sequence docSequence,
+                                         std::vector<Collatable> keys,
+                                         std::vector<alloc_slice> values)
+    {
+        _lastSequenceIndexed = docSequence;
+        if (IndexWriter(this,t).update(docID, docSequence, keys, values, _rowCount)) {
             _lastSequenceChangedAt = _lastSequenceIndexed;
             return true;
         }
@@ -240,40 +320,49 @@ namespace forestdb {
 
 
     void MapReduceIndexer::addIndex(MapReduceIndex* index, Transaction* t) {
-        assert(index);
-        assert(t);
+        CBFAssert(index);
+        CBFAssert(t);
         _indexes.push_back(index);
         _transactions.push_back(t);
     }
 
 
-    bool MapReduceIndexer::run() {
-        KeyStore sourceStore = _indexes[0]->sourceStore();
-        _latestDbSequence = sourceStore.lastSequence();
+    KeyStore MapReduceIndexer::sourceStore() {
+        return _indexes[0]->sourceStore();
+    }
+
+
+    sequence MapReduceIndexer::startingSequence() {
+        _latestDbSequence = sourceStore().lastSequence();
 
         // First find the minimum sequence that not all indexes have indexed yet.
-        // Also start a transaction for each index:
         sequence startSequence = _latestDbSequence+1;
         for (auto idx = _indexes.begin(); idx != _indexes.end(); ++idx) {
             sequence lastSequence = (*idx)->lastSequenceIndexed();
             if (lastSequence < _latestDbSequence) {
                 startSequence = std::min(startSequence, lastSequence+1);
             } else if (*idx == _triggerIndex) {
-                return false; // The trigger index doesn't need to be updated, so abort
+                return UINT64_MAX; // The trigger index doesn't need to be updated, so abort
             }
             _lastSequences.push_back(lastSequence);
         }
+        if (startSequence > _latestDbSequence)
+            startSequence = UINT64_MAX; // no updating needed
+        return startSequence;
+    }
 
+    bool MapReduceIndexer::run() {
+        sequence startSequence = startingSequence();
         if (startSequence > _latestDbSequence)
             return false; // no updating needed
 
         // Enumerate all the documents:
         DocEnumerator::Options options = DocEnumerator::Options::kDefault;
         options.includeDeleted = true;
-        for (DocEnumerator e(sourceStore, startSequence, UINT64_MAX, options); e.next(); ) {
+        for (DocEnumerator e(sourceStore(), startSequence, UINT64_MAX, options); e.next(); ) {
             addDocument(*e);
         }
-        _finished = true;
+        finished();
         return true;
     }
 
@@ -297,6 +386,20 @@ namespace forestdb {
         const size_t n = indexCount();
         for (size_t i = 0; i < n; ++i)
             updateDocInIndex(i, mappable);
+    }
+
+    void MapReduceIndexer::emitDocIntoView(slice docID,
+                                           sequence docSequence,
+                                           unsigned viewNumber,
+                                           std::vector<Collatable> keys,
+                                           std::vector<slice> values)
+    {
+        emitter emit;
+        for (unsigned i = 0; i < keys.size(); ++i)
+            emit.emit(keys[i], values[i]);
+        _indexes[viewNumber]->emitForDocument(*_transactions[viewNumber],
+                                              docID, docSequence,
+                                              emit.keys, emit.values);
     }
 
 }

@@ -15,6 +15,7 @@
 
 #import <Foundation/Foundation.h>
 #import "Collatable.hh"
+#import "error.hh"
 
 
 namespace forestdb {
@@ -70,10 +71,13 @@ namespace forestdb {
 
 
     NSString* CollatableReader::readNSString() {
-        expectTag(kString);
+        if (peekTag() == kGeohash)
+            expectTag(kGeohash);
+        else
+            expectTag(kString);
         const void* end = _data.findByte(0);
         if (!end)
-            throw "malformed string";
+            throw error(error::CorruptIndexData); // malformed string
         size_t nBytes = _data.offsetOf(end);
 
         if (nBytes > 1024) {
@@ -84,7 +88,8 @@ namespace forestdb {
             return decodeNSString(slice(buf, nBytes), _data);
         }
     }
-    
+
+
     id CollatableReader::readNSObject() {
         if (_data.size == 0)
             return nil;
@@ -102,6 +107,7 @@ namespace forestdb {
             case kPositive:
                 return @(readDouble());
             case kString:
+            case kGeohash:
                 return readNSString();
             case kArray: {
                 beginArray();
@@ -122,9 +128,9 @@ namespace forestdb {
                 return result;
             }
             case kSpecial:
-                throw "can't convert Special tag to NSObject";
+                throw error(error::CorruptIndexData); // can't convert Special tag to NSObject
             default:
-                throw "invalid tag in Collatable data";
+                throw error(error::CorruptIndexData); // invalid tag in Collatable data
         }
     }
 

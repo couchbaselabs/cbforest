@@ -16,11 +16,14 @@
 #include "RevID.hh"
 #include "Error.hh"
 #include "varint.hh"
-#include <assert.h>
 #include <math.h>
+#ifdef _MSC_VER
+#include <BaseTsd.h>
+typedef SSIZE_T ssize_t;
+#endif
 
 
-#if defined(__ANDROID__) || defined(__GLIBC__)
+#if defined(__ANDROID__) || defined(__GLIBC__) || defined(_MSC_VER)
 // digittoint is a BSD function, not available on Android, Linux, etc.
 static int digittoint(char ch) {
     int d = ch - '0';
@@ -103,6 +106,8 @@ namespace forestdb {
     }
 
     alloc_slice revid::expanded() const {
+        if (!buf)
+            return alloc_slice();
         alloc_slice result(expandedSize());
         _expandInto(result);
         return result;

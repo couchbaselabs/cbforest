@@ -24,6 +24,8 @@ namespace forestdb {
         Writer(Writer&&);
         ~Writer();
 
+        Writer& operator= (Writer&&);
+
         size_t length() const                   {return _buffer.size - _available.size;}
 
         /** Returns the data written, without copying.

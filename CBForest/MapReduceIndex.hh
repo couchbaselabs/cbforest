@@ -17,6 +17,7 @@
 #define __CBForest__MapReduceIndex__
 
 #include "Index.hh"
+#include "Geohash.hh"
 #include <vector>
 
 
@@ -38,18 +39,23 @@ namespace forestdb {
 
     class EmitFn {
     public:
-        virtual void emit(const Collatable& key, const Collatable& value) =0;
+        virtual void emit(const Collatable &key, slice value) =0;
+        virtual void emit(const geohash::area& boundingBox, slice geoJSON, slice value) =0;
 
         /** Emits the text for full-text indexing. Each word in the text will be emitted separately
             as a string key. When querying, use IndexEnumerator::getTextToken to read the info. */
-        virtual void emitTextTokens(slice text, Collatable value) =0;
+        virtual void emitTextTokens(slice text, slice value) =0;
 
-        inline void operator() (const Collatable& key, const Collatable& value) {emit(key, value);}
+        inline void operator() (const Collatable &key, slice value) {emit(key, value);}
+        inline void operator() (const geohash::area& bbox, slice geoJSON, slice value)
+                                                            {emit(bbox, geoJSON, value);}
+        virtual ~EmitFn() { }
     };
 
     class MapFn {
     public:
         virtual void operator() (const Mappable&, EmitFn& emit) =0;
+        virtual ~MapFn() { }
     };
 
     /** An Index that uses a MapFn to index the documents of another KeyStore. */
@@ -84,12 +90,20 @@ namespace forestdb {
         /** Reads the value that was emitted along with a full-text key. */
         alloc_slice readFullTextValue(slice docID, sequence seq, unsigned fullTextID);
 
+        void readGeoArea(slice docID, sequence seq, unsigned geoID,
+                         geohash::area &outArea,
+                         alloc_slice& outGeoJSON,
+                         alloc_slice& outValue);
+
     protected:
         void deleted(); // called by Transaction::deleteDatabase()
 
     private:
         void saveState(Transaction& t);
         bool updateDocInIndex(Transaction&, const Mappable&);
+        bool emitForDocument(Transaction& t, slice docID, sequence docSequence,
+                             std::vector<Collatable> keys, std::vector<alloc_slice> values);
+        alloc_slice getSpecialEntry(slice docID, sequence, unsigned fullTextID);
 
         forestdb::KeyStore _sourceDatabase;
         MapFn* _map;
@@ -108,16 +122,32 @@ namespace forestdb {
     class MapReduceIndexer {
     public:
         MapReduceIndexer();
-        ~MapReduceIndexer();
+        virtual ~MapReduceIndexer();
 
         void addIndex(MapReduceIndex*, Transaction*);
 
         /** If set, indexing will only occur if this index needs to be updated. */
         void triggerOnIndex(MapReduceIndex* index)  {_triggerIndex = index;}
 
+        KeyStore sourceStore();
+
         bool run();
 
+        void finished()                             {_finished = true;}
+
         sequence latestDbSequence() const           {return _latestDbSequence;}
+
+        // Incremental mode:
+
+        /** Determines at which sequence indexing should start.
+            Returns UINT64_MAX if no re-indexing is necessary. */
+        sequence startingSequence();
+
+        void emitDocIntoView(slice docID,
+                             sequence docSequence,
+                             unsigned viewNumber,
+                             std::vector<Collatable> keys,
+                             std::vector<slice> values);
 
     protected:
         /** Transforms the Document to a Mappable and invokes addMappable.

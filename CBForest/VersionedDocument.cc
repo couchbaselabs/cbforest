@@ -16,7 +16,6 @@
 #include "VersionedDocument.hh"
 #include "Error.hh"
 #include "varint.hh"
-#include <assert.h>
 #include <ostream>
 
 namespace forestdb {
@@ -90,21 +89,30 @@ namespace forestdb {
     }
 
     void VersionedDocument::updateMeta() {
-        const Revision* curRevision = currentRevision();
-        slice revID = curRevision->revID;
-
-        // Compute flags:
+        slice revID;
         Flags flags = 0;
-        if (curRevision->isDeleted())
-            flags |= kDeleted;
-        if (hasConflict())
-            flags |= kConflicted;
-        for (auto rev=allRevisions().begin(); rev != allRevisions().end(); ++rev) {
-            if (rev->hasAttachments()) {
-                flags |= kHasAttachments;
-                break;
+
+        const Revision* curRevision = currentRevision();
+        if (curRevision) {
+            revID = curRevision->revID;
+
+            // Compute flags:
+            if (curRevision->isDeleted())
+                flags |= kDeleted;
+            if (hasConflict())
+                flags |= kConflicted;
+            for (auto rev=allRevisions().begin(); rev != allRevisions().end(); ++rev) {
+                if (rev->hasAttachments()) {
+                    flags |= kHasAttachments;
+                    break;
+                }
             }
+        } else {
+            flags = kDeleted;
         }
+
+        // update _flags instance variable
+        _flags = flags;
 
         // Write to _doc.meta:
         slice meta = _doc.resizeMeta(2 + revID.size + SizeOfVarInt(_docType.size) + _docType.size);
@@ -115,16 +123,16 @@ namespace forestdb {
         meta.writeFrom(revID);
         WriteUVarInt(&meta, _docType.size);
         meta.writeFrom(_docType);
-        assert(meta.size == 0);
+        CBFAssert(meta.size == 0);
     }
 
     bool VersionedDocument::isBodyOfRevisionAvailable(const Revision* rev, uint64_t atOffset) const {
         if (RevTree::isBodyOfRevisionAvailable(rev, atOffset))
             return true;
-        if (atOffset == 0)
+        if (atOffset == 0 || atOffset >= _doc.offset())
             return false;
         VersionedDocument oldVersDoc(_db, _db.getByOffset(atOffset, rev->sequence));
-        if (oldVersDoc.sequence() != rev->sequence)
+        if (!oldVersDoc.exists() || oldVersDoc.sequence() != rev->sequence)
             return false;
         const Revision* oldRev = oldVersDoc.get(rev->revID);
         return (oldRev && RevTree::isBodyOfRevisionAvailable(oldRev, atOffset));
@@ -133,10 +141,10 @@ namespace forestdb {
     alloc_slice VersionedDocument::readBodyOfRevision(const Revision* rev, uint64_t atOffset) const {
         if (RevTree::isBodyOfRevisionAvailable(rev, atOffset))
             return RevTree::readBodyOfRevision(rev, atOffset);
-        if (atOffset == 0)
+        if (atOffset == 0 || atOffset >= _doc.offset())
             return alloc_slice();
         VersionedDocument oldVersDoc(_db, _db.getByOffset(atOffset, rev->sequence));
-        if (oldVersDoc.sequence() != rev->sequence)
+        if (!oldVersDoc.exists() || oldVersDoc.sequence() != rev->sequence)
             return alloc_slice();
         const Revision* oldRev = oldVersDoc.get(rev->revID);
         if (!oldRev)
@@ -148,9 +156,13 @@ namespace forestdb {
         if (!_changed)
             return;
         updateMeta();
-        // Don't call _doc.setBody() because it'll invalidate all the pointers from Revisions into
-        // the existing body buffer.
-        _doc.updateSequence( transaction(_db).set(_doc.key(), _doc.meta(), encode()) );
+        if (currentRevision()) {
+            // Don't call _doc.setBody() because it'll invalidate all the pointers from Revisions into
+            // the existing body buffer.
+            _doc.updateSequence( transaction(_db).set(_doc.key(), _doc.meta(), encode()) );
+        } else {
+            transaction(_db).del(_doc.key());
+        }
         _changed = false;
     }
 
