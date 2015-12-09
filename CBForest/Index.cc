@@ -20,6 +20,7 @@
 
 
 namespace forestdb {
+    using namespace fleece;
 
     const slice Index::kSpecialValue("*", 1);
 

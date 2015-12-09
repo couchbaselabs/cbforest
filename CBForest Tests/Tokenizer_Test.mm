@@ -10,6 +10,7 @@
 #import "Tokenizer.hh"
 
 using namespace forestdb;
+using namespace fleece;
 
 
 @interface Tokenizer_Test : XCTestCase

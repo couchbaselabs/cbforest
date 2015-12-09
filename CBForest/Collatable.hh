@@ -22,6 +22,7 @@
 #include "Geohash.hh"
 
 namespace forestdb {
+    using namespace fleece;
 
     class CollatableTypes {
     public:
