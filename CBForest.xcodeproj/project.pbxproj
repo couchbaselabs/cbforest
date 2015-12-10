@@ -394,7 +394,6 @@
 		27FA9A3919180B5F00912F96 /* stem_ISO_8859_1_porter.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FCA1914296D00A327B9 /* stem_ISO_8859_1_porter.h */; };
 		27FA9A3A19180B5F00912F96 /* stem_ISO_8859_2_romanian.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FD21914296D00A327B9 /* stem_ISO_8859_2_romanian.h */; };
 		27FA9A3B19180B5F00912F96 /* stem_UTF_8_porter.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FE81914296D00A327B9 /* stem_UTF_8_porter.h */; };
-		27FA9A4019180B9100912F96 /* libTokenizer-iOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 27FA9A3F19180B5F00912F96 /* libTokenizer-iOS.a */; };
 		27FF7E561BAB64BE004EB8D4 /* native_view.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27FF7E551BAB64BE004EB8D4 /* native_view.cc */; };
 		27FF7E571BAB64D9004EB8D4 /* View.java in Sources */ = {isa = PBXBuildFile; fileRef = 27FF7E541BAB60E2004EB8D4 /* View.java */; };
 		27FF7E591BAB65A2004EB8D4 /* QueryIterator.java in Sources */ = {isa = PBXBuildFile; fileRef = 27FF7E581BAB65A2004EB8D4 /* QueryIterator.java */; };
@@ -941,7 +940,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				27FA9A4019180B9100912F96 /* libTokenizer-iOS.a in Frameworks */,
 				27139BC418F8EEC80021A9A3 /* libforestdb.a in Frameworks */,
 				27139B9618F8EE3A0021A9A3 /* Foundation.framework in Frameworks */,
 			);
