@@ -102,6 +102,32 @@
 		273AD3E618F5E8D8007D8C23 /* snappy.h in Headers */ = {isa = PBXBuildFile; fileRef = 273AD3DB18F5E8D8007D8C23 /* snappy.h */; };
 		273AD3E918F5EB15007D8C23 /* config.h in Headers */ = {isa = PBXBuildFile; fileRef = 273AD3E718F5EB15007D8C23 /* config.h */; };
 		273AD3EA18F5EB15007D8C23 /* snappy-stubs-public.h in Headers */ = {isa = PBXBuildFile; fileRef = 273AD3E818F5EB15007D8C23 /* snappy-stubs-public.h */; };
+		273F57DE1C1A4C4E007067FF /* Encoder.cc in Sources */ = {isa = PBXBuildFile; fileRef = 273F57D11C1A4C4E007067FF /* Encoder.cc */; };
+		273F57DF1C1A4C4E007067FF /* Encoder.hh in Headers */ = {isa = PBXBuildFile; fileRef = 273F57D21C1A4C4E007067FF /* Encoder.hh */; };
+		273F57E01C1A4C4E007067FF /* Encoder+ObjC.mm in Sources */ = {isa = PBXBuildFile; fileRef = 273F57D31C1A4C4E007067FF /* Encoder+ObjC.mm */; };
+		273F57E11C1A4C4E007067FF /* Endian.hh in Headers */ = {isa = PBXBuildFile; fileRef = 273F57D41C1A4C4E007067FF /* Endian.hh */; };
+		273F57E21C1A4C4E007067FF /* Internal.hh in Headers */ = {isa = PBXBuildFile; fileRef = 273F57D51C1A4C4E007067FF /* Internal.hh */; };
+		273F57E31C1A4C4E007067FF /* StringTable.cc in Sources */ = {isa = PBXBuildFile; fileRef = 273F57D61C1A4C4E007067FF /* StringTable.cc */; };
+		273F57E41C1A4C4E007067FF /* StringTable.hh in Headers */ = {isa = PBXBuildFile; fileRef = 273F57D71C1A4C4E007067FF /* StringTable.hh */; };
+		273F57E51C1A4C4E007067FF /* Value.cc in Sources */ = {isa = PBXBuildFile; fileRef = 273F57D81C1A4C4E007067FF /* Value.cc */; };
+		273F57E61C1A4C4E007067FF /* Value.hh in Headers */ = {isa = PBXBuildFile; fileRef = 273F57D91C1A4C4E007067FF /* Value.hh */; };
+		273F57E71C1A4C4E007067FF /* Value+JSON.cc in Sources */ = {isa = PBXBuildFile; fileRef = 273F57DA1C1A4C4E007067FF /* Value+JSON.cc */; };
+		273F57E81C1A4C4E007067FF /* Value+ObjC.mm in Sources */ = {isa = PBXBuildFile; fileRef = 273F57DB1C1A4C4E007067FF /* Value+ObjC.mm */; };
+		273F57E91C1A4C4E007067FF /* Writer.cc in Sources */ = {isa = PBXBuildFile; fileRef = 273F57DC1C1A4C4E007067FF /* Writer.cc */; };
+		273F57EA1C1A4C4E007067FF /* Writer.hh in Headers */ = {isa = PBXBuildFile; fileRef = 273F57DD1C1A4C4E007067FF /* Writer.hh */; };
+		273F57F01C1A4C79007067FF /* StringTable.cc in Sources */ = {isa = PBXBuildFile; fileRef = 273F57D61C1A4C4E007067FF /* StringTable.cc */; };
+		273F57F11C1A4C79007067FF /* Value+ObjC.mm in Sources */ = {isa = PBXBuildFile; fileRef = 273F57DB1C1A4C4E007067FF /* Value+ObjC.mm */; };
+		273F57F21C1A4C79007067FF /* Value.cc in Sources */ = {isa = PBXBuildFile; fileRef = 273F57D81C1A4C4E007067FF /* Value.cc */; };
+		273F57F31C1A4C79007067FF /* Encoder+ObjC.mm in Sources */ = {isa = PBXBuildFile; fileRef = 273F57D31C1A4C4E007067FF /* Encoder+ObjC.mm */; };
+		273F57F41C1A4C79007067FF /* Encoder.cc in Sources */ = {isa = PBXBuildFile; fileRef = 273F57D11C1A4C4E007067FF /* Encoder.cc */; };
+		273F57F51C1A4C79007067FF /* Value+JSON.cc in Sources */ = {isa = PBXBuildFile; fileRef = 273F57DA1C1A4C4E007067FF /* Value+JSON.cc */; };
+		273F57F61C1A4C79007067FF /* Writer.cc in Sources */ = {isa = PBXBuildFile; fileRef = 273F57DC1C1A4C4E007067FF /* Writer.cc */; };
+		273F57F91C1A4C79007067FF /* Internal.hh in Headers */ = {isa = PBXBuildFile; fileRef = 273F57D51C1A4C4E007067FF /* Internal.hh */; };
+		273F57FA1C1A4C79007067FF /* Endian.hh in Headers */ = {isa = PBXBuildFile; fileRef = 273F57D41C1A4C4E007067FF /* Endian.hh */; };
+		273F57FB1C1A4C79007067FF /* Writer.hh in Headers */ = {isa = PBXBuildFile; fileRef = 273F57DD1C1A4C4E007067FF /* Writer.hh */; };
+		273F57FC1C1A4C79007067FF /* Value.hh in Headers */ = {isa = PBXBuildFile; fileRef = 273F57D91C1A4C4E007067FF /* Value.hh */; };
+		273F57FD1C1A4C79007067FF /* Encoder.hh in Headers */ = {isa = PBXBuildFile; fileRef = 273F57D21C1A4C4E007067FF /* Encoder.hh */; };
+		273F57FE1C1A4C79007067FF /* StringTable.hh in Headers */ = {isa = PBXBuildFile; fileRef = 273F57D71C1A4C4E007067FF /* StringTable.hh */; };
 		2744151F1900E8D800964583 /* fdb_errors.h in Headers */ = {isa = PBXBuildFile; fileRef = 2744151D1900E8D800964583 /* fdb_errors.h */; };
 		274415201900E8D800964583 /* fdb_errors.h in Headers */ = {isa = PBXBuildFile; fileRef = 2744151D1900E8D800964583 /* fdb_errors.h */; };
 		274415211900E8D800964583 /* fdb_types.h in Headers */ = {isa = PBXBuildFile; fileRef = 2744151E1900E8D800964583 /* fdb_types.h */; };
@@ -664,6 +690,21 @@
 		273AD3DB18F5E8D8007D8C23 /* snappy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = snappy.h; sourceTree = "<group>"; };
 		273AD3E718F5EB15007D8C23 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
 		273AD3E818F5EB15007D8C23 /* snappy-stubs-public.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "snappy-stubs-public.h"; sourceTree = "<group>"; };
+		273F57CD1C1A4B23007067FF /* libFleece.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFleece.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		273F57D11C1A4C4E007067FF /* Encoder.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Encoder.cc; path = Fleece/Encoder.cc; sourceTree = "<group>"; };
+		273F57D21C1A4C4E007067FF /* Encoder.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Encoder.hh; path = Fleece/Encoder.hh; sourceTree = "<group>"; };
+		273F57D31C1A4C4E007067FF /* Encoder+ObjC.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = "Encoder+ObjC.mm"; path = "Fleece/Encoder+ObjC.mm"; sourceTree = "<group>"; };
+		273F57D41C1A4C4E007067FF /* Endian.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Endian.hh; path = Fleece/Endian.hh; sourceTree = "<group>"; };
+		273F57D51C1A4C4E007067FF /* Internal.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Internal.hh; path = Fleece/Internal.hh; sourceTree = "<group>"; };
+		273F57D61C1A4C4E007067FF /* StringTable.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = StringTable.cc; path = Fleece/StringTable.cc; sourceTree = "<group>"; };
+		273F57D71C1A4C4E007067FF /* StringTable.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = StringTable.hh; path = Fleece/StringTable.hh; sourceTree = "<group>"; };
+		273F57D81C1A4C4E007067FF /* Value.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Value.cc; path = Fleece/Value.cc; sourceTree = "<group>"; };
+		273F57D91C1A4C4E007067FF /* Value.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Value.hh; path = Fleece/Value.hh; sourceTree = "<group>"; };
+		273F57DA1C1A4C4E007067FF /* Value+JSON.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "Value+JSON.cc"; path = "Fleece/Value+JSON.cc"; sourceTree = "<group>"; };
+		273F57DB1C1A4C4E007067FF /* Value+ObjC.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = "Value+ObjC.mm"; path = "Fleece/Value+ObjC.mm"; sourceTree = "<group>"; };
+		273F57DC1C1A4C4E007067FF /* Writer.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Writer.cc; path = Fleece/Writer.cc; sourceTree = "<group>"; };
+		273F57DD1C1A4C4E007067FF /* Writer.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Writer.hh; path = Fleece/Writer.hh; sourceTree = "<group>"; };
+		273F58021C1A4C79007067FF /* libFleeceIOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFleeceIOS.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		2744151D1900E8D800964583 /* fdb_errors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fdb_errors.h; path = libforestdb/fdb_errors.h; sourceTree = "<group>"; };
 		2744151E1900E8D800964583 /* fdb_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fdb_types.h; path = libforestdb/fdb_types.h; sourceTree = "<group>"; };
 		274A69871BED288D00D16D37 /* c4Document.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = c4Document.cc; sourceTree = "<group>"; };
@@ -958,6 +999,20 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		273F57CA1C1A4B23007067FF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		273F57F71C1A4C79007067FF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		274D03D01BA732B000FF7C35 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1136,6 +1191,8 @@
 				274D04081BA75E1C00FF7C35 /* CppTests */,
 				720EA3F51BA7EAD9002B8416 /* libCBForest-Interop.dylib */,
 				720EA46E1BA909C4002B8416 /* libCBForest-Interop.a */,
+				273F57CD1C1A4B23007067FF /* libFleece.a */,
+				273F58021C1A4C79007067FF /* libFleeceIOS.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1364,6 +1421,19 @@
 		2797BD471C164F9F00E5C991 /* fleece */ = {
 			isa = PBXGroup;
 			children = (
+				273F57D11C1A4C4E007067FF /* Encoder.cc */,
+				273F57D21C1A4C4E007067FF /* Encoder.hh */,
+				273F57D31C1A4C4E007067FF /* Encoder+ObjC.mm */,
+				273F57D41C1A4C4E007067FF /* Endian.hh */,
+				273F57D51C1A4C4E007067FF /* Internal.hh */,
+				273F57D61C1A4C4E007067FF /* StringTable.cc */,
+				273F57D71C1A4C4E007067FF /* StringTable.hh */,
+				273F57D81C1A4C4E007067FF /* Value.cc */,
+				273F57D91C1A4C4E007067FF /* Value.hh */,
+				273F57DA1C1A4C4E007067FF /* Value+JSON.cc */,
+				273F57DB1C1A4C4E007067FF /* Value+ObjC.mm */,
+				273F57DC1C1A4C4E007067FF /* Writer.cc */,
+				273F57DD1C1A4C4E007067FF /* Writer.hh */,
 				2797BD1D1C164F9200E5C991 /* slice.cc */,
 				2797BD1E1C164F9200E5C991 /* slice.hh */,
 				2797BD1F1C164F9200E5C991 /* slice.mm */,
@@ -1573,6 +1643,32 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		273F57CB1C1A4B23007067FF /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				273F57E21C1A4C4E007067FF /* Internal.hh in Headers */,
+				273F57E11C1A4C4E007067FF /* Endian.hh in Headers */,
+				273F57EA1C1A4C4E007067FF /* Writer.hh in Headers */,
+				273F57E61C1A4C4E007067FF /* Value.hh in Headers */,
+				273F57DF1C1A4C4E007067FF /* Encoder.hh in Headers */,
+				273F57E41C1A4C4E007067FF /* StringTable.hh in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		273F57F81C1A4C79007067FF /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				273F57F91C1A4C79007067FF /* Internal.hh in Headers */,
+				273F57FA1C1A4C79007067FF /* Endian.hh in Headers */,
+				273F57FB1C1A4C79007067FF /* Writer.hh in Headers */,
+				273F57FC1C1A4C79007067FF /* Value.hh in Headers */,
+				273F57FD1C1A4C79007067FF /* Encoder.hh in Headers */,
+				273F57FE1C1A4C79007067FF /* StringTable.hh in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		274D03D11BA732B000FF7C35 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -1768,6 +1864,40 @@
 			productReference = 27139BA218F8EE3A0021A9A3 /* CBForest-iOS Tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		273F57CC1C1A4B23007067FF /* Fleece */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 273F57D01C1A4B23007067FF /* Build configuration list for PBXNativeTarget "Fleece" */;
+			buildPhases = (
+				273F57C91C1A4B23007067FF /* Sources */,
+				273F57CA1C1A4B23007067FF /* Frameworks */,
+				273F57CB1C1A4B23007067FF /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Fleece;
+			productName = Fleece;
+			productReference = 273F57CD1C1A4B23007067FF /* libFleece.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		273F57EE1C1A4C79007067FF /* Fleece iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 273F57FF1C1A4C79007067FF /* Build configuration list for PBXNativeTarget "Fleece iOS" */;
+			buildPhases = (
+				273F57EF1C1A4C79007067FF /* Sources */,
+				273F57F71C1A4C79007067FF /* Frameworks */,
+				273F57F81C1A4C79007067FF /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Fleece iOS";
+			productName = Fleece;
+			productReference = 273F58021C1A4C79007067FF /* libFleeceIOS.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 		274D03D21BA732B000FF7C35 /* CBForestJNI */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 274D03D91BA732B100FF7C35 /* Build configuration list for PBXNativeTarget "CBForestJNI" */;
@@ -1929,6 +2059,9 @@
 					27139BA118F8EE3A0021A9A3 = {
 						TestTargetID = 27139B9418F8EE3A0021A9A3;
 					};
+					273F57CC1C1A4B23007067FF = {
+						CreatedOnToolsVersion = 7.2;
+					};
 					274D03D21BA732B000FF7C35 = {
 						CreatedOnToolsVersion = 7.0;
 					};
@@ -1962,6 +2095,8 @@
 				274D04071BA75E1C00FF7C35 /* CppTests */,
 				720EA3DB1BA7EAD9002B8416 /* CBForest-Interop */,
 				720EA44C1BA909C4002B8416 /* CBForest-Interop iOS */,
+				273F57CC1C1A4B23007067FF /* Fleece */,
+				273F57EE1C1A4C79007067FF /* Fleece iOS */,
 			);
 		};
 /* End PBXProject section */
@@ -2092,6 +2227,34 @@
 				270A4B081925746900DE4104 /* VersionedDocument_Tests.mm in Sources */,
 				272230451A08133300BFF25C /* Tokenizer_Test.mm in Sources */,
 				2722304C1A08178200BFF25C /* GeoHash_Test.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		273F57C91C1A4B23007067FF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				273F57E31C1A4C4E007067FF /* StringTable.cc in Sources */,
+				273F57E81C1A4C4E007067FF /* Value+ObjC.mm in Sources */,
+				273F57E51C1A4C4E007067FF /* Value.cc in Sources */,
+				273F57E01C1A4C4E007067FF /* Encoder+ObjC.mm in Sources */,
+				273F57DE1C1A4C4E007067FF /* Encoder.cc in Sources */,
+				273F57E71C1A4C4E007067FF /* Value+JSON.cc in Sources */,
+				273F57E91C1A4C4E007067FF /* Writer.cc in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		273F57EF1C1A4C79007067FF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				273F57F01C1A4C79007067FF /* StringTable.cc in Sources */,
+				273F57F11C1A4C79007067FF /* Value+ObjC.mm in Sources */,
+				273F57F21C1A4C79007067FF /* Value.cc in Sources */,
+				273F57F31C1A4C79007067FF /* Encoder+ObjC.mm in Sources */,
+				273F57F41C1A4C79007067FF /* Encoder.cc in Sources */,
+				273F57F51C1A4C79007067FF /* Value+JSON.cc in Sources */,
+				273F57F61C1A4C79007067FF /* Writer.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2629,6 +2792,94 @@
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 				WRAPPER_EXTENSION = xctest;
+			};
+			name = Release;
+		};
+		273F57CE1C1A4B23007067FF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CODE_SIGN_IDENTITY = "-";
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				EXECUTABLE_PREFIX = lib;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREFIX_HEADER = "CBForest/CBForest-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		273F57CF1C1A4B23007067FF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				EXECUTABLE_PREFIX = lib;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREFIX_HEADER = "CBForest/CBForest-Prefix.pch";
+				LLVM_LTO = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		273F58001C1A4C79007067FF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CODE_SIGN_IDENTITY = "-";
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				EXECUTABLE_PREFIX = lib;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREFIX_HEADER = "CBForest/CBForest-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_NAME = FleeceIOS;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		273F58011C1A4C79007067FF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				EXECUTABLE_PREFIX = lib;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREFIX_HEADER = "CBForest/CBForest-Prefix.pch";
+				LLVM_LTO = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_NAME = FleeceIOS;
+				SDKROOT = iphoneos;
 			};
 			name = Release;
 		};
@@ -3211,6 +3462,23 @@
 			buildConfigurations = (
 				27139BB618F8EE3A0021A9A3 /* Debug */,
 				27139BB718F8EE3A0021A9A3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		273F57D01C1A4B23007067FF /* Build configuration list for PBXNativeTarget "Fleece" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				273F57CE1C1A4B23007067FF /* Debug */,
+				273F57CF1C1A4B23007067FF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		273F57FF1C1A4C79007067FF /* Build configuration list for PBXNativeTarget "Fleece iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				273F58001C1A4C79007067FF /* Debug */,
+				273F58011C1A4C79007067FF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
