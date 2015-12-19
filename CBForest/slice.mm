@@ -16,7 +16,7 @@
 #include "slice.hh"
 #import <Foundation/Foundation.h>
 
-namespace forestdb {
+namespace cbforest {
 
     NSData* slice::copiedNSData() const {
         return buf ? [NSData dataWithBytes: buf length: size] : nil;

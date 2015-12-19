@@ -26,7 +26,7 @@
 #define offsetby(PTR,OFFSET) (void*)((uint8_t*)(PTR)+(OFFSET))
 
 
-namespace forestdb {
+namespace cbforest {
 
     /** A simple range of memory. No ownership implied. */
     struct slice {

@@ -18,7 +18,7 @@
 #import "error.hh"
 
 
-namespace forestdb {
+namespace cbforest {
 
     Collatable& Collatable::operator<< (__unsafe_unretained id obj) {
         if ([obj isKindOfClass: [NSString class]]) {

@@ -21,7 +21,7 @@
 #include <vector>
 
 
-namespace forestdb {
+namespace cbforest {
 
     /** A document as passed to a map function. This is subclassable; subclasses can transform
         the document (e.g. parsing JSON) and provide additional methods to access the transformed
@@ -105,7 +105,7 @@ namespace forestdb {
                              std::vector<Collatable> keys, std::vector<alloc_slice> values);
         alloc_slice getSpecialEntry(slice docID, sequence, unsigned fullTextID);
 
-        forestdb::KeyStore _sourceDatabase;
+        cbforest::KeyStore _sourceDatabase;
         MapFn* _map;
         std::string _mapVersion, _lastMapVersion;
         int _indexType;

@@ -13,7 +13,7 @@
 #include "c4Database.h"
 #include "slice.hh"
 
-namespace forestdb {
+namespace cbforest {
     namespace jni {
 
 extern JavaVM *gJVM;

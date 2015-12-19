@@ -14,7 +14,7 @@
 #include "Collatable.hh"
 #include "Error.hh"
 
-using namespace forestdb;
+using namespace cbforest;
 
 
 // Predefine C4Slice as a typedef of slice so we can use the richer slice API:
