@@ -63,8 +63,8 @@ public class View {
                 descending,
                 inclusiveStart,
                 inclusiveEnd,
-                objectToKey(startKey),
-                objectToKey(endKey),
+                objectToKey(startKey, false),
+                objectToKey(endKey, false),
                 startKeyDocID,
                 endKeyDocID));
     }
@@ -80,7 +80,7 @@ public class View {
         long keyHandles[] = new long[keys.length];
         int i = 0;
         for (Object key : keys) {
-            keyHandles[i++] = objectToKey(key);
+            keyHandles[i++] = objectToKey(key, true);
         }
         return new QueryIterator(query(_handle, skip, limit, descending,
                                        inclusiveStart, inclusiveEnd, keyHandles));
@@ -113,12 +113,20 @@ public class View {
 
     //////// KEY:
 
-    // Key generation:
-
-    static long objectToKey(Object o) {
-        if (o == null) {
+    /**
+     * Key generation:
+     *
+     * @param o
+     * @param bNullKey if true, create null-key if o is null,
+     *                 otherwise, return 0 which indicates no-key
+     * @return address to key instance in native layer
+     */
+    static long objectToKey(Object o, boolean bNullKey) {
+        if (o == null && !bNullKey) {
+            // 0 -> noKey
             return 0;
         } else {
+            // o == null -> NullKey
             long key = newKey();
             try {
                 keyAdd(key, o);

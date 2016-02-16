@@ -30,7 +30,7 @@ public class Indexer {
         // initialize C4Key
         long keyHandles[] = new long[keys.length];
         for (int i = 0; i < keys.length; i++) {
-            keyHandles[i] = View.objectToKey(keys[i]);
+            keyHandles[i] = View.objectToKey(keys[i], true);
         }
 
         emit(_handle, doc._handle, viewNumber, keyHandles, values);
