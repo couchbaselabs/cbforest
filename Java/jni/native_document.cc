@@ -265,15 +265,23 @@ JNIEXPORT jint JNICALL Java_com_couchbase_cbforest_Document_insertRevisionWithHi
     int inserted;
     C4Error error;
     {
+        // NOTE:
+        // If revision history is larger than JNI local reference table size (512),
+        // it causes `local reference table overflow (max=512)` without releasing a local reference.
+        // Needs to delete local reference immediately.
+        // Issue: https://github.com/couchbase/couchbase-lite-android/issues/782
+
         // Convert jhistory, a Java String[], to a C array of C4Slice:
         jsize n = env->GetArrayLength(jhistory);
-        std::vector<C4Slice> history(n);
-        std::vector<jstringSlice*> historyAlloc;
+        std::vector <C4Slice> history(n);
         for (jsize i = 0; i < n; i++) {
-            jstring js = (jstring)env->GetObjectArrayElement(jhistory, i);
-            jstringSlice *item = new jstringSlice(env, js);
-            historyAlloc.push_back(item); // so its memory won't be freed
-            history[i] = *item;
+            jstring js = (jstring) env->GetObjectArrayElement(jhistory, i);
+            const char *cstr = env->GetStringUTFChars(js, 0);
+            char *str = (char *) malloc(strlen(cstr) + 1);
+            strcpy(str, cstr);
+            history[i] = c4str(str);
+            env->ReleaseStringUTFChars(js, cstr);
+            env->DeleteLocalRef(js);
         }
 
         // Make sure the body will be released before releasing keeper.
@@ -290,10 +298,10 @@ JNIEXPORT jint JNICALL Java_com_couchbase_cbforest_Document_insertRevisionWithHi
 
         // release memory
         for (jsize i = 0; i < n; i++)
-            delete historyAlloc.at(i);
-        historyAlloc.clear();
-
+            c4slice_free(history.at(i));
+        history.clear();
     }
+
     if (inserted >= 0) {
         updateRevIDAndFlags(env, self, doc);
         updateSelection(env, self, doc);
