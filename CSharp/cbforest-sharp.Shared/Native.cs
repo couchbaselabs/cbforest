@@ -98,10 +98,20 @@ namespace CBForest
         /// 0	            |   the contents of both memory blocks are equal
         /// &gt;0	        |   the first byte that does not match in both memory blocks has a greater value in b1 than in b2
         ///                     (if evaluated as unsigned char values)</returns>
+        #if __MOBILE__
+        [DllImport("libc", CallingConvention=CallingConvention.Cdecl)]
+        #else
+        // The default mono dll map will take care of desktop
         [DllImport("msvcrt.dll", CallingConvention=CallingConvention.Cdecl)]
+        #endif
         public static extern int memcmp(void* b1, void* b2, UIntPtr count);
 
+        #if __MOBILE__
+        [DllImport("libc", CallingConvention=CallingConvention.Cdecl)]
+        #else
+        // The default mono dll map will take care of desktop
         [DllImport("msvcrt.dll", CallingConvention=CallingConvention.Cdecl)]
+        #endif
         public static extern int memcpy(void* dest, void* src, UIntPtr count);
 
 
