@@ -299,9 +299,18 @@ namespace CBForest
         /// </summary>
         /// <param name="db">The database to check</param>
         /// <returns>Whether or not a transaction is active</returns>
-        [DllImport(DLL_NAME, CallingConvention=CallingConvention.Cdecl, CharSet=CharSet.Ansi)]
+        [DllImport(DLL_NAME, CallingConvention=CallingConvention.Cdecl, CharSet=CharSet.Ansi, EntryPoint="c4db_isInTransaction")]
         [return: MarshalAs(UnmanagedType.U1)]
-        public static extern bool c4db_isInTransaction(C4Database *db);
+        private static extern bool _c4db_isInTransaction(C4Database *db);
+
+        public static bool c4db_isInTransaction(C4Database *db)
+        {
+            if (db == null) {
+                throw new ArgumentNullException("db");
+            }
+
+            return _c4db_isInTransaction(db);
+        }
 
         [DllImport(DLL_NAME, CallingConvention=CallingConvention.Cdecl, CharSet=CharSet.Ansi, EntryPoint="c4raw_free")]
         private static extern void _c4raw_free(C4RawDocument *rawDoc);
@@ -482,6 +491,9 @@ namespace CBForest
             }
         }
 
+        [DllImport(DLL_NAME, CallingConvention=CallingConvention.Cdecl, CharSet=CharSet.Ansi, EntryPoint="c4doc_getBySequence")]
+        private static extern C4Document* _c4doc_getBySequence(C4Database *db, ulong sequence, C4Error *outError);
+
         /// <summary>
         /// Retrieves a document by its sequence number
         /// </summary>
@@ -489,8 +501,22 @@ namespace CBForest
         /// <param name="db">The database to search in</param>
         /// <param name="sequence">The sequence number to search for</param>
         /// <param name="outError">The error that occurred if the operation doesn't succeed</param>
-        [DllImport(DLL_NAME, CallingConvention=CallingConvention.Cdecl, CharSet=CharSet.Ansi)]
-        public static extern C4Document* c4doc_getBySequence(C4Database *db, ulong sequence, C4Error *outError);
+        public static C4Document* c4doc_getBySequence(C4Database *db, ulong sequence, C4Error *outError)
+        {
+            #if DEBUG && !NET_3_5
+            var retVal = _c4doc_getBySequence(db, sequence, outError);
+            if(retVal != null) {
+                _AllocatedObjects.TryAdd((IntPtr)retVal, "C4Document");
+            #if ENABLE_LOGGING
+                Console.WriteLine("[c4doc_getBySequence] Allocated 0x{0}", ((IntPtr)retVal).ToString("X"));
+            #endif
+            }
+
+            return retVal;
+            #else
+            return _c4doc_getBySequence(db, sequence, outError);
+            #endif
+        }
 
         /// <summary>
         /// Returns the document type (as set by setDocType.) This value is ignored by CBForest itself; by convention 

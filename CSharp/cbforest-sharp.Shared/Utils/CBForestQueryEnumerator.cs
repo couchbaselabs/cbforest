@@ -20,6 +20,7 @@
 //
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace CBForest
 {
@@ -126,8 +127,9 @@ namespace CBForest
 
         #region Variables
 
-        private readonly C4QueryEnumerator *_e;
+        private C4QueryEnumerator *_e;
         private CBForestQueryStatus _current;
+        private readonly CancellationToken _cancelToken;
 
         #endregion
 
@@ -137,9 +139,15 @@ namespace CBForest
         /// Constructor
         /// </summary>
         /// <param name="e">The native query enumerator object to use</param>
-        public CBForestQueryEnumerator(C4QueryEnumerator *e)
+        public CBForestQueryEnumerator(C4QueryEnumerator *e, CancellationToken cancelToken)
         {
+            if (cancelToken.IsCancellationRequested) {
+                return;
+            }
+
             _e = e;
+            _cancelToken = cancelToken;
+            _cancelToken.Register(() =>  Dispose(false));
         }
 
         ~CBForestQueryEnumerator()
@@ -153,7 +161,11 @@ namespace CBForest
 
         private void Dispose(bool disposing)
         {
-            Native.c4queryenum_free(_e);
+            var e = _e;
+            _e = null;
+            if (e != null) {
+                Native.c4queryenum_free(e);
+            }
         }
 
         #endregion
