@@ -28,7 +28,7 @@ JNIEXPORT jlong JNICALL Java_com_couchbase_cbforest_DocumentIterator_initEnumera
     jstringSlice startDocID(env, jStartDocID);
     jstringSlice endDocID(env, jEndDocID);
     const C4EnumeratorOptions options = {unsigned(skip), C4EnumeratorFlags(optionFlags)};
-    C4Error error;
+    C4Error error = {HTTPDomain, 0};
     C4DocEnumerator *e = c4db_enumerateAllDocs((C4Database*)dbHandle, startDocID, endDocID, &options, &error);
     if (!e) {
         throwError(env, error);
@@ -59,7 +59,7 @@ JNIEXPORT jlong JNICALL Java_com_couchbase_cbforest_DocumentIterator_initEnumera
     }
 
     const C4EnumeratorOptions options = {unsigned(0), C4EnumeratorFlags(optionFlags)};
-    C4Error error;
+    C4Error error = {HTTPDomain, 0};
     C4DocEnumerator *e = c4db_enumerateSomeDocs((C4Database*)dbHandle, docIDs, n, &options,
                                                 &error);
 
@@ -82,7 +82,7 @@ JNIEXPORT jlong JNICALL Java_com_couchbase_cbforest_DocumentIterator_initEnumera
         (JNIEnv *env, jclass clazz, jlong dbHandle, jlong since, jint optionFlags)
 {
     const C4EnumeratorOptions options = {unsigned(0), C4EnumeratorFlags(optionFlags)};
-    C4Error error;
+    C4Error error = {HTTPDomain, 0};
     C4DocEnumerator *e = c4db_enumerateChanges((C4Database*)dbHandle, since, &options, &error);
     if (!e) {
         throwError(env, error);
@@ -97,7 +97,7 @@ JNIEXPORT jboolean JNICALL Java_com_couchbase_cbforest_DocumentIterator_next
     auto e = (C4DocEnumerator*)handle;
     if (!e)
         return 0;
-    C4Error error;
+    C4Error error = {HTTPDomain, 0};
     if (c4enum_next(e, &error)) {
         return true;
     } else if (error.code == 0) {
@@ -114,7 +114,7 @@ JNIEXPORT jlong JNICALL Java_com_couchbase_cbforest_DocumentIterator_getDocument
     auto e = (C4DocEnumerator*)handle;
     if (!e)
         return 0;
-    C4Error error;
+    C4Error error = {HTTPDomain, 0};
     auto doc = c4enum_getDocument(e, &error);
     if (!doc) {
         throwError(env, error);
