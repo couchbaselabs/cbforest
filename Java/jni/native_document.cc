@@ -88,7 +88,7 @@ JNIEXPORT jlong JNICALL Java_com_couchbase_cbforest_Document_init
 (JNIEnv *env, jobject self, jlong dbHandle, jstring jdocID, jboolean mustExist)
 {
     jstringSlice docID(env, jdocID);
-    C4Error error;
+    C4Error error = {HTTPDomain, 0};
     C4Document *doc = c4doc_get((C4Database*)dbHandle, docID, mustExist, &error);
     if (!doc) {
         throwError(env, error);
@@ -102,7 +102,7 @@ JNIEXPORT jlong JNICALL Java_com_couchbase_cbforest_Document_init
 JNIEXPORT jlong JNICALL Java_com_couchbase_cbforest_Document_initWithSequence
         (JNIEnv *env, jobject self, jlong dbHandle, jlong sequence)
 {
-    C4Error error;
+    C4Error error = {HTTPDomain, 0};
     C4Document *doc = c4doc_getBySequence((C4Database*)dbHandle, sequence, &error);
     if (!doc) {
         throwError(env, error);
@@ -132,7 +132,7 @@ JNIEXPORT jint JNICALL Java_com_couchbase_cbforest_Document_purgeRevision
         (JNIEnv *env, jclass clazz, jlong docHandle, jstring jrevid){
     auto doc = (C4Document *) docHandle;
     jstringSlice revID(env, jrevid);
-    C4Error error;
+    C4Error error = {HTTPDomain, 0};
     int num = c4doc_purgeRevision(doc, revID, &error);
     if (num == -1)
         throwError(env, error);
@@ -167,7 +167,7 @@ JNIEXPORT jboolean JNICALL Java_com_couchbase_cbforest_Document_selectRevID
 {
     auto doc = (C4Document*)docHandle;
     jstringSlice revID(env, jrevID);
-    C4Error error;
+    C4Error error = {HTTPDomain, 0};
     bool ok = c4doc_selectRevision(doc, revID, withBody, &error);
     if (ok || error.domain == HTTPDomain)
         updateSelection(env, self, doc);
@@ -211,7 +211,7 @@ JNIEXPORT jboolean JNICALL Java_com_couchbase_cbforest_Document_selectNextLeaf
 (JNIEnv *env, jobject self, jlong docHandle, jboolean includeDeleted, jboolean withBody)
 {
     auto doc = (C4Document*)docHandle;
-    C4Error error;
+    C4Error error = {HTTPDomain, 0};
     bool ok = c4doc_selectNextLeafRevision(doc, includeDeleted, withBody, &error);
     if (ok || error.domain == HTTPDomain)  // 404 or 410 don't trigger exceptions
         updateSelection(env, self, doc, withBody);
@@ -225,7 +225,7 @@ JNIEXPORT jbyteArray JNICALL Java_com_couchbase_cbforest_Document_readSelectedBo
 (JNIEnv *env, jobject self, jlong docHandle)
 {
     auto doc = (C4Document*)docHandle;
-    C4Error error;
+    C4Error error = {HTTPDomain, 0};
     if (!c4doc_loadRevisionBody(doc, &error)) {
         throwError(env, error);
         return NULL;
@@ -245,7 +245,7 @@ JNIEXPORT jboolean JNICALL Java_com_couchbase_cbforest_Document_insertRevision
 {
     auto doc = (C4Document*)docHandle;
     int inserted;
-    C4Error error;
+    C4Error error = {HTTPDomain, 0};
     {
         jstringSlice revID(env, jrevID);
         jbyteArraySlice body(env, jbody, true); // critical
@@ -269,7 +269,7 @@ JNIEXPORT jint JNICALL Java_com_couchbase_cbforest_Document_insertRevisionWithHi
 {
     auto doc = (C4Document*)docHandle;
     int inserted;
-    C4Error error;
+    C4Error error = {HTTPDomain, 0};
     {
         // Convert jhistory, a Java String[], to a C array of C4Slice:
         jsize n = env->GetArrayLength(jhistory);
@@ -313,7 +313,7 @@ JNIEXPORT jint JNICALL Java_com_couchbase_cbforest_Document_insertRevisionWithHi
 JNIEXPORT void JNICALL Java_com_couchbase_cbforest_Document_save
 (JNIEnv *env, jobject self, jlong docHandle, jint maxRevTreeDepth) {
     auto doc = (C4Document*)docHandle;
-    C4Error error;
+    C4Error error = {HTTPDomain, 0};
     if (c4doc_save(doc, maxRevTreeDepth, &error))
         updateRevIDAndFlags(env, self, doc);
     else

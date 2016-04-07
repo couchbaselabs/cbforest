@@ -42,7 +42,7 @@ JNIEXPORT jboolean JNICALL Java_com_couchbase_cbforest_QueryIterator_next
     auto e = (C4QueryEnumerator*)handle;
     if (!e)
         return false;
-    C4Error error;
+    C4Error error = {HTTPDomain, 0};
     jboolean result = c4queryenum_next(e, &error);
     if (!result) {
         // At end of iteration, proactively free the enumerator:
@@ -147,11 +147,11 @@ JNIEXPORT jstring JNICALL Java_com_couchbase_cbforest_FullTextResult_getFullText
   (JNIEnv *env, jclass clazz, jlong viewHandle, jstring jdocID, jlong sequence, jint fullTextID)
 {
     jstringSlice docID(env, jdocID);
-    C4Error err;
+    C4Error error = {HTTPDomain, 0};
     C4SliceResult text = c4view_fullTextMatched((C4View*)viewHandle, docID, sequence, fullTextID,
-                                                &err);
+                                                &error);
     if (!text.buf) {
-        throwError(env, err);
+        throwError(env, error);
         return NULL;
     }
     jstring result = toJString(env, text);

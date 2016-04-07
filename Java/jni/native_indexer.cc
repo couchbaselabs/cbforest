@@ -27,7 +27,7 @@ JNIEXPORT jlong JNICALL Java_com_couchbase_cbforest_Indexer_beginIndex
 (JNIEnv *env, jclass clazz, jlong dbHandle, jlongArray viewHandles)
 {
     auto c4views = handlesToVector<C4View*>(env, viewHandles);
-    C4Error error;
+    C4Error error = {HTTPDomain, 0};
     C4Indexer* indexer = c4indexer_begin((C4Database*)dbHandle, c4views.data(), c4views.size(), &error);
     if (!indexer)
         throwError(env, error);
@@ -47,7 +47,7 @@ JNIEXPORT void JNICALL Java_com_couchbase_cbforest_Indexer_triggerOnView
 JNIEXPORT jlong JNICALL Java_com_couchbase_cbforest_Indexer_iterateDocuments
 (JNIEnv *env, jclass clazz, jlong indexerHandle)
 {
-    C4Error error;
+    C4Error error = {HTTPDomain, 0};
     C4DocEnumerator* e = c4indexer_enumerateDocuments((C4Indexer*)indexerHandle, &error);
     if(!e && error.code != 0)
         throwError(env, error);
@@ -80,7 +80,7 @@ JNIEXPORT void JNICALL Java_com_couchbase_cbforest_Indexer_emit
 
     C4Indexer* indexer = (C4Indexer*)indexerHandle;
     C4Document* doc = (C4Document*)documentHandler;
-    C4Error error;
+    C4Error error = {HTTPDomain, 0};
     if (!c4indexer_emitList(indexer, doc, viewNumber, kv, &error))
         throwError(env, error);
 
@@ -91,7 +91,7 @@ JNIEXPORT void JNICALL Java_com_couchbase_cbforest_Indexer_emit
 JNIEXPORT void JNICALL Java_com_couchbase_cbforest_Indexer_endIndex
 (JNIEnv *env, jclass clazz, jlong indexerHandle, jboolean commit)
 {
-    C4Error error;
+    C4Error error = {HTTPDomain, 0};
     if(!c4indexer_end((C4Indexer *)indexerHandle, commit, &error))
         throwError(env, error);
 }

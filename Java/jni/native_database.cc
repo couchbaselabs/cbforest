@@ -56,7 +56,7 @@ jlong JNICALL Java_com_couchbase_cbforest_Database__1open
     if (!getEncryptionKey(env, encryptionAlg, encryptionKey, &key))
         return 0;
 
-    C4Error error;
+    C4Error error = {HTTPDomain, 0};
     C4Database* db = c4db_open(path, (C4DatabaseFlags)flags, &key, &error);
     if (!db)
         throwError(env, error);
@@ -72,7 +72,7 @@ JNIEXPORT void JNICALL Java_com_couchbase_cbforest_Database_rekey
 
     auto db = getDbHandle(env, self);
     if (db) {
-        C4Error error;
+        C4Error error = {HTTPDomain, 0};
         if(!c4db_rekey(db, &key, &error))
             throwError(env, error);
     }
@@ -84,7 +84,7 @@ JNIEXPORT void JNICALL Java_com_couchbase_cbforest_Database_free
     auto db = getDbHandle(env, self);
     if (db) {
         env->SetLongField(self, kHandleField, 0);
-        C4Error error;
+        C4Error error = {HTTPDomain, 0};
         if (!c4db_close(db, &error))
             throwError(env, error);
     }
@@ -95,7 +95,7 @@ JNIEXPORT void JNICALL Java_com_couchbase_cbforest_Database_compact
 {
     auto db = getDbHandle(env, self);
     if (db) {
-        C4Error error;
+        C4Error error = {HTTPDomain, 0};
         if (!c4db_compact(db, &error))
             throwError(env, error);
     }
@@ -118,7 +118,7 @@ JNIEXPORT jlong JNICALL Java_com_couchbase_cbforest_Database_getLastSequence
 JNIEXPORT void JNICALL Java_com_couchbase_cbforest_Database_beginTransaction
 (JNIEnv *env, jobject self)
 {
-    C4Error error;
+    C4Error error = {HTTPDomain, 0};
     if (!c4db_beginTransaction(getDbHandle(env, self), &error))
         throwError(env, error);
 }
@@ -127,7 +127,7 @@ JNIEXPORT void JNICALL Java_com_couchbase_cbforest_Database_beginTransaction
 JNIEXPORT void JNICALL Java_com_couchbase_cbforest_Database_endTransaction
 (JNIEnv *env, jobject self, jboolean commit)
 {
-    C4Error error;
+    C4Error error = {HTTPDomain, 0};
     if (!c4db_endTransaction(getDbHandle(env, self), commit, &error))
         throwError(env, error);
 }
@@ -175,7 +175,7 @@ JNIEXPORT void JNICALL Java_com_couchbase_cbforest_Database_purgeDoc
 (JNIEnv *env, jclass clazz, jlong db, jstring jdocID)
 {
     jstringSlice docID(env, jdocID);
-    C4Error error;
+    C4Error error = {HTTPDomain, 0};
     if(!c4db_purgeDoc((C4Database*)db, docID, &error))
         throwError(env, error);
 }
@@ -189,7 +189,7 @@ JNIEXPORT void JNICALL Java_com_couchbase_cbforest_Database__1rawPut
     jstringSlice    key(env, jkey);
     jbyteArraySlice meta(env, jmeta, true); // critical
     jbyteArraySlice body(env, jbody, true); // critical
-    C4Error error;
+    C4Error error = {HTTPDomain, 0};
     if(!c4raw_put((C4Database*)db, store, key, meta, body, &error))
         throwError(env, error);
 }
@@ -199,7 +199,7 @@ JNIEXPORT jobjectArray JNICALL Java_com_couchbase_cbforest_Database__1rawGet
     // obtain raw document
     jstringSlice store(env, jstore);
     jstringSlice key(env, jkey);
-    C4Error error;
+    C4Error error = {HTTPDomain, 0};
     C4RawDocument *doc = c4raw_get((C4Database *)db, store, key, &error);
     if (doc == NULL) {
         throwError(env, error);

@@ -52,7 +52,7 @@ JNIEXPORT jlong JNICALL Java_com_couchbase_cbforest_View__1open
     C4EncryptionKey key;
     if (!getEncryptionKey(env, encryptionAlg, encryptionKey, &key))
         return 0;
-    C4Error error;
+    C4Error error = {HTTPDomain, 0};
     C4View *view = c4view_open((C4Database*)dbHandle, path, name, version,
                                (C4DatabaseFlags)flags, &key, &error);
     if (!view)
@@ -66,7 +66,7 @@ JNIEXPORT void JNICALL Java_com_couchbase_cbforest_View_close
 {
     C4View* view = getViewHandle(env, self);
     env->SetLongField(self, kHandleField, 0);
-    C4Error error;
+    C4Error error = {HTTPDomain, 0};
     if (!c4view_close(view, &error))
         throwError(env, error);
 }
@@ -80,7 +80,7 @@ JNIEXPORT void JNICALL Java_com_couchbase_cbforest_View_rekey
 
     auto view = getViewHandle(env, self);
     if (view) {
-        C4Error error;
+        C4Error error = {HTTPDomain, 0};
         if(!c4view_rekey(view, &key, &error))
             throwError(env, error);
     }
@@ -90,7 +90,7 @@ JNIEXPORT void JNICALL Java_com_couchbase_cbforest_View_rekey
 JNIEXPORT void JNICALL Java_com_couchbase_cbforest_View_eraseIndex
   (JNIEnv *env, jobject self)
 {
-    C4Error error;
+    C4Error error = {HTTPDomain, 0};
     if (!c4view_eraseIndex(getViewHandle(env, self), &error))
         throwError(env, error);
 }
@@ -101,7 +101,7 @@ JNIEXPORT void JNICALL Java_com_couchbase_cbforest_View_delete
 {
     C4View* view = getViewHandle(env, self);
     env->SetLongField(self, kHandleField, 0);
-    C4Error error;
+    C4Error error = {HTTPDomain, 0};
     if (!c4view_delete(view, &error))
         throwError(env, error);
 }
@@ -132,7 +132,7 @@ JNIEXPORT jlong JNICALL Java_com_couchbase_cbforest_View_getLastSequenceChangedA
 JNIEXPORT jlong JNICALL Java_com_couchbase_cbforest_View_query__J
         (JNIEnv *env, jclass clazz, jlong viewHandle)
 {
-    C4Error error;
+    C4Error error = {HTTPDomain, 0};
     C4QueryEnumerator *e = c4view_query((C4View*)viewHandle, NULL, &error);
     if (!e)
         throwError(env, error);
@@ -158,7 +158,7 @@ JNIEXPORT jlong JNICALL Java_com_couchbase_cbforest_View_query__JJJZZZJJLjava_la
         startKeyDocID,
         endKeyDocID
     };
-    C4Error error;
+    C4Error error = {HTTPDomain, 0};
     C4QueryEnumerator *e = c4view_query((C4View*)viewHandle, &options, &error);
     if (!e)
         throwError(env, error);
@@ -189,7 +189,7 @@ JNIEXPORT jlong JNICALL Java_com_couchbase_cbforest_View_query__JJJZZZ_3J
         const_cast<const C4Key**>(c4keys.data()),
         keyCount
     };
-    C4Error error;
+    C4Error error = {HTTPDomain, 0};
     C4QueryEnumerator *e = c4view_query((C4View*)viewHandle, &options, &error);
     if (!e)
         throwError(env, error);
@@ -206,7 +206,7 @@ JNIEXPORT jlong JNICALL Java_com_couchbase_cbforest_View_query__JLjava_lang_Stri
     C4QueryOptions options = kC4DefaultQueryOptions;
     options.rankFullText = ranked;
 
-    C4Error error;
+    C4Error error = {HTTPDomain, 0};
     C4QueryEnumerator *e = c4view_fullTextQuery((C4View*)viewHandle, queryString, languageCode,
                                                 &options, &error);
     if (!e)
@@ -220,7 +220,7 @@ JNIEXPORT jlong JNICALL Java_com_couchbase_cbforest_View_query__JDDDD
    jdouble xmin, jdouble ymin, jdouble xmax, jdouble ymax)
 {
     C4GeoArea area = {xmin, ymin, xmax, ymax};
-    C4Error error;
+    C4Error error = {HTTPDomain, 0};
     C4QueryEnumerator *e = c4view_geoQuery((C4View*)viewHandle, area, &error);
     if (!e)
         throwError(env, error);
