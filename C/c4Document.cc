@@ -413,6 +413,7 @@ static int32_t insertRevision(C4DocumentInternal *idoc,
                               bool allowConflict,
                               C4Error *outError)
 {
+    CBFAssert(!deletion);//TEMP
     try {
         int httpStatus;
         auto newRev = idoc->_versionedDoc.insert(encodedRevID,

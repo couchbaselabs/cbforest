@@ -639,7 +639,7 @@ class C4DatabaseTest : public C4Test {
     CPPUNIT_TEST_SUITE_END();
 };
 
-CPPUNIT_TEST_SUITE_REGISTRATION(C4DatabaseTest);
+//TEMP CPPUNIT_TEST_SUITE_REGISTRATION(C4DatabaseTest);
 
 
 class C4EncryptedDatabaseTest : public C4DatabaseTest {
@@ -680,4 +680,4 @@ class C4EncryptedDatabaseTest : public C4DatabaseTest {
 
 C4EncryptionKey C4EncryptedDatabaseTest::sKey;
 
-CPPUNIT_TEST_SUITE_REGISTRATION(C4EncryptedDatabaseTest);
+//TEMP CPPUNIT_TEST_SUITE_REGISTRATION(C4EncryptedDatabaseTest);

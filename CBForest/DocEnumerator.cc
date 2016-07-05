@@ -168,8 +168,10 @@ namespace cbforest {
             close();
             return false;
         }
+        bool first = true;//TEMP
         bool ignoreDeleted;
         do {
+            CBFAssert(first); first = false;//TEMP
             if (_skipStep) {
                 // The first time next() is called, don't advance the iterator
                 _skipStep = false;
@@ -178,6 +180,7 @@ namespace cbforest {
                                                         : fdb_iterator_next(_iterator);
                 Debug("enum: fdb_iterator_%s(%p) --> %d",
                       (_options.descending ?"prev" :"next"), _iterator, status);
+                fprintf(stderr, "[next %p]", _iterator);
                 if (status == FDB_RESULT_ITERATOR_FAIL) {
                     close();
                     return false;

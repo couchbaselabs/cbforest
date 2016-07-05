@@ -90,6 +90,7 @@ struct C4DocEnumerator: c4Internal::InstanceCounted {
         do {
             if (!_e.next())
                 return false;
+            CBFAssert(useDoc());//TEMP
         } while (!useDoc());
         return true;
     }
