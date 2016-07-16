@@ -13,6 +13,17 @@
 #include "forestdb.h"
 #include "slice.hh"
 
+// note: fdb_seqnum_t is platform dependent. see arch.h in forestdb
+#ifdef __ANDROID__
+#if defined(__arm__) || defined(__i386__) || defined(__mips32__)
+#define _F64 "llu"
+#else
+#define _F64 "lu"
+#endif
+#else
+#define _F64 "llu"
+#endif
+
 namespace cbforest {
 
     class Database;
