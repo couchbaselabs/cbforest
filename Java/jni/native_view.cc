@@ -112,6 +112,15 @@ JNIEXPORT void JNICALL Java_com_couchbase_cbforest_View_delete
         throwError(env, error);
 }
 
+JNIEXPORT jboolean JNICALL Java_com_couchbase_cbforest_View_deleteAtPath
+  (JNIEnv *env, jclass clazz, jstring jpath, jint jflag)
+{
+    jstringSlice path(env, jpath);
+    C4Error error;
+    if (!c4view_deleteAtPath(path, (C4DatabaseFlags)jflag, &error))
+         throwError(env, error);
+    return true;
+}
 
 JNIEXPORT jlong JNICALL Java_com_couchbase_cbforest_View_getTotalRows
   (JNIEnv *env, jobject self)
