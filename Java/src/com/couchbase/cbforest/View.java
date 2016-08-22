@@ -39,6 +39,8 @@ public class View {
     public native long getLastSequenceIndexed();
     public native long getLastSequenceChangedAt();
 
+    public static native void deleteAtPath(String path, int flags) throws ForestException;
+
     protected void finalize() {
         freeHandle(_handle);
     }
