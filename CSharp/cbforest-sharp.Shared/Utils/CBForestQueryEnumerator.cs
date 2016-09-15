@@ -39,6 +39,10 @@ namespace CBForest
         private string _geoJSON;
         private C4FullTextTerm *_fullTextTerms;
 
+        public readonly uint FullTextID;
+
+        public readonly uint FullTextTermCount;
+
         /// <summary>
         /// The key of this entry
         /// </summary>
@@ -125,11 +129,6 @@ namespace CBForest
         }
 
         /// <summary>
-        /// Gets the count of the full text terms on this query, if applicable
-        /// </summary>
-        public uint FullTextTermCount { get; private set; }
-
-        /// <summary>
         /// Gets the bounding box for the geoquery of this query, if applicable
         /// </summary>
         /// <value>The bounding box.</value>
@@ -147,6 +146,7 @@ namespace CBForest
             _docIDSlice = e->docID;
             _fullTextTerms = e->fullTextTerms;
             FullTextTermCount = e->fullTextTermCount;
+            FullTextID = e->fullTextID;
             BoundingBox = e->geoBBox;
             GeoJSONRaw = e->geoJSON;
         }

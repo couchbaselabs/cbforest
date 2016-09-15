@@ -45,6 +45,8 @@ namespace CBForest
     /// </summary>
     public unsafe delegate int C4TryLogicDelegate3(C4Error *err);
 
+    public unsafe delegate C4Slice C4TryLogicDelegate4(C4Error* err);
+
     #endregion
 
     /// <summary>
@@ -190,6 +192,11 @@ namespace CBForest
             return Execute(block, 0);
         }
 
+        public unsafe C4Slice Execute(C4TryLogicDelegate4 block)
+        {
+            return Execute(block, 0);
+        }
+
         #endregion
 
         #region Private Methods
@@ -254,6 +261,29 @@ namespace CBForest
 
             Exception = new CBForestException(err);
             if (err.domain == C4ErrorDomain.ForestDB && err.code == (int)ForestDBStatus.HandleBusy) {
+                Thread.Sleep(RETRY_TIME);
+                return Execute(block, attemptCount + 1);
+            }
+
+            ThrowOrHandle();
+            return retVal;
+        }
+
+        private unsafe C4Slice Execute(C4TryLogicDelegate4 block, int attemptCount)
+        {
+            if(attemptCount > _maxAttempts) {
+                ThrowOrHandle();
+            }
+
+            var err = default(C4Error);
+            var retVal = block(&err);
+            if(retVal.buf != null) {
+                Exception = null;
+                return retVal;
+            }
+
+            Exception = new CBForestException(err);
+            if(err.domain == C4ErrorDomain.ForestDB && err.code == (int)ForestDBStatus.HandleBusy) {
                 Thread.Sleep(RETRY_TIME);
                 return Execute(block, attemptCount + 1);
             }
