@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "72EFA5C91D8A392600D17CFE"
-               BuildableName = "libTokenizer.dylib"
-               BlueprintName = "Tokenizer-Interop"
+               BlueprintIdentifier = "72EFA6181D8A5FA000D17CFE"
+               BuildableName = "libTokenizer-Interop Static.dylib"
+               BlueprintName = "Tokenizer-Interop Static"
                ReferencedContainer = "container:CBForest.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -33,7 +33,7 @@
       </AdditionalOptions>
    </TestAction>
    <LaunchAction
-      buildConfiguration = "Release"
+      buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
@@ -45,9 +45,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "72EFA5C91D8A392600D17CFE"
-            BuildableName = "libTokenizer.dylib"
-            BlueprintName = "Tokenizer-Interop"
+            BlueprintIdentifier = "72EFA6181D8A5FA000D17CFE"
+            BuildableName = "libTokenizer-Interop Static.dylib"
+            BlueprintName = "Tokenizer-Interop Static"
             ReferencedContainer = "container:CBForest.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -63,9 +63,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "72EFA5C91D8A392600D17CFE"
-            BuildableName = "libTokenizer.dylib"
-            BlueprintName = "Tokenizer-Interop"
+            BlueprintIdentifier = "72EFA6181D8A5FA000D17CFE"
+            BuildableName = "libTokenizer-Interop Static.dylib"
+            BlueprintName = "Tokenizer-Interop Static"
             ReferencedContainer = "container:CBForest.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

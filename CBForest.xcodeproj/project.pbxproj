@@ -350,6 +350,74 @@
 		72EFA60F1D8A392600D17CFE /* stem_ISO_8859_2_romanian.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FD21914296D00A327B9 /* stem_ISO_8859_2_romanian.h */; };
 		72EFA6101D8A392600D17CFE /* stem_UTF_8_porter.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FE81914296D00A327B9 /* stem_UTF_8_porter.h */; };
 		72EFA6151D8A39DF00D17CFE /* sqlite_glue.c in Sources */ = {isa = PBXBuildFile; fileRef = 27A82D941BC48E38005CB742 /* sqlite_glue.c */; };
+		72EFA61A1D8A5FA000D17CFE /* sqlite_glue.c in Sources */ = {isa = PBXBuildFile; fileRef = 27A82D941BC48E38005CB742 /* sqlite_glue.c */; };
+		72EFA61B1D8A5FA000D17CFE /* stem_UTF_8_dutch.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FD71914296D00A327B9 /* stem_UTF_8_dutch.c */; };
+		72EFA61C1D8A5FA000D17CFE /* stem_ISO_8859_1_hungarian.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FC31914296D00A327B9 /* stem_ISO_8859_1_hungarian.c */; };
+		72EFA61D1D8A5FA000D17CFE /* stem_UTF_8_swedish.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FF11914296D00A327B9 /* stem_UTF_8_swedish.c */; };
+		72EFA61E1D8A5FA000D17CFE /* stem_ISO_8859_1_dutch.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FB91914296D00A327B9 /* stem_ISO_8859_1_dutch.c */; };
+		72EFA61F1D8A5FA000D17CFE /* fts3_unicodesn.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FA71914296D00A327B9 /* fts3_unicodesn.c */; };
+		72EFA6201D8A5FA000D17CFE /* stem_UTF_8_english.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FD91914296D00A327B9 /* stem_UTF_8_english.c */; };
+		72EFA6211D8A5FA000D17CFE /* stem_ISO_8859_1_german.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FC11914296D00A327B9 /* stem_ISO_8859_1_german.c */; };
+		72EFA6221D8A5FA000D17CFE /* stem_UTF_8_french.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FDD1914296D00A327B9 /* stem_UTF_8_french.c */; };
+		72EFA6231D8A5FA000D17CFE /* utilities_sq3.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FB51914296D00A327B9 /* utilities_sq3.c */; };
+		72EFA6241D8A5FA000D17CFE /* stem_UTF_8_italian.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FE31914296D00A327B9 /* stem_UTF_8_italian.c */; };
+		72EFA6251D8A5FA000D17CFE /* stem_ISO_8859_1_norwegian.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FC71914296D00A327B9 /* stem_ISO_8859_1_norwegian.c */; };
+		72EFA6261D8A5FA000D17CFE /* stem_KOI8_R_russian.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FD31914296D00A327B9 /* stem_KOI8_R_russian.c */; };
+		72EFA6271D8A5FA000D17CFE /* stem_UTF_8_finnish.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FDB1914296D00A327B9 /* stem_UTF_8_finnish.c */; };
+		72EFA6281D8A5FA000D17CFE /* stem_ISO_8859_1_english.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FBB1914296D00A327B9 /* stem_ISO_8859_1_english.c */; };
+		72EFA6291D8A5FA000D17CFE /* stem_UTF_8_danish.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FD51914296D00A327B9 /* stem_UTF_8_danish.c */; };
+		72EFA62A1D8A5FA000D17CFE /* stem_ISO_8859_1_finnish.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FBD1914296D00A327B9 /* stem_ISO_8859_1_finnish.c */; };
+		72EFA62B1D8A5FA000D17CFE /* stem_UTF_8_portuguese.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FE91914296D00A327B9 /* stem_UTF_8_portuguese.c */; };
+		72EFA62C1D8A5FA000D17CFE /* stem_ISO_8859_1_swedish.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FCF1914296D00A327B9 /* stem_ISO_8859_1_swedish.c */; };
+		72EFA62D1D8A5FA000D17CFE /* fts3_unicode2.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FA61914296D00A327B9 /* fts3_unicode2.c */; };
+		72EFA62E1D8A5FA000D17CFE /* stem_UTF_8_russian.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FED1914296D00A327B9 /* stem_UTF_8_russian.c */; };
+		72EFA62F1D8A5FA000D17CFE /* stem_ISO_8859_1_french.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FBF1914296D00A327B9 /* stem_ISO_8859_1_french.c */; };
+		72EFA6301D8A5FA000D17CFE /* stem_UTF_8_german.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FDF1914296D00A327B9 /* stem_UTF_8_german.c */; };
+		72EFA6311D8A5FA000D17CFE /* stem_UTF_8_porter.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FE71914296D00A327B9 /* stem_UTF_8_porter.c */; };
+		72EFA6321D8A5FA000D17CFE /* stem_ISO_8859_1_danish.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FB71914296D00A327B9 /* stem_ISO_8859_1_danish.c */; };
+		72EFA6331D8A5FA000D17CFE /* stem_UTF_8_norwegian.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FE51914296D00A327B9 /* stem_UTF_8_norwegian.c */; };
+		72EFA6341D8A5FA000D17CFE /* stem_ISO_8859_1_italian.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FC51914296D00A327B9 /* stem_ISO_8859_1_italian.c */; };
+		72EFA6351D8A5FA000D17CFE /* stem_UTF_8_romanian.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FEB1914296D00A327B9 /* stem_UTF_8_romanian.c */; };
+		72EFA6361D8A5FA000D17CFE /* api_sq3.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FB31914296D00A327B9 /* api_sq3.c */; };
+		72EFA6371D8A5FA000D17CFE /* stem_UTF_8_turkish.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FF31914296D00A327B9 /* stem_UTF_8_turkish.c */; };
+		72EFA6381D8A5FA000D17CFE /* libstemmer_utf8.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FAD1914296D00A327B9 /* libstemmer_utf8.c */; };
+		72EFA6391D8A5FA000D17CFE /* stem_ISO_8859_1_spanish.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FCD1914296D00A327B9 /* stem_ISO_8859_1_spanish.c */; };
+		72EFA63A1D8A5FA000D17CFE /* stem_ISO_8859_2_romanian.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FD11914296D00A327B9 /* stem_ISO_8859_2_romanian.c */; };
+		72EFA63B1D8A5FA000D17CFE /* stem_UTF_8_hungarian.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FE11914296D00A327B9 /* stem_UTF_8_hungarian.c */; };
+		72EFA63C1D8A5FA000D17CFE /* stem_ISO_8859_1_porter.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FC91914296D00A327B9 /* stem_ISO_8859_1_porter.c */; };
+		72EFA63D1D8A5FA000D17CFE /* stem_UTF_8_spanish.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FEF1914296D00A327B9 /* stem_UTF_8_spanish.c */; };
+		72EFA63E1D8A5FA000D17CFE /* stem_ISO_8859_1_portuguese.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FCB1914296D00A327B9 /* stem_ISO_8859_1_portuguese.c */; };
+		72EFA6411D8A5FA000D17CFE /* stem_UTF_8_russian.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FEE1914296D00A327B9 /* stem_UTF_8_russian.h */; };
+		72EFA6421D8A5FA000D17CFE /* stem_ISO_8859_1_italian.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FC61914296D00A327B9 /* stem_ISO_8859_1_italian.h */; };
+		72EFA6431D8A5FA000D17CFE /* stem_ISO_8859_1_norwegian.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FC81914296D00A327B9 /* stem_ISO_8859_1_norwegian.h */; };
+		72EFA6441D8A5FA000D17CFE /* stem_ISO_8859_1_dutch.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FBA1914296D00A327B9 /* stem_ISO_8859_1_dutch.h */; };
+		72EFA6451D8A5FA000D17CFE /* stem_UTF_8_portuguese.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FEA1914296D00A327B9 /* stem_UTF_8_portuguese.h */; };
+		72EFA6461D8A5FA000D17CFE /* stem_ISO_8859_1_hungarian.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FC41914296D00A327B9 /* stem_ISO_8859_1_hungarian.h */; };
+		72EFA6471D8A5FA000D17CFE /* stem_ISO_8859_1_portuguese.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FCC1914296D00A327B9 /* stem_ISO_8859_1_portuguese.h */; };
+		72EFA6481D8A5FA000D17CFE /* stem_UTF_8_english.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FDA1914296D00A327B9 /* stem_UTF_8_english.h */; };
+		72EFA6491D8A5FA000D17CFE /* stem_ISO_8859_1_french.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FC01914296D00A327B9 /* stem_ISO_8859_1_french.h */; };
+		72EFA64A1D8A5FA000D17CFE /* stem_UTF_8_italian.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FE41914296D00A327B9 /* stem_UTF_8_italian.h */; };
+		72EFA64B1D8A5FA000D17CFE /* stem_UTF_8_german.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FE01914296D00A327B9 /* stem_UTF_8_german.h */; };
+		72EFA64C1D8A5FA000D17CFE /* stem_UTF_8_romanian.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FEC1914296D00A327B9 /* stem_UTF_8_romanian.h */; };
+		72EFA64D1D8A5FA000D17CFE /* stem_UTF_8_swedish.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FF21914296D00A327B9 /* stem_UTF_8_swedish.h */; };
+		72EFA64E1D8A5FA000D17CFE /* stem_UTF_8_hungarian.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FE21914296D00A327B9 /* stem_UTF_8_hungarian.h */; };
+		72EFA64F1D8A5FA000D17CFE /* stem_KOI8_R_russian.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FD41914296D00A327B9 /* stem_KOI8_R_russian.h */; };
+		72EFA6501D8A5FA000D17CFE /* stem_UTF_8_norwegian.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FE61914296D00A327B9 /* stem_UTF_8_norwegian.h */; };
+		72EFA6511D8A5FA000D17CFE /* stem_UTF_8_finnish.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FDC1914296D00A327B9 /* stem_UTF_8_finnish.h */; };
+		72EFA6521D8A5FA000D17CFE /* stem_UTF_8_dutch.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FD81914296D00A327B9 /* stem_UTF_8_dutch.h */; };
+		72EFA6531D8A5FA000D17CFE /* stem_ISO_8859_1_finnish.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FBE1914296D00A327B9 /* stem_ISO_8859_1_finnish.h */; };
+		72EFA6541D8A5FA000D17CFE /* stem_ISO_8859_1_german.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FC21914296D00A327B9 /* stem_ISO_8859_1_german.h */; };
+		72EFA6551D8A5FA000D17CFE /* stem_ISO_8859_1_spanish.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FCE1914296D00A327B9 /* stem_ISO_8859_1_spanish.h */; };
+		72EFA6561D8A5FA000D17CFE /* stem_ISO_8859_1_danish.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FB81914296D00A327B9 /* stem_ISO_8859_1_danish.h */; };
+		72EFA6571D8A5FA000D17CFE /* stem_ISO_8859_1_english.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FBC1914296D00A327B9 /* stem_ISO_8859_1_english.h */; };
+		72EFA6581D8A5FA000D17CFE /* stem_ISO_8859_1_swedish.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FD01914296D00A327B9 /* stem_ISO_8859_1_swedish.h */; };
+		72EFA6591D8A5FA000D17CFE /* stem_UTF_8_french.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FDE1914296D00A327B9 /* stem_UTF_8_french.h */; };
+		72EFA65A1D8A5FA000D17CFE /* stem_UTF_8_danish.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FD61914296D00A327B9 /* stem_UTF_8_danish.h */; };
+		72EFA65B1D8A5FA000D17CFE /* stem_UTF_8_turkish.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FF41914296D00A327B9 /* stem_UTF_8_turkish.h */; };
+		72EFA65C1D8A5FA000D17CFE /* stem_UTF_8_spanish.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FF01914296D00A327B9 /* stem_UTF_8_spanish.h */; };
+		72EFA65D1D8A5FA000D17CFE /* stem_ISO_8859_1_porter.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FCA1914296D00A327B9 /* stem_ISO_8859_1_porter.h */; };
+		72EFA65E1D8A5FA000D17CFE /* stem_ISO_8859_2_romanian.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FD21914296D00A327B9 /* stem_ISO_8859_2_romanian.h */; };
+		72EFA65F1D8A5FA000D17CFE /* stem_UTF_8_porter.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FE81914296D00A327B9 /* stem_UTF_8_porter.h */; };
 		9399E72E1B7E536700D4BE79 /* Slice_Test.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9399E72C1B7E536700D4BE79 /* Slice_Test.mm */; };
 /* End PBXBuildFile section */
 
@@ -832,6 +900,7 @@
 		72C086921CBDEB2000808CE7 /* c4ExpiryEnumerator.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = c4ExpiryEnumerator.cc; sourceTree = "<group>"; };
 		72C086931CBDEB2000808CE7 /* c4ExpiryEnumerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = c4ExpiryEnumerator.h; sourceTree = "<group>"; };
 		72EFA6141D8A392600D17CFE /* libTokenizer-Interop.dylib */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libTokenizer-Interop.dylib"; sourceTree = BUILT_PRODUCTS_DIR; };
+		72EFA6631D8A5FA000D17CFE /* libTokenizer.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libTokenizer.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		9399E72C1B7E536700D4BE79 /* Slice_Test.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Slice_Test.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -918,6 +987,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		72EFA5F01D8A392600D17CFE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		72EFA63F1D8A5FA000D17CFE /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1099,6 +1175,7 @@
 				27A6579C1CBC190B00A7A1D7 /* SwiftForest.framework */,
 				27A657A51CBC190B00A7A1D7 /* SwiftForestTests.xctest */,
 				72EFA6141D8A392600D17CFE /* libTokenizer-Interop.dylib */,
+				72EFA6631D8A5FA000D17CFE /* libTokenizer.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1655,6 +1732,44 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		72EFA6401D8A5FA000D17CFE /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				72EFA6411D8A5FA000D17CFE /* stem_UTF_8_russian.h in Headers */,
+				72EFA6421D8A5FA000D17CFE /* stem_ISO_8859_1_italian.h in Headers */,
+				72EFA6431D8A5FA000D17CFE /* stem_ISO_8859_1_norwegian.h in Headers */,
+				72EFA6441D8A5FA000D17CFE /* stem_ISO_8859_1_dutch.h in Headers */,
+				72EFA6451D8A5FA000D17CFE /* stem_UTF_8_portuguese.h in Headers */,
+				72EFA6461D8A5FA000D17CFE /* stem_ISO_8859_1_hungarian.h in Headers */,
+				72EFA6471D8A5FA000D17CFE /* stem_ISO_8859_1_portuguese.h in Headers */,
+				72EFA6481D8A5FA000D17CFE /* stem_UTF_8_english.h in Headers */,
+				72EFA6491D8A5FA000D17CFE /* stem_ISO_8859_1_french.h in Headers */,
+				72EFA64A1D8A5FA000D17CFE /* stem_UTF_8_italian.h in Headers */,
+				72EFA64B1D8A5FA000D17CFE /* stem_UTF_8_german.h in Headers */,
+				72EFA64C1D8A5FA000D17CFE /* stem_UTF_8_romanian.h in Headers */,
+				72EFA64D1D8A5FA000D17CFE /* stem_UTF_8_swedish.h in Headers */,
+				72EFA64E1D8A5FA000D17CFE /* stem_UTF_8_hungarian.h in Headers */,
+				72EFA64F1D8A5FA000D17CFE /* stem_KOI8_R_russian.h in Headers */,
+				72EFA6501D8A5FA000D17CFE /* stem_UTF_8_norwegian.h in Headers */,
+				72EFA6511D8A5FA000D17CFE /* stem_UTF_8_finnish.h in Headers */,
+				72EFA6521D8A5FA000D17CFE /* stem_UTF_8_dutch.h in Headers */,
+				72EFA6531D8A5FA000D17CFE /* stem_ISO_8859_1_finnish.h in Headers */,
+				72EFA6541D8A5FA000D17CFE /* stem_ISO_8859_1_german.h in Headers */,
+				72EFA6551D8A5FA000D17CFE /* stem_ISO_8859_1_spanish.h in Headers */,
+				72EFA6561D8A5FA000D17CFE /* stem_ISO_8859_1_danish.h in Headers */,
+				72EFA6571D8A5FA000D17CFE /* stem_ISO_8859_1_english.h in Headers */,
+				72EFA6581D8A5FA000D17CFE /* stem_ISO_8859_1_swedish.h in Headers */,
+				72EFA6591D8A5FA000D17CFE /* stem_UTF_8_french.h in Headers */,
+				72EFA65A1D8A5FA000D17CFE /* stem_UTF_8_danish.h in Headers */,
+				72EFA65B1D8A5FA000D17CFE /* stem_UTF_8_turkish.h in Headers */,
+				72EFA65C1D8A5FA000D17CFE /* stem_UTF_8_spanish.h in Headers */,
+				72EFA65D1D8A5FA000D17CFE /* stem_ISO_8859_1_porter.h in Headers */,
+				72EFA65E1D8A5FA000D17CFE /* stem_ISO_8859_2_romanian.h in Headers */,
+				72EFA65F1D8A5FA000D17CFE /* stem_UTF_8_porter.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
@@ -1840,6 +1955,23 @@
 			productReference = 72EFA6141D8A392600D17CFE /* libTokenizer-Interop.dylib */;
 			productType = "com.apple.product-type.library.static";
 		};
+		72EFA6181D8A5FA000D17CFE /* Tokenizer-Interop Static */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 72EFA6601D8A5FA000D17CFE /* Build configuration list for PBXNativeTarget "Tokenizer-Interop Static" */;
+			buildPhases = (
+				72EFA6191D8A5FA000D17CFE /* Sources */,
+				72EFA63F1D8A5FA000D17CFE /* Frameworks */,
+				72EFA6401D8A5FA000D17CFE /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Tokenizer-Interop Static";
+			productName = Tokenizer;
+			productReference = 72EFA6631D8A5FA000D17CFE /* libTokenizer.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -1890,6 +2022,7 @@
 				27A657A41CBC190B00A7A1D7 /* SwiftForestTests */,
 				27B7E0F118F8FB4700044EBA /* All */,
 				72EFA5C91D8A392600D17CFE /* Tokenizer-Interop */,
+				72EFA6181D8A5FA000D17CFE /* Tokenizer-Interop Static */,
 			);
 		};
 /* End PBXProject section */
@@ -2212,6 +2345,50 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		72EFA6191D8A5FA000D17CFE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				72EFA61A1D8A5FA000D17CFE /* sqlite_glue.c in Sources */,
+				72EFA61B1D8A5FA000D17CFE /* stem_UTF_8_dutch.c in Sources */,
+				72EFA61C1D8A5FA000D17CFE /* stem_ISO_8859_1_hungarian.c in Sources */,
+				72EFA61D1D8A5FA000D17CFE /* stem_UTF_8_swedish.c in Sources */,
+				72EFA61E1D8A5FA000D17CFE /* stem_ISO_8859_1_dutch.c in Sources */,
+				72EFA61F1D8A5FA000D17CFE /* fts3_unicodesn.c in Sources */,
+				72EFA6201D8A5FA000D17CFE /* stem_UTF_8_english.c in Sources */,
+				72EFA6211D8A5FA000D17CFE /* stem_ISO_8859_1_german.c in Sources */,
+				72EFA6221D8A5FA000D17CFE /* stem_UTF_8_french.c in Sources */,
+				72EFA6231D8A5FA000D17CFE /* utilities_sq3.c in Sources */,
+				72EFA6241D8A5FA000D17CFE /* stem_UTF_8_italian.c in Sources */,
+				72EFA6251D8A5FA000D17CFE /* stem_ISO_8859_1_norwegian.c in Sources */,
+				72EFA6261D8A5FA000D17CFE /* stem_KOI8_R_russian.c in Sources */,
+				72EFA6271D8A5FA000D17CFE /* stem_UTF_8_finnish.c in Sources */,
+				72EFA6281D8A5FA000D17CFE /* stem_ISO_8859_1_english.c in Sources */,
+				72EFA6291D8A5FA000D17CFE /* stem_UTF_8_danish.c in Sources */,
+				72EFA62A1D8A5FA000D17CFE /* stem_ISO_8859_1_finnish.c in Sources */,
+				72EFA62B1D8A5FA000D17CFE /* stem_UTF_8_portuguese.c in Sources */,
+				72EFA62C1D8A5FA000D17CFE /* stem_ISO_8859_1_swedish.c in Sources */,
+				72EFA62D1D8A5FA000D17CFE /* fts3_unicode2.c in Sources */,
+				72EFA62E1D8A5FA000D17CFE /* stem_UTF_8_russian.c in Sources */,
+				72EFA62F1D8A5FA000D17CFE /* stem_ISO_8859_1_french.c in Sources */,
+				72EFA6301D8A5FA000D17CFE /* stem_UTF_8_german.c in Sources */,
+				72EFA6311D8A5FA000D17CFE /* stem_UTF_8_porter.c in Sources */,
+				72EFA6321D8A5FA000D17CFE /* stem_ISO_8859_1_danish.c in Sources */,
+				72EFA6331D8A5FA000D17CFE /* stem_UTF_8_norwegian.c in Sources */,
+				72EFA6341D8A5FA000D17CFE /* stem_ISO_8859_1_italian.c in Sources */,
+				72EFA6351D8A5FA000D17CFE /* stem_UTF_8_romanian.c in Sources */,
+				72EFA6361D8A5FA000D17CFE /* api_sq3.c in Sources */,
+				72EFA6371D8A5FA000D17CFE /* stem_UTF_8_turkish.c in Sources */,
+				72EFA6381D8A5FA000D17CFE /* libstemmer_utf8.c in Sources */,
+				72EFA6391D8A5FA000D17CFE /* stem_ISO_8859_1_spanish.c in Sources */,
+				72EFA63A1D8A5FA000D17CFE /* stem_ISO_8859_2_romanian.c in Sources */,
+				72EFA63B1D8A5FA000D17CFE /* stem_UTF_8_hungarian.c in Sources */,
+				72EFA63C1D8A5FA000D17CFE /* stem_ISO_8859_1_porter.c in Sources */,
+				72EFA63D1D8A5FA000D17CFE /* stem_UTF_8_spanish.c in Sources */,
+				72EFA63E1D8A5FA000D17CFE /* stem_ISO_8859_1_portuguese.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -2463,6 +2640,26 @@
 			};
 			name = Release;
 		};
+		72EFA6611D8A5FA000D17CFE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 273E9FBF1C519A1B003115A6 /* Tokenizer.xcconfig */;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
+				PRODUCT_NAME = Tokenizer;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		72EFA6621D8A5FA000D17CFE /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 273E9FBF1C519A1B003115A6 /* Tokenizer.xcconfig */;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
+				PRODUCT_NAME = Tokenizer;
+				SDKROOT = iphoneos;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -2570,6 +2767,15 @@
 			buildConfigurations = (
 				72EFA6121D8A392600D17CFE /* Debug */,
 				72EFA6131D8A392600D17CFE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		72EFA6601D8A5FA000D17CFE /* Build configuration list for PBXNativeTarget "Tokenizer-Interop Static" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				72EFA6611D8A5FA000D17CFE /* Debug */,
+				72EFA6621D8A5FA000D17CFE /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
