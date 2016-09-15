@@ -121,7 +121,8 @@ $(FORESTDB_PATH)/src/hbtrie.o \
 $(FORESTDB_PATH)/src/iterator.o \
 $(FORESTDB_PATH)/src/kv_instance.o \
 $(FORESTDB_PATH)/src/list.o \
-$(FORESTDB_PATH)/src/snapshot.o \
+$(FORESTDB_PATH)/src/superblock.o \
+$(FORESTDB_PATH)/src/breakpad_dummy.o \
 $(FORESTDB_PATH)/src/transaction.o \
 $(FORESTDB_PATH)/src/wal.o \
 $(FORESTDB_PATH)/src/version.o \
