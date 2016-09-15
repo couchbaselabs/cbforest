@@ -1,15 +1,18 @@
 #!/bin/bash
 
 set -e
-
-OUTPUT_DIR="`pwd`/../prebuilt"
+pushd "`dirname $0`/../prebuilt"
+CURRENT_DIR=`pwd`
+cd ../prebuilt
+OUTPUT_DIR=`pwd`
+popd
 
 rm -f $OUTPUT_DIR/libCBForest-Interop.dylib
-pushd ../../
+pushd $CURRENT_DIR/../../
 rm -rf build
-xcodebuild ARCHS="i386 x86_64" -scheme "CBForest-Interop" -configuration Release -derivedDataPath build clean build
+xcodebuild ARCHS="i386 x86_64" -scheme "CBForest-Interop" -configuration Release -derivedDataPath $OUTPUT_DIR/build clean build
 
-mv build/Build/Products/Release/libCBForest-Interop.dylib $OUTPUT_DIR/libCBForest-Interop.dylib
+mv $OUTPUT_DIR/build/Build/Products/Release/libCBForest-Interop.dylib $OUTPUT_DIR/libCBForest-Interop.dylib
 
-rm -rf build
+rm -rf $OUTPUT_DIR/build
 popd

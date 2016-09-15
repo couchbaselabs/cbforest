@@ -2,11 +2,13 @@
 
 set -e
 
-OUTPUT_DIR="`pwd`/../prebuilt"
+pushd `dirname $0`/../prebuilt
+OUTPUT_DIR="`pwd`"
+popd
 
 rm -f $OUTPUT_DIR/libCBForest-Interop.a
 
-pushd ../../
+pushd $OUTPUT_DIR/../../
 rm -rf build
 xcodebuild -scheme "CBForest static" -configuration Release -derivedDataPath build -sdk iphoneos
 xcodebuild -scheme "CBForest static" -configuration Release -derivedDataPath build -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 6,OS=latest'
