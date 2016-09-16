@@ -21,7 +21,7 @@
 
 namespace cbforest {
 
-void _Log(logLevel, const char *message, ...);
+void _Log(logLevel, const char *message, ...) noexcept;
 
 #ifdef _MSC_VER
     // Apparently vararg macro syntax is slightly different in MSVC than in Clang/GCC

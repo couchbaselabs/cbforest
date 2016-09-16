@@ -39,7 +39,7 @@ static const uint64_t kAutoCompactInterval = (5*60);
 namespace c4Internal {
     std::atomic_int InstanceCounted::gObjectCount;
 
-    void recordError(C4ErrorDomain domain, int code, C4Error* outError) {
+    void recordError(C4ErrorDomain domain, int code, C4Error* outError) noexcept {
         if (outError) {
             if (domain == ForestDBDomain && code <= -1000)   // custom CBForest errors (Error.hh)
                 domain = C4Domain;
@@ -48,20 +48,20 @@ namespace c4Internal {
         }
     }
 
-    void recordHTTPError(int httpStatus, C4Error* outError) {
+    void recordHTTPError(int httpStatus, C4Error* outError) noexcept {
         recordError(HTTPDomain, httpStatus, outError);
     }
 
-    void recordError(const error &e, C4Error* outError) {
+    void recordError(const error &e, C4Error* outError) noexcept {
         recordError(ForestDBDomain, e.status, outError);
     }
 
-    void recordException(const std::exception &e, C4Error* outError) {
+    void recordException(const std::exception &e, C4Error* outError) noexcept {
         Warn("Unexpected C++ \"%s\" exception thrown from CBForest", e.what());
         recordError(C4Domain, kC4ErrorInternalException, outError);
     }
 
-    void recordUnknownException(C4Error* outError) {
+    void recordUnknownException(C4Error* outError) noexcept {
         Warn("Unexpected C++ exception thrown from CBForest");
         recordError(C4Domain, kC4ErrorInternalException, outError);
     }
@@ -204,9 +204,11 @@ bool c4Database::endTransaction(bool commit) {
         WITH_LOCK(this);
         auto t = _transaction;
         _transaction = NULL;
-        if (!commit)
+        if (commit)
+            t->commit();
+        else
             t->abort();
-        delete t; // this commits/aborts the transaction
+        delete t;
     }
 #if C4DB_THREADSAFE
     _transactionMutex.unlock(); // undoes lock in beginTransaction()

@@ -132,6 +132,7 @@ static void updateIndex(Database *indexDB, MapReduceIndex* index) {
         for (NSString* docID in data) {
             trans.set(nsstring_slice(docID), cbforest::slice::null, JSONToData(data[docID],NULL));
         }
+        trans.commit();
     }
 
     index->setup(0, "1");
@@ -149,7 +150,11 @@ static void updateIndex(Database *indexDB, MapReduceIndex* index) {
     NSLog(@"--- Updating OR");
     NSDictionary* body = @{@"name": @"Oregon",
                            @"cities": @[@"Portland", @"Walla Walla", @"Salem"]};
-    Transaction(db).set(nsstring_slice(@"OR"), cbforest::slice::null, JSONToData(body,NULL));
+    {
+        Transaction t(db);
+        t.set(nsstring_slice(@"OR"), cbforest::slice::null, JSONToData(body,NULL));
+        t.commit();
+    }
     [self queryExpectingKeys: @[@"Cambria", @"Port Townsend", @"Portland", @"Salem",
                                 @"San Francisco", @"San Jose", @"Seattle", @"Skookumchuk",
                                 @"Walla Walla"]];
@@ -158,7 +163,11 @@ static void updateIndex(Database *indexDB, MapReduceIndex* index) {
     // After deleting a doc, updating the index can be done incrementally because the deleted doc
     // will appear in the by-sequence iteration, so the indexer can remove its rows.
     NSLog(@"--- Deleting CA");
-    Transaction(db).del(nsstring_slice(@"CA"));
+    {
+        Transaction t(db);
+        t.del(nsstring_slice(@"CA"));
+        t.commit();
+    }
     [self queryExpectingKeys: @[@"Port Townsend", @"Portland", @"Salem",
                                 @"Seattle", @"Skookumchuk", @"Walla Walla"]];
     AssertEq(numMapCalls, 0);
@@ -172,7 +181,11 @@ static void updateIndex(Database *indexDB, MapReduceIndex* index) {
     // Deletion followed by compaction will purge the deleted docs, so incremental indexing no
     // longer works. The indexer should detect this and rebuild from scratch.
     NSLog(@"--- Deleting OR");
-    Transaction(db).del(nsstring_slice(@"OR"));
+    {
+        Transaction t(db);
+        t.del(nsstring_slice(@"OR"));
+        t.commit();
+    }
     NSLog(@"--- Compacting db");
     db->compact();
 

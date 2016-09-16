@@ -56,11 +56,11 @@ struct C4DocEnumerator;
 
 namespace c4Internal {
 
-    void recordError(C4ErrorDomain domain, int code, C4Error* outError);
-    void recordHTTPError(int httpStatus, C4Error* outError);
-    void recordError(const error &e, C4Error* outError);
-    void recordException(const std::exception &e, C4Error* outError);
-    void recordUnknownException(C4Error* outError);
+    void recordError(C4ErrorDomain domain, int code, C4Error* outError) noexcept;
+    void recordHTTPError(int httpStatus, C4Error* outError) noexcept;
+    void recordError(const error &e, C4Error* outError) noexcept;
+    void recordException(const std::exception &e, C4Error* outError) noexcept;
+    void recordUnknownException(C4Error* outError) noexcept;
     static inline void clearError(C4Error* outError) {if (outError) outError->code = 0;}
 
     #define catchError(OUTERR) \
@@ -105,18 +105,20 @@ namespace c4Internal {
 
         int refCount() const { return _refCount; }
 
-        SELF* retain() {
+        SELF* retain() noexcept {
             ++_refCount;
             return (SELF*)this;
         }
 
-        void release() {
+        void release() noexcept {
             int newref = --_refCount;
-            CBFAssert(newref >= 0);
-            if (newref == 0) {
+            if (newref == 0)
                 delete this;
-            }
+            else if (newref < 0)
+                Warn("RefCounted object at %p released too many times; refcount now %d",
+                     this, (int)_refCount);
         }
+
     protected:
         virtual ~RefCounted() {
             if (_refCount > 0) {

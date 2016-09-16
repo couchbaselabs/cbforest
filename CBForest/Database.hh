@@ -109,7 +109,9 @@ namespace cbforest {
         friend class KeyStore;
         friend class Transaction;
         fdb_kvs_handle* openKVS(std::string name) const;
-        void beginTransaction(Transaction*);
+        void beginTransaction(Transaction*, bool active);
+        void commitTransaction(Transaction*);
+        void abortTransaction(Transaction*);
         void endTransaction(Transaction*);
 
         Database(const Database&) = delete;
@@ -142,35 +144,23 @@ namespace cbforest {
 
 
     /** Grants exclusive write access to a Database while in scope.
-        The transaction is committed when the object exits scope, unless abort() was called.
         Only one Transaction object can be created on a database file at a time.
-        Not just per Database object; per database _file_. */
+        Not just per Database object; per database _file_.
+        If you don't call `commit()` before the Transaction exits scope, the destructor will
+        abort the transaction. */
     class Transaction : public KeyStoreWriter {
     public:
-        enum state {
-            kNoOp,
-            kAbort,
-            kCommit,
-            kCommitManualWALFlush
-        };
-
         Transaction(Database*);
-        ~Transaction()                          {_db.endTransaction(this);}
+        ~Transaction();
+
+        void commit();
+        void abort();
 
         /** Converts a KeyStore to a KeyStoreWriter to allow write access. */
         KeyStoreWriter operator() (KeyStore& s)  {return KeyStoreWriter(s, *this);}
         KeyStoreWriter operator() (KeyStore* s) {return KeyStoreWriter(*s, *this);}
 
         Database* database() const          {return &_db;}
-        state state() const                 {return _state;}
-
-        /** Tells the Transaction that it should rollback, not commit, when exiting scope. */
-        void abort()                        {if (_state != kNoOp) _state = kAbort;}
-
-        /** Force the database write-ahead log to be completely flushed on commit. */
-        void flushWAL()                     {if (_state == kCommit) _state = kCommitManualWALFlush;}
-
-        void check(fdb_status status);
 
         /** Deletes the doc, and increments the database's purgeCount */
         bool del(slice key);
@@ -182,7 +172,7 @@ namespace cbforest {
         Transaction(const Transaction&) = delete;
 
         Database& _db;
-        enum state _state;
+        bool _active {true};
     };
     
 }

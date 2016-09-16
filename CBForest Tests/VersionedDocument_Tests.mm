@@ -149,6 +149,7 @@ static revidBuffer stringToRev(NSString* str) {
         AssertEq(v.docType(), slice("moose"));
         Transaction t(db);
         v.save(t);
+        t.commit();
     }
     {
         VersionedDocument v(*db, @"foo");

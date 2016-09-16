@@ -362,6 +362,7 @@ namespace cbforest {
                 index->_lastSequenceIndexed = std::max(index->_lastSequenceIndexed,
                                                        finalSequence);
                 index->saveState(*_transaction);
+                _transaction->commit();
             } else {
                 _transaction->abort();
             }
@@ -412,9 +413,14 @@ namespace cbforest {
     }
 
 
+    void MapReduceIndexer::finished(sequence seq) {
+        for (auto writer = _writers.begin(); writer != _writers.end(); ++writer) {
+            (*writer)->finish(seq);
+        }
+    }
+
     MapReduceIndexer::~MapReduceIndexer() {
         for (auto writer = _writers.begin(); writer != _writers.end(); ++writer) {
-            (*writer)->finish(_finishedSequence);
             delete *writer;
         }
     }

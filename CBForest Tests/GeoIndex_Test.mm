@@ -102,6 +102,7 @@ static double randomLon()   {return random() / (double)INT_MAX * 360.0 - 180.0;}
         t.set(slice(docID), body);
         NSLog(@"Added %s --> (%+08.4f, %+09.4f)", docID, lat0, lon0);
     }
+    t.commit();
 }
 
 - (void) indexIt {
