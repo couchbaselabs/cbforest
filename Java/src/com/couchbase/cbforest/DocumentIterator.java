@@ -58,7 +58,20 @@ public class DocumentIterator {
         return next() ? getDocument() : null;
     }
 
-    protected void finalize()       { if (_handle != 0) free(_handle); }
+    public void close() {
+        if (_handle != 0) {
+            free(_handle);
+            _handle = 0;
+        }
+    }
+
+    protected void finalize() throws Throwable {
+        try {
+            if (_handle != 0) free(_handle);
+        } finally {
+            super.finalize();
+        }
+    }
 
     private void getCurrentInfo() {
         if (!_hasCurrentInfo) {
