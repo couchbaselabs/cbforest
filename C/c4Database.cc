@@ -255,7 +255,7 @@ C4Database* c4db_open(C4Slice path,
     auto config = c4DbConfig(flags, encryptionKey);
     try {
         try {
-            return new c4Database(pathStr, config);
+            return (new c4Database(pathStr, config))->retain();
         } catch (cbforest::error error) {
             if (error.status == FDB_RESULT_INVALID_COMPACTION_MODE
                         && config.compaction_mode == FDB_COMPACTION_AUTO) {
@@ -263,7 +263,7 @@ C4Database* c4db_open(C4Slice path,
                 // Opening them with auto-compact causes this error. Upgrade such a database by
                 // switching its compaction mode:
                 config.compaction_mode = FDB_COMPACTION_MANUAL;
-                auto db = new c4Database(pathStr, config);
+                auto db = (new c4Database(pathStr, config))->retain();
                 db->setCompactionMode(FDB_COMPACTION_AUTO);
                 return db;
             } else {

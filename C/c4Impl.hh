@@ -14,6 +14,7 @@
 #include "Collatable.hh"
 #include "VersionedDocument.hh"
 #include "Error.hh"
+#include "LogInternal.hh"
 #include <functional>
 
 // Defining C4DB_THREADSAFE as 1 will make C4Database thread-safe: the same handle can be called
@@ -85,6 +86,9 @@ namespace c4Internal {
 
     void setEnumFilter(C4DocEnumerator*, EnumFilter);
 
+
+    /** Base class that keeps track of the total instance count of all subclasses,
+        which is returned by c4_getObjectCount(). */
     class InstanceCounted {
     public:
         static std::atomic_int gObjectCount;
@@ -92,14 +96,17 @@ namespace c4Internal {
         ~InstanceCounted()  {--gObjectCount;}
     };
 
+
+    /** Simple thread-safe ref-counting implementation.
+        Note: The ref-count starts at 0, so you must call retain() on an instance right after
+        constructing it. */
     template <typename SELF>
     struct RefCounted : InstanceCounted {
 
         int refCount() const { return _refCount; }
 
         SELF* retain() {
-            int newref = ++_refCount;
-            CBFAssert(newref > 1);
+            ++_refCount;
             return (SELF*)this;
         }
 
@@ -112,10 +119,30 @@ namespace c4Internal {
         }
     protected:
         virtual ~RefCounted() {
-            CBFAssert(_refCount == 0);
+            if (_refCount > 0) {
+                Warn("FATAL: RefCounted object at %p destructed while it still has a refCount of %d",
+                     this, (int)_refCount);
+                abort();
+            }
         }
     private:
-        std::atomic_int _refCount {1};
+        std::atomic_int _refCount {0};
+    };
+
+
+    /** Simple smart pointer that retains the RefCounted instance it holds. */
+    template <typename REFCOUNTED>
+    class Retained {
+    public:
+        Retained(REFCOUNTED *t)          :_ref(t->retain()) { }
+        ~Retained()                      {_ref->release();}
+        operator REFCOUNTED* () const    {return _ref;}
+        REFCOUNTED* operator-> () const  {return _ref;}
+    private:
+        REFCOUNTED *_ref;
+
+        Retained(const Retained&) =delete;
+        Retained& operator=(const Retained&) =delete;
     };
 
 
