@@ -256,7 +256,6 @@
 		27F6F51D1BAA0482003FD798 /* c4Test.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27F6F51B1BAA0482003FD798 /* c4Test.cc */; };
 		27F6F51F1BAA0952003FD798 /* c4KeyTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27F6F51E1BAA0952003FD798 /* c4KeyTest.cc */; };
 		27F6F5211BAA1740003FD798 /* c4ViewTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27F6F5201BAA1740003FD798 /* c4ViewTest.cc */; };
-		27FA99E01917EF9600912F96 /* libTokenizer.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 27EF807419142C2500A327B9 /* libTokenizer.a */; };
 		27FF7E561BAB64BE004EB8D4 /* native_view.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27FF7E551BAB64BE004EB8D4 /* native_view.cc */; };
 		27FF7E571BAB64D9004EB8D4 /* View.java in Sources */ = {isa = PBXBuildFile; fileRef = 27FF7E541BAB60E2004EB8D4 /* View.java */; };
 		27FF7E591BAB65A2004EB8D4 /* QueryIterator.java in Sources */ = {isa = PBXBuildFile; fileRef = 27FF7E581BAB65A2004EB8D4 /* QueryIterator.java */; };
@@ -350,7 +349,6 @@
 		72EFA60F1D8A392600D17CFE /* stem_ISO_8859_2_romanian.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FD21914296D00A327B9 /* stem_ISO_8859_2_romanian.h */; };
 		72EFA6101D8A392600D17CFE /* stem_UTF_8_porter.h in Headers */ = {isa = PBXBuildFile; fileRef = 27EF7FE81914296D00A327B9 /* stem_UTF_8_porter.h */; };
 		72EFA6151D8A39DF00D17CFE /* sqlite_glue.c in Sources */ = {isa = PBXBuildFile; fileRef = 27A82D941BC48E38005CB742 /* sqlite_glue.c */; };
-		72EFA61A1D8A5FA000D17CFE /* sqlite_glue.c in Sources */ = {isa = PBXBuildFile; fileRef = 27A82D941BC48E38005CB742 /* sqlite_glue.c */; };
 		72EFA61B1D8A5FA000D17CFE /* stem_UTF_8_dutch.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FD71914296D00A327B9 /* stem_UTF_8_dutch.c */; };
 		72EFA61C1D8A5FA000D17CFE /* stem_ISO_8859_1_hungarian.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FC31914296D00A327B9 /* stem_ISO_8859_1_hungarian.c */; };
 		72EFA61D1D8A5FA000D17CFE /* stem_UTF_8_swedish.c in Sources */ = {isa = PBXBuildFile; fileRef = 27EF7FF11914296D00A327B9 /* stem_UTF_8_swedish.c */; };
@@ -504,13 +502,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 27A6579B1CBC190B00A7A1D7;
 			remoteInfo = SwiftForest;
-		};
-		27EF81151917EF4000A327B9 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 2750723318E3E52800A80C5A /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 27EF807319142C2500A327B9;
-			remoteInfo = Tokenizer;
 		};
 		27FA99E11917F10C00912F96 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -899,7 +890,7 @@
 		720EA46F1BA90A0C002B8416 /* libstdc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.dylib"; path = "Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.4.sdk/usr/lib/libstdc++.dylib"; sourceTree = DEVELOPER_DIR; };
 		72C086921CBDEB2000808CE7 /* c4ExpiryEnumerator.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = c4ExpiryEnumerator.cc; sourceTree = "<group>"; };
 		72C086931CBDEB2000808CE7 /* c4ExpiryEnumerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = c4ExpiryEnumerator.h; sourceTree = "<group>"; };
-		72EFA6141D8A392600D17CFE /* libTokenizer-Interop.dylib */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libTokenizer-Interop.dylib"; sourceTree = BUILT_PRODUCTS_DIR; };
+		72EFA6141D8A392600D17CFE /* libTokenizer-Interop.dylib */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = "libTokenizer-Interop.dylib"; path = libTokenizer.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		72EFA6631D8A5FA000D17CFE /* libTokenizer.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libTokenizer.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		9399E72C1B7E536700D4BE79 /* Slice_Test.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Slice_Test.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -973,7 +964,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				2701C22D1C4DA76B006D7A99 /* libforestdb.a in Frameworks */,
-				27FA99E01917EF9600912F96 /* libTokenizer.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1911,7 +1901,6 @@
 			);
 			dependencies = (
 				27FA99E21917F10C00912F96 /* PBXTargetDependency */,
-				27EF81161917EF4000A327B9 /* PBXTargetDependency */,
 			);
 			name = "CBForest static";
 			productName = "CBForest-iOS";
@@ -2349,7 +2338,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				72EFA61A1D8A5FA000D17CFE /* sqlite_glue.c in Sources */,
 				72EFA61B1D8A5FA000D17CFE /* stem_UTF_8_dutch.c in Sources */,
 				72EFA61C1D8A5FA000D17CFE /* stem_ISO_8859_1_hungarian.c in Sources */,
 				72EFA61D1D8A5FA000D17CFE /* stem_UTF_8_swedish.c in Sources */,
@@ -2431,11 +2419,6 @@
 			isa = PBXTargetDependency;
 			target = 27A6579B1CBC190B00A7A1D7 /* SwiftForest */;
 			targetProxy = 27A657A71CBC190B00A7A1D7 /* PBXContainerItemProxy */;
-		};
-		27EF81161917EF4000A327B9 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 27EF807319142C2500A327B9 /* Tokenizer */;
-			targetProxy = 27EF81151917EF4000A327B9 /* PBXContainerItemProxy */;
 		};
 		27FA99E21917F10C00912F96 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
