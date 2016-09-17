@@ -15,12 +15,14 @@ SQLITE3_PATH   	:=  $(LOCAL_PATH)/../vendor/sqlite3-unicodesn
 SQLITE_INC_PATH :=  $(LOCAL_PATH)/../vendor/sqlite
 CBFOREST_PATH   :=  $(LOCAL_PATH)/../CBForest
 OPENSSL_PATH		:=  $(LOCAL_PATH)/../vendor/openssl/libs/include
+SQLITE_WIN_PATH := $(LOCAL_PATH)/../CBForest.VS2015
 
 LOCAL_CFLAGS    :=  -I$(SQLITE3_PATH)/libstemmer_c/runtime/ \
 					-I$(SQLITE3_PATH)/libstemmer_c/src_c/ \
 					-I$(SQLITE3_PATH)/ \
 					-I$(SQLITE_INC_PATH)/ \
-					-I$(OPENSSL_PATH)/ 
+					-I$(OPENSSL_PATH)/ \
+                    -I$(SQLITE_WIN_PATH)/ 
 
 # For sqlite3-unicodesn
 LOCAL_CFLAGS	+=	-DSQLITE_ENABLE_FTS4 \
