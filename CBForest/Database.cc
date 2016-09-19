@@ -278,7 +278,6 @@ namespace cbforest {
 #pragma mark - TRANSACTION:
 
     void Database::beginTransaction(Transaction* t) {
-        CBFAssert(!_inTransaction);
         if (!isOpen())
             error::_throw(FDB_RESULT_INVALID_HANDLE);
         std::unique_lock<std::mutex> lock(_file->_transactionMutex);
