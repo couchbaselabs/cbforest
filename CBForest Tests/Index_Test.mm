@@ -131,6 +131,7 @@ static boolBlock scopedEnumerate() {
         IndexWriter writer(index, trans);
         for (NSString* docID in docs)
             [self updateDoc: docID body: docs[docID] writer: writer];
+        trans.commit();
     }
 
     NSLog(@"--- First query");
@@ -142,6 +143,7 @@ static boolBlock scopedEnumerate() {
         NSLog(@"--- Updating OR");
         [self updateDoc: @"OR" body: @[@"Oregon", @"Portland", @"Walla Walla", @"Salem"]
                  writer: writer];
+        trans.commit();
     }
     XCTAssertEqual([self doQuery], 9);
 
@@ -150,6 +152,7 @@ static boolBlock scopedEnumerate() {
         Transaction trans(database);
         IndexWriter writer(index, trans);
         [self updateDoc: @"CA" body: @[] writer: writer];
+        trans.commit();
     }
     XCTAssertEqual([self doQuery], 6);
 
@@ -214,6 +217,7 @@ static boolBlock scopedEnumerate() {
         bool changed = writer.update(slice("doc1"), 1, keys, values, _rowCount);
         Assert(changed);
         AssertEq(_rowCount, 2u);
+        trans.commit();
     }
     NSLog(@"--- First query");
     XCTAssertEqual([self doQuery], 2);
@@ -232,6 +236,7 @@ static boolBlock scopedEnumerate() {
         bool changed = writer.update(slice("doc1"), 2, keys, values, _rowCount);
         Assert(changed);
         AssertEq(_rowCount, 3u);
+        trans.commit();
     }
     NSLog(@"--- Second query");
     XCTAssertEqual([self doQuery], 3);

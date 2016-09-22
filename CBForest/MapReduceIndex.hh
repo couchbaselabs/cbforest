@@ -91,7 +91,7 @@ namespace cbforest {
     class MapReduceIndexer {
     public:
         ~MapReduceIndexer();
-
+        
         void addIndex(MapReduceIndex*);
 
         /** If set, indexing will only occur if this index needs to be updated. */
@@ -130,13 +130,12 @@ namespace cbforest {
 
         /** Call when all documents have been indexed. Pass the last sequence that was enumerated
             (usually the database's lastSequence).*/
-        void finished(sequence seq =1)       {_finishedSequence = seq;}
+        void finished(sequence seq =1);
 
     private:
         std::vector<MapReduceIndexWriter*> _writers;
         MapReduceIndex* _triggerIndex {nullptr};
         sequence _latestDbSequence {0};
-        sequence _finishedSequence {0};
         bool _allDocTypes {false};
         std::set<slice> _docTypes;
 

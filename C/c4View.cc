@@ -48,7 +48,7 @@ struct c4View : public c4Internal::RefCounted<c4View> {
            C4Slice name,
            const Database::config &config,
            C4Slice version)
-    :_sourceDB(sourceDB->retain()),
+    :_sourceDB(sourceDB),
      _viewDB((std::string)path, config),
      _index(&_viewDB, (std::string)name, sourceDB)
     {
@@ -71,17 +71,12 @@ struct c4View : public c4Internal::RefCounted<c4View> {
         _viewDB.close();
     }
 
-    C4Database *_sourceDB;
+    Retained<C4Database> _sourceDB;
     Database _viewDB;
     MapReduceIndex _index;
 #if C4DB_THREADSAFE
     std::mutex _mutex;
 #endif
-
-private:
-    ~c4View() {
-        _sourceDB->release();
-    }
 };
 
 
@@ -99,7 +94,7 @@ C4View* c4view_open(C4Database* db,
         config.seqtree_opt = FDB_SEQTREE_NOT_USE; // indexes don't need by-sequence ordering
         config.purging_interval = 0;              // nor have any use for keeping deleted docs
 
-        return new c4View(db, path, viewName, config, version);
+        return (new c4View(db, path, viewName, config, version))->retain();
     } catchError(outError);
     return NULL;
 }
@@ -410,7 +405,7 @@ static DocEnumerator::Options convertOptions(const C4QueryOptions *c4options) {
 
 struct C4QueryEnumInternal : public C4QueryEnumerator, c4Internal::InstanceCounted {
     C4QueryEnumInternal(C4View *view)
-    :_view(view->retain())
+    :_view(view)
 #if C4DB_THREADSAFE
      ,_mutex(view->_mutex)
 #endif
@@ -418,9 +413,7 @@ struct C4QueryEnumInternal : public C4QueryEnumerator, c4Internal::InstanceCount
         ::memset((C4QueryEnumerator*)this, 0, sizeof(C4QueryEnumerator));   // init public fields
     }
 
-    virtual ~C4QueryEnumInternal() {
-        _view->release();
-    }
+    virtual ~C4QueryEnumInternal() =default;
 
     virtual bool next() {
         ::memset((C4QueryEnumerator*)this, 0, sizeof(C4QueryEnumerator));   // clear public fields
@@ -429,7 +422,7 @@ struct C4QueryEnumInternal : public C4QueryEnumerator, c4Internal::InstanceCount
 
     virtual void close() { }
 
-    C4View* _view;
+    Retained<C4View> _view;
 #if C4DB_THREADSAFE
     std::mutex &_mutex;
 #endif

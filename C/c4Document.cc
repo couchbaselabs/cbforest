@@ -40,7 +40,7 @@ static const uint32_t kDefaultMaxRevTreeDepth = 20;
 
 
 struct C4DocumentInternal : public C4Document, c4Internal::InstanceCounted {
-    C4Database* _db;
+    Retained<C4Database> _db;
     VersionedDocument _versionedDoc;
     const Revision *_selectedRev;
     alloc_slice _revIDBuf;
@@ -48,7 +48,7 @@ struct C4DocumentInternal : public C4Document, c4Internal::InstanceCounted {
     alloc_slice _loadedBody;
 
     C4DocumentInternal(C4Database* database, C4Slice docID)
-    :_db(database->retain()),
+    :_db(database),
      _versionedDoc(*_db, docID),
      _selectedRev(NULL)
     {
@@ -56,15 +56,11 @@ struct C4DocumentInternal : public C4Document, c4Internal::InstanceCounted {
     }
 
     C4DocumentInternal(C4Database *database, Document &&doc)
-    :_db(database->retain()),
+    :_db(database),
     _versionedDoc(*_db, std::move(doc)),
     _selectedRev(NULL)
     {
         init();
-    }
-
-    ~C4DocumentInternal() {
-        _db->release();
     }
 
     void init() {

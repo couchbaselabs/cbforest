@@ -39,7 +39,7 @@ struct C4DocEnumerator: c4Internal::InstanceCounted {
                     sequence start,
                     sequence end,
                     const C4EnumeratorOptions &options)
-    :_database(database->retain()),
+    :_database(database),
      _e(*database, start, end, allDocOptions(options)),
      _options(options)
     { }
@@ -48,7 +48,7 @@ struct C4DocEnumerator: c4Internal::InstanceCounted {
                     C4Slice startDocID,
                     C4Slice endDocID,
                     const C4EnumeratorOptions &options)
-    :_database(database->retain()),
+    :_database(database),
      _e(*database, startDocID, endDocID, allDocOptions(options)),
      _options(options)
     { }
@@ -56,14 +56,10 @@ struct C4DocEnumerator: c4Internal::InstanceCounted {
     C4DocEnumerator(C4Database *database,
                     std::vector<std::string>docIDs,
                     const C4EnumeratorOptions &options)
-    :_database(database->retain()),
+    :_database(database),
      _e(*database, docIDs, allDocOptions(options)),
      _options(options)
     { }
-
-    ~C4DocEnumerator() {
-        _database->release();
-    }
 
     void close() {
         _e.close();
@@ -129,7 +125,7 @@ private:
             && (!_filter || _filter(_e.doc(), _docFlags, docType));
     }
 
-    C4Database *_database;
+    Retained<C4Database> _database;
     DocEnumerator _e;
     C4EnumeratorOptions _options;
     EnumFilter _filter;

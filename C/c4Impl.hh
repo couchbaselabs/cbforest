@@ -14,6 +14,7 @@
 #include "Collatable.hh"
 #include "VersionedDocument.hh"
 #include "Error.hh"
+#include "LogInternal.hh"
 #include <functional>
 
 // Defining C4DB_THREADSAFE as 1 will make C4Database thread-safe: the same handle can be called
@@ -55,11 +56,11 @@ struct C4DocEnumerator;
 
 namespace c4Internal {
 
-    void recordError(C4ErrorDomain domain, int code, C4Error* outError);
-    void recordHTTPError(int httpStatus, C4Error* outError);
-    void recordError(const error &e, C4Error* outError);
-    void recordException(const std::exception &e, C4Error* outError);
-    void recordUnknownException(C4Error* outError);
+    void recordError(C4ErrorDomain domain, int code, C4Error* outError) noexcept;
+    void recordHTTPError(int httpStatus, C4Error* outError) noexcept;
+    void recordError(const error &e, C4Error* outError) noexcept;
+    void recordException(const std::exception &e, C4Error* outError) noexcept;
+    void recordUnknownException(C4Error* outError) noexcept;
     static inline void clearError(C4Error* outError) {if (outError) outError->code = 0;}
 
     #define catchError(OUTERR) \
@@ -85,6 +86,9 @@ namespace c4Internal {
 
     void setEnumFilter(C4DocEnumerator*, EnumFilter);
 
+
+    /** Base class that keeps track of the total instance count of all subclasses,
+        which is returned by c4_getObjectCount(). */
     class InstanceCounted {
     public:
         static std::atomic_int gObjectCount;
@@ -92,30 +96,55 @@ namespace c4Internal {
         ~InstanceCounted()  {--gObjectCount;}
     };
 
+
+    /** Simple thread-safe ref-counting implementation.
+        Note: The ref-count starts at 0, so you must call retain() on an instance right after
+        constructing it. */
     template <typename SELF>
     struct RefCounted : InstanceCounted {
 
         int refCount() const { return _refCount; }
 
-        SELF* retain() {
-            int newref = ++_refCount;
-            CBFAssert(newref > 1);
+        SELF* retain() noexcept {
+            ++_refCount;
             return (SELF*)this;
         }
 
-        void release() {
+        void release() noexcept {
             int newref = --_refCount;
-            CBFAssert(newref >= 0);
-            if (newref == 0) {
+            if (newref == 0)
                 delete this;
-            }
+            else if (newref < 0)
+                Warn("RefCounted object at %p released too many times; refcount now %d",
+                     this, (int)_refCount);
         }
+
     protected:
         virtual ~RefCounted() {
-            CBFAssert(_refCount == 0);
+            if (_refCount > 0) {
+                Warn("FATAL: RefCounted object at %p destructed while it still has a refCount of %d",
+                     this, (int)_refCount);
+                abort();
+            }
         }
     private:
-        std::atomic_int _refCount {1};
+        std::atomic_int _refCount {0};
+    };
+
+
+    /** Simple smart pointer that retains the RefCounted instance it holds. */
+    template <typename REFCOUNTED>
+    class Retained {
+    public:
+        Retained(REFCOUNTED *t)          :_ref(t->retain()) { }
+        ~Retained()                      {_ref->release();}
+        operator REFCOUNTED* () const    {return _ref;}
+        REFCOUNTED* operator-> () const  {return _ref;}
+    private:
+        REFCOUNTED *_ref;
+
+        Retained(const Retained&) =delete;
+        Retained& operator=(const Retained&) =delete;
     };
 
 

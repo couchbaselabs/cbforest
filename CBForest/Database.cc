@@ -46,7 +46,7 @@ namespace cbforest {
     logLevel LogLevel = kWarning;
     void (*LogCallback)(logLevel, const char *message) = &defaultLogCallback;
 
-    void _Log(logLevel level, const char *message, ...) {
+    void _Log(logLevel level, const char *message, ...) noexcept {
         if (LogLevel <= level && LogCallback != NULL) {
             va_list args;
             va_start(args, message);
@@ -257,7 +257,7 @@ namespace cbforest {
 
     void Database::deleteDatabase() {
         if (isOpen()) {
-            Transaction t(this, false);
+            Transaction t(this, false); // fake transaction -- just used for the mutex
             close();
             deleteDatabase(_file->_path, _config);
         } else {
@@ -277,74 +277,76 @@ namespace cbforest {
 
 #pragma mark - TRANSACTION:
 
-    void Database::beginTransaction(Transaction* t) {
+    void Database::beginTransaction(Transaction* t, bool active) {
+        CBFAssert(!_inTransaction);
         if (!isOpen())
             error::_throw(FDB_RESULT_INVALID_HANDLE);
         std::unique_lock<std::mutex> lock(_file->_transactionMutex);
         while (_file->_transaction != NULL)
             _file->_transactionCond.wait(lock);
 
-        if (t->state() >= Transaction::kCommit) {
+        _file->_transaction = t;
+        _inTransaction = true;
+
+        if (active) {
             Log("Database: beginTransaction");
             check(fdb_begin_transaction(_fileHandle, FDB_ISOLATION_READ_COMMITTED));
         }
-        _file->_transaction = t;
-        _inTransaction = true;
+    }
+
+    void Database::commitTransaction(Transaction* t) {
+        Log("Database: commit transaction");
+        CBFAssert(_file->_transaction == t);
+        check(fdb_end_transaction(_fileHandle, FDB_COMMIT_NORMAL));
+    }
+
+    void Database::abortTransaction(Transaction* t) {
+        Log("Database: abort transaction");
+        CBFAssert(_file->_transaction == t);
+        fdb_abort_transaction(_fileHandle);
     }
 
     void Database::endTransaction(Transaction* t) {
-        fdb_status status = FDB_RESULT_SUCCESS;
-        switch (t->state()) {
-            case Transaction::kCommit:
-                Log("Database: commit transaction");
-                status = fdb_end_transaction(_fileHandle, FDB_COMMIT_NORMAL);
-                break;
-            case Transaction::kCommitManualWALFlush:
-                Log("Database: commit transaction with WAL flush");
-                status = fdb_end_transaction(_fileHandle, FDB_COMMIT_MANUAL_WAL_FLUSH);
-                break;
-            case Transaction::kAbort:
-                Log("Database: abort transaction");
-                (void)fdb_abort_transaction(_fileHandle);
-                break;
-            case Transaction::kNoOp:
-                Log("Database: end noop transaction");
-                break;
-        }
-
         std::unique_lock<std::mutex> lock(_file->_transactionMutex);
         CBFAssert(_file->_transaction == t);
         _file->_transaction = NULL;
         _file->_transactionCond.notify_one();
         _inTransaction = false;
-
-        check(status);
     }
 
 
     Transaction::Transaction(Database* db)
+    :Transaction(db, true)
+    { }
+
+    Transaction::Transaction(Database* db, bool active)
     :KeyStoreWriter(*db),
      _db(*db),
-     _state(kCommit)
+     _active(false)
     {
-        _db.beginTransaction(this);
+        _db.beginTransaction(this, active);
+        _active = active;
     }
 
-    Transaction::Transaction(Database* db, bool begin)
-    :KeyStoreWriter(*db),
-     _db(*db),
-     _state(begin ? kCommit : kNoOp)
-    {
-        _db.beginTransaction(this);
+    void Transaction::commit() {
+        CBFAssert(_active);
+        _active = false;
+        _db.commitTransaction(this);
     }
 
-    void Transaction::check(fdb_status status) {
-        if (expected(status != FDB_RESULT_SUCCESS, false)) {
-            _state = kAbort;
-            cbforest::check(status); // throw exception
+    void Transaction::abort() {
+        CBFAssert(_active);
+        _active = false;
+        _db.abortTransaction(this);
+    }
+
+    Transaction::~Transaction() {
+        if (_active) {
+            Log("Database: Transaction exiting scope without explicit commit or abort");
+            _db.abortTransaction(this);
         }
+        _db.endTransaction(this);
     }
-
 
     bool Transaction::del(slice key) {
         if (!KeyStoreWriter::del(key))

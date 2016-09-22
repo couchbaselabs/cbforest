@@ -107,6 +107,7 @@ Database::config TestDBConfig() {
     {
         Transaction t(db);
         t.set(key, nsstring_slice(@"value"));
+        t.commit();
     }
     AssertEq(db->lastSequence(), 1u);
     Document doc = db->get(key);
@@ -115,7 +116,11 @@ Database::config TestDBConfig() {
 }
 
 - (void) test03_SaveDocs {
-    Transaction(db).set(nsstring_slice(@"a"), nsstring_slice(@"A"));   //WORKAROUND: Add a doc before the main transaction so it doesn't start at sequence 0
+    {
+        Transaction t(db);
+        t.set(nsstring_slice(@"a"), nsstring_slice(@"A"));   //WORKAROUND: Add a doc before the main transaction so it doesn't start at sequence 0
+        t.commit();
+    }
 
     Database aliased_db(dbPath, TestDBConfig());
     AssertEqual((NSString*)aliased_db.get(nsstring_slice(@"a")).body(), @"A");
@@ -144,6 +149,7 @@ Database::config TestDBConfig() {
 
         // Doc shouldn't exist outside transaction yet:
         AssertEq(aliased_db.get(nsstring_slice(@"doc")).sequence(), 0u);
+        t.commit();
     }
 
     AssertEq(db->get(nsstring_slice(@"doc")).sequence(), 3u);
@@ -160,6 +166,7 @@ Database::config TestDBConfig() {
                     docID,
                     @"(i=%d)", i);
     }
+    t.commit();
 }
 
 - (void) test04_EnumerateDocs {
@@ -325,7 +332,11 @@ Database::config TestDBConfig() {
 
 - (void) test05_AbortTransaction {
     // Initial document:
-    Transaction(db).set(nsstring_slice(@"a"), nsstring_slice(@"A"));
+    {
+        Transaction t(db);
+        t.set(nsstring_slice(@"a"), nsstring_slice(@"A"));
+        t.commit();
+    }
     {
         Transaction t(db);
         t.set(nsstring_slice(@"x"), nsstring_slice(@"X"));
@@ -352,6 +363,7 @@ Database::config TestDBConfig() {
             NSString* docID = [NSString stringWithFormat: @"%03lu.%03lu", (unsigned long)t, (unsigned long)d];
             trans.set(nsstring_slice(docID), nsstring_slice(@"some document content goes here"));
         }
+        trans.commit();
     }
 
     int i = 0;
@@ -367,10 +379,18 @@ Database::config TestDBConfig() {
 
 - (void) test07_DeleteKey {
     slice key("a");
-    Transaction(db).set(key, nsstring_slice(@"A"));
+    {
+        Transaction t(db);
+        t.set(key, nsstring_slice(@"A"));
+        t.commit();
+    }
     AssertEq(db->lastSequence(), 1u);
     AssertEq(db->purgeCount(), 0u);
-    Transaction(db).del(key);
+    {
+        Transaction t(db);
+        t.del(key);
+        t.commit();
+    }
     Document doc = db->get(key);
     Assert(!doc.exists());
     AssertEq(db->lastSequence(), 2u);
@@ -381,12 +401,16 @@ Database::config TestDBConfig() {
 
 - (void) test07_DeleteDoc {
     slice key("a");
-    Transaction(db).set(key, nsstring_slice(@"A"));
-
+    {
+        Transaction t(db);
+        t.set(key, nsstring_slice(@"A"));
+        t.commit();
+    }
     {
         Transaction t(db);
         Document doc = db->get(key);
         t.del(doc);
+        t.commit();
     }
 
     Document doc = db->get(key);
@@ -401,12 +425,15 @@ Database::config TestDBConfig() {
 // Tests workaround for ForestDB bug MB-18753
 - (void) test07_DeleteDocAndReopen {
     slice key("a");
-    Transaction(db).set(key, nsstring_slice(@"A"));
-
+    { Transaction t(db);
+        t.set(key, nsstring_slice(@"A"));
+        t.commit();
+    }
     {
         Transaction t(db);
         Document doc = db->get(key);
         t.del(doc);
+        t.commit();
     }
 
     Document doc = db->get(key);
@@ -441,6 +468,7 @@ Database::config TestDBConfig() {
     {
         Transaction t(db);
         t(s).set(key, nsstring_slice(@"value"));
+        t.commit();
     }
     AssertEq(s.lastSequence(), 1u);
     Document doc = s.get(key);
@@ -457,6 +485,7 @@ Database::config TestDBConfig() {
 //    {
 //        Transaction t(db);
 //        t(s).set(key, nsstring_slice(@"value"));
+//        t.commit();
 //    }
     s.erase();
     AssertEq(s.lastSequence(), 0u);
@@ -482,6 +511,7 @@ Database::config TestDBConfig() {
     {
         Transaction t(db);
         t.set(slice("key"), nsstring_slice(@"value"));
+        t.commit();
     }
     // Reopen db as read-only:
     Database::config config = db->getConfig();
@@ -501,6 +531,7 @@ Database::config TestDBConfig() {
         Transaction t(db);
         // This is expected to throw an exception:
         t.set(slice("key"), nsstring_slice(@"somethingelse"));
+        t.commit();
     } catch (error x) {
         status = x.status;
     }
@@ -568,6 +599,7 @@ static void onCompact(void *context, bool compacting) {
             Document doc = db->get((nsstring_slice)docID);
             t.del(doc);
         }
+        t.commit();
     }
 
     sCurrentTest = self;
