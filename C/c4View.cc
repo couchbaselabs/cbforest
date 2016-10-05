@@ -94,7 +94,30 @@ C4View* c4view_open(C4Database* db,
         config.seqtree_opt = FDB_SEQTREE_NOT_USE; // indexes don't need by-sequence ordering
         config.purging_interval = 0;              // nor have any use for keeping deleted docs
 
-        return (new c4View(db, path, viewName, config, version))->retain();
+        try {
+            return (new c4View(db, path, viewName, config, version))->retain();
+        } catch (cbforest::error error) {
+            if (error.status == FDB_RESULT_INVALID_COMPACTION_MODE
+                    && config.compaction_mode == FDB_COMPACTION_AUTO) {
+                // Databases created by earlier builds of CBL (pre-1.2) didn't have auto-compact.
+                // Opening them with auto-compact causes this error. Upgrade such a database by
+                // switching its compaction mode:
+                {
+                    // WORKAROUND:
+                    // Reference count of _viewDB of c4View will be 2 after c4View constructor
+                    // by calling fdb_kvs_open() in `Database::getKeyStore()` by `_index`.
+                    // fdb_switch_compaction_mode(...) does not work with multiple references.
+                    config.compaction_mode = FDB_COMPACTION_MANUAL;
+                    Database viewdb((std::string)path, config);
+                    viewdb.setCompactionMode(FDB_COMPACTION_AUTO);
+                    viewdb.close();
+                    config.compaction_mode = FDB_COMPACTION_AUTO;
+                }
+                return (new c4View(db, path, viewName, config, version))->retain();
+            } else {
+                throw error;
+            }
+        }
     } catchError(outError);
     return NULL;
 }
