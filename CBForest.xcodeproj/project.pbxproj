@@ -857,7 +857,7 @@
 		720EA46F1BA90A0C002B8416 /* libstdc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.dylib"; path = "Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.4.sdk/usr/lib/libstdc++.dylib"; sourceTree = DEVELOPER_DIR; };
 		72C086921CBDEB2000808CE7 /* c4ExpiryEnumerator.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = c4ExpiryEnumerator.cc; sourceTree = "<group>"; };
 		72C086931CBDEB2000808CE7 /* c4ExpiryEnumerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = c4ExpiryEnumerator.h; sourceTree = "<group>"; };
-		72EFA6141D8A392600D17CFE /* libTokenizer-Interop.dylib */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = "libTokenizer-Interop.dylib"; path = libTokenizer.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		72EFA6141D8A392600D17CFE /* libTokenizer.dylib */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libTokenizer.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		72EFA6631D8A5FA000D17CFE /* libTokenizer.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libTokenizer.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		9399E72C1B7E536700D4BE79 /* Slice_Test.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Slice_Test.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -1112,7 +1112,7 @@
 				274D03D31BA732B000FF7C35 /* libCBForestJNI.dylib */,
 				274D04081BA75E1C00FF7C35 /* CppTests */,
 				720EA3F51BA7EAD9002B8416 /* libCBForest-Interop.dylib */,
-				72EFA6141D8A392600D17CFE /* libTokenizer-Interop.dylib */,
+				72EFA6141D8A392600D17CFE /* libTokenizer.dylib */,
 				72EFA6631D8A5FA000D17CFE /* libTokenizer.a */,
 			);
 			name = Products;
@@ -1815,7 +1815,7 @@
 			);
 			name = "Tokenizer-Interop";
 			productName = Tokenizer;
-			productReference = 72EFA6141D8A392600D17CFE /* libTokenizer-Interop.dylib */;
+			productReference = 72EFA6141D8A392600D17CFE /* libTokenizer.dylib */;
 			productType = "com.apple.product-type.library.static";
 		};
 		72EFA6181D8A5FA000D17CFE /* Tokenizer-Interop Static */ = {
@@ -1842,7 +1842,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0730;
-				LastUpgradeCheck = 0730;
+				LastUpgradeCheck = 0820;
 				ORGANIZATIONNAME = Couchbase;
 				TargetAttributes = {
 					27139B2F18F8E9750021A9A3 = {
