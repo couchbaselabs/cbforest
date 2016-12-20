@@ -589,6 +589,17 @@ namespace CBForest
             }
         }
 
+        [DllImport(DLL_NAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        public static extern C4Document* c4doc_getForPut(C4Database* db, C4Slice docID, C4Slice parentRevID, [MarshalAs(UnmanagedType.U1)]bool deleting, [MarshalAs(UnmanagedType.U1)]bool allowConflict, C4Error* outError);
+
+        public static C4Document* c4doc_getForPut(C4Database* db, string docID, string parentRevID, bool deleting, bool allowConflict, C4Error* outError)
+        {
+            using(var docID_ = new C4String(docID))
+            using(var parentRevID_ = new C4String(parentRevID)) {
+                return c4doc_getForPut(db, docID_.AsC4Slice(), parentRevID_.AsC4Slice(), deleting, allowConflict, outError);
+            }
+        }
+
         /// <summary>
         /// Retrieves a document by its sequence number
         /// </summary>
