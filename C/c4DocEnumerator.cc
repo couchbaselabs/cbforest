@@ -83,6 +83,7 @@ struct C4DocEnumerator: c4Internal::InstanceCounted {
     C4Database* database() const {return _database;}
 
     bool next() {
+        WITH_LOCK(_database);
         do {
             if (!_e.next())
                 return false;
