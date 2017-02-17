@@ -20,8 +20,7 @@ LOCAL_CFLAGS    :=  -I$(SQLITE3_PATH)/libstemmer_c/runtime/ \
 					-I$(SQLITE3_PATH)/libstemmer_c/src_c/ \
 					-I$(SQLITE3_PATH)/ \
 					-I$(SQLITE_INC_PATH)/ \
-					-I$(OPENSSL_PATH)/ \
-					-D_ALIGN_MEM_ACCESS
+					-I$(OPENSSL_PATH)/ 
 
 # For sqlite3-unicodesn
 LOCAL_CFLAGS	+=	-DSQLITE_ENABLE_FTS4 \
@@ -41,8 +40,7 @@ LOCAL_CPPFLAGS	:= 	-I$(FORESTDB_PATH)/include/ \
 					-I$(CBFOREST_PATH)/Encryption \
 					-I$(OPENSSL_PATH)/ \
 					-D_CRYPTO_OPENSSL \
-					-DFORESTDB_VERSION=\"Internal\" \
-					-D_ALIGN_MEM_ACCESS
+					-DFORESTDB_VERSION=\"Internal\"
 
 LOCAL_CPPFLAGS	+=	-std=c++11
 LOCAL_CPPFLAGS	+=	-fexceptions
