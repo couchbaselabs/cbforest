@@ -144,7 +144,7 @@ namespace cbforest {
         doc.bodylen = body.size;
 
         check(fdb_set(_handle, &doc));
-        Log("DB %p: added %s --> %s (meta %s) (seq %llu)\n",
+        Log("DB %p: added %s --> %s (meta %s) (seq %" _F64 ")\n",
             _handle, key.hexCString(), body.hexCString(), meta.hexCString(), doc.seqnum);
         return doc.seqnum;
     }
