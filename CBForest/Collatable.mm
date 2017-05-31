@@ -15,7 +15,7 @@
 
 #import <Foundation/Foundation.h>
 #import "Collatable.hh"
-#import "error.hh"
+#import "Error.hh"
 
 
 namespace cbforest {
