@@ -169,7 +169,7 @@ JNIEXPORT jboolean JNICALL Java_com_couchbase_cbforest_Document_selectRevID
     jstringSlice revID(env, jrevID);
     C4Error error;
     bool ok = c4doc_selectRevision(doc, revID, withBody, &error);
-    if (ok || error.domain == HTTPDomain)
+    if (ok)
         updateSelection(env, self, doc);
     else
         throwError(env, error);
